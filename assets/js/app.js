@@ -16,6 +16,14 @@ if( !localStorage.getItem('currentLevel') ) {
 }
 
 /**
+ * Adds default current level to local storage, if no local storage exists
+*/
+
+if( !localStorage.getItem('timeRemaining') ) {
+  localStorage.setItem('timeRemaining', JSON.stringify(900));
+}
+
+/**
  * Adds default blinds to local storage, if no local storage exists
 */
 
@@ -158,8 +166,10 @@ function updateLevel() {
 function initTimer() {
   // setup timer to begin running the first level
   HELPERS.getLevelCont().textContent = defaultBlindsData[currentLevel].label;
-  HELPERS.getMinutesCont().textContent = defaultBlindsData[currentLevel].time;
-  HELPERS.getSecondsCont().textContent = '00';
+  // HELPERS.getMinutesCont().textContent = defaultBlindsData[currentLevel].time;
+  // HELPERS.getSecondsCont().textContent = '00';
+
+  setTimer( localStorage.getItem('timeRemaining'));
 
   HELPERS.getSmallBlindCont().textContent = defaultBlindsData[currentLevel].sb ? defaultBlindsData[currentLevel].sb : '-';
   HELPERS.getBigBlindCont().textContent = defaultBlindsData[currentLevel].bb ? defaultBlindsData[currentLevel].bb : '-';
@@ -184,6 +194,16 @@ let timerInterval;
 let isRunning = false;
 let timeRemaining; // value in seconds expressed as integer
 
+function setTimer(timeRemaining) {
+  var minutes, seconds;
+  minutes = parseInt(timeRemaining / 60, 10);
+  seconds = parseInt(timeRemaining % 60, 10);
+  seconds = seconds < 10 ? "0" + seconds : seconds;
+
+  HELPERS.getMinutesCont().textContent = minutes;
+  HELPERS.getSecondsCont().textContent = seconds;
+}
+
 function startTimer(timeRemaining) {
 
   isRunning = true;
@@ -200,6 +220,7 @@ function startTimer(timeRemaining) {
       HELPERS.getSecondsCont().textContent = seconds;
 
       --timeRemaining;
+      localStorage.setItem('timeRemaining', timeRemaining);
 
       if (timeRemaining == 59) {
         HELPERS.getAudioWarning().play();
@@ -232,7 +253,8 @@ function pauseTimer() {
 // get time remaining from timer display
 
 function getTimeRemaining() {
-  timeRemaining = parseInt( HELPERS.getMinutesCont().textContent) * 60 + parseInt( HELPERS.getSecondsCont().textContent);
+  // timeRemaining = parseInt( HELPERS.getMinutesCont().textContent) * 60 + parseInt( HELPERS.getSecondsCont().textContent);
+  timeRemaining = localStorage.getItem('timeRemaining');
   return timeRemaining;
 }
 

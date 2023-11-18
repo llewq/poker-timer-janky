@@ -8,15 +8,18 @@ HELPERS.getPlayBtn().addEventListener('click', function(){
     getTimeRemaining();
 
   } else {
+    timeRemaining = getTimeRemaining();
 
-    if( !timeRemaining == defaultBlindsData[currentLevel].time * 60 - 1) {
-      startTimer(timeRemaining - 1); // subtracting 1 to offset initial interval
-      if(audioTimer.paused) { setTimeout(() => {
-        audioTimer.play();
-      }, 1000);  }
-    } else {
-      startTimer(defaultBlindsData[currentLevel].time * 60 - 1); // subtracting 1 to offset initial interval 
-    }
+    startTimer(timeRemaining - 1);
+
+    // if( !timeRemaining == defaultBlindsData[currentLevel].time * 60 ) {
+    //   startTimer(timeRemaining - 1); // subtracting 1 to offset initial interval
+    //   if(audioTimer.paused) { setTimeout(() => {
+    //     audioTimer.play();
+    //   }, 1000);  }
+    // } else {
+    //   startTimer(defaultBlindsData[currentLevel].time * 60 - 1); // subtracting 1 to offset initial interval 
+    // }
 
     isRunning = true;
 
@@ -33,6 +36,7 @@ HELPERS.getNextBtn().addEventListener('click', function(){
     clearInterval(timerInterval);
     updateLevel(++currentLevel);
     getLevel();
+    localStorage.setItem('timeRemaining', (defaultBlinds[currentLevel].time * 60));
     initTimer();
     timeRemaining = defaultBlindsData[currentLevel].time * 60 - 1;
   }
@@ -46,8 +50,16 @@ HELPERS.getPrevBtn().addEventListener('click', function(){
     clearInterval(timerInterval);
     updateLevel(--currentLevel);
     getLevel();
+    localStorage.setItem('timeRemaining', (defaultBlinds[currentLevel].time * 60));
     initTimer();
-    timeRemaining = defaultBlindsData[currentLevel].time * 60 - 1;
+    // timeRemaining = defaultBlindsData[currentLevel].time * 60 - 1;
+  } else if (currentLevel == 0) {
+    HELPERS.getPlayBtn().classList.add('fa-play');
+    HELPERS.getPlayBtn().classList.remove('fa-pause');
+    clearInterval(timerInterval);
+    localStorage.setItem('timeRemaining', (defaultBlinds[currentLevel].time * 60));
+    initTimer();
+    // timeRemaining = defaultBlindsData[currentLevel].time * 60 - 1;
   }
 });
 
