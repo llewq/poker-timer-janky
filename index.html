@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Poker Timer</title>
+  <link rel="stylesheet" href="assets/fonts/fontawesome/css/all.min.css">
+  <link rel="stylesheet" href="assets/css/main.css">
+  <link rel="shortcut icon" type="image/jpg" href="assets/img/favicon.ico"/>
+</head>
+<body>
+  <div id="audio-clips" aria-hidden="true">
+    <audio id="audio-notification" src="assets/audio/notification.mp3"></audio>
+    <audio id="audio-timer" src="assets/audio/timer-buzzer.mp3"></audio>
+    <audio id="audio-warning" src="assets/audio/warning.mp3"></audio>
+  </div>
+  <div class="wrapper">
+
+    <section id="menu" class="">
+
+      <div class="nav-container">
+        <span class="close-btn">
+          <i class="fas fa-times"></i>
+        </span>
+        <h2>Settings</h2>
+        <nav>
+          <a href="" class="levels"><span>Levels</span><i class="fas fa-angle-right"></i></a>
+          <a href="" class="players"><span>Players</span><i class="fas fa-angle-right"></i></a>
+          <a href="" class="cash"><span>Buy-ins & Payouts</span><i class="fas fa-angle-right"></i></a>
+          <a href="" class="audio"><span>Audio Alerts</span><i class="fas fa-angle-right"></i></a>
+        </nav>
+      </div>
+
+      <div id="navLevels" class="nav-panel">
+        <span class="back"><i class="fas fa-angle-left"></i>Settings</span>
+        <h2>Levels</h2>
+        <div class="content">
+          <div class="header">
+            <span>Small</span>
+            <span>Big</span>
+            <span>Ante</span>
+            <span>Time</span>
+          </div>
+          <div class="level-row">
+            <form action="">
+              <div class="mover">
+                <button><i class="fas fa-angle-up"></i></button>
+                <button><i class="fas fa-angle-down"></i></button>
+              </div>
+              <div>
+                <label for="sb-1">Small Blind</label>
+                <input type="text" id="sb-1" name="Small Blind 1" value="25">
+              </div>
+              <div>
+                <label for="bb-1">Big Blind</label>
+                <input type="text" id="bb-1" name="Big Blind 1" value="50">
+              </div>
+              <div>
+                <label for="an-1">Ante</label>
+                <input type="text" id="an-1" name="Ante 1">
+              </div>
+              <div>
+                <label for="tm-1">Time</label>
+                <input type="text" id="tm-1" name="Time 1">
+              </div>
+              <div class="delete">
+                <button><i class="fas fa-times"></i></button>
+              </div>
+            </form>
+          </div>
+
+          <div class="break-row">
+            <form action="">
+              <div class="mover">
+                <button><i class="fas fa-angle-up"></i></button>
+                <button><i class="fas fa-angle-down"></i></button>
+              </div>
+              <div>
+                <label for="br-1">Break Length</label>
+                <input type="text" id="br-1" name="Break 1" value="15 min">
+              </div>
+              <div class="delete">
+                <button><i class="fas fa-times"></i></button>
+              </div>
+            </form>
+          </div>
+
+          <div class="option-row">
+            <form action="">
+              <div class="blind">
+                <button class="primary">Blind</button>
+              </div>
+              <div class="break">
+                <button class="primary">Break</button>
+              </div>
+              <div class="cancel">
+                <button class="ghost">Cancel</button>
+              </div>
+            </form>
+          </div>
+
+          <div class="action-row">
+            <form action="">
+              <div class="add">
+                <button class="primary"><i class="fas fa-plus"></i></button>
+              </div>
+              <div class="reset">
+                <button class="ghost">Reset</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div id="navPlayers" class="nav-panel">
+        <span class="back"><i class="fas fa-angle-left"></i>Settings</span>
+        <h2>Players</h2>
+        <div class="content">
+          <div class="action-row">
+            <form action="" onsubmit="return false">
+              <div class="add">
+                <button class="primary"><i class="fas fa-plus"></i></button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div id="navCash" class="nav-panel">
+        <span class="back"><i class="fas fa-angle-left"></i>Settings</span>
+        <h2>Buy-ins</h2>
+        <h2>Payouts</h2>
+      </div>
+
+      <div id="navAudio" class="nav-panel">
+        <span class="back"><i class="fas fa-angle-left"></i>Settings</span>
+        <h2>Audio Alerts</h2>
+      </div>
+
+    </section>
+
+
+    <section id="tools">
+      <div class="menu-btn">
+        <i class="fas fa-sliders"></i>
+      </div>
+      <div class="controls">
+        <i class="prev fas fa-caret-left"></i>
+        <i class="play fas fa-play"></i>
+        <i class="next fas fa-caret-right"></i>
+      </div>
+      <div class="reset-btn">
+        <i class="fas fa-undo"></i>
+      </div>
+    </section>
+
+
+    <section id="content">
+      <section id="info">
+        <div id="remaining">
+          <h2 class="title">Players Remaining</h2>
+          <p>
+            <span id="player-count-remaining">0<!-- data --></span>
+            <span> of </span>
+            <span id="player-count-initial">00<!-- data --></span>
+          </p>
+        </div>
+        <div id="average">
+          <h2 class="title">Average Stack</h2>
+          <p>
+            <span id="average-stack">$33,333</span>
+          </p>
+        </div>
+        <!-- <div id="next-break">
+          <h2 class="title">Next Break</h2>
+          <p>
+            <span class="time-til-break">37 minutes</span>
+          </p>
+        </div> -->
+      </section>
+
+
+      <section id="main">
+        <div class="inner">
+          <span class="level"><!-- data --></span></span>
+          <span class="timer"><span class="minutes"><!-- data --></span>:<span class="seconds"><!-- data --></span></span>
+          <div class="blinds">
+            <div class="blind small-blind">
+              <span class="label">small</span>
+              <span class="value">100</span>
+            </div>
+            <div class="blind big-blind">
+              <span class="label">big</span>
+              <span class="value">200</span>
+            </div>
+            <div class="blind ante">
+              <span class="label">ante</span>
+              <span class="value">200</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="next">
+          <span class="title">Next Level:</span>
+          <div class="blinds">
+            <div class="blind small-blind">
+              <span class="label">Small</span>
+              <span class="value">100</span>
+            </div>
+            <div class="blind big-blind">
+              <span class="label">Big</span>
+              <span class="value">200</span>
+            </div>
+            <div class="blind ante">
+              <span class="label">Ante</span>
+              <span class="value">200</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- <div class="player" id="888">
+        <span class="field player-inactive has-prize"><span class="prize"><sup>$</sup>87</span></span>
+      </div> -->
+
+
+      <section id="players">
+        <div class="inner">
+          <div id="results">
+            <button type="button" id="accordion-2" aria-expanded="true" aria-controls="player-list-2">
+              <h2 class="title">Results</h2>
+              <i class="fas fa-angle-up"></i>
+            </button>
+            <div id="player-list-2" role="region" aria-labelledby="accordion-2">
+              <!-- data -->
+            </div>
+          </div>
+
+          <div id="players-remaining">
+            <button type="button" id="accordion-1" aria-expanded="true" aria-controls="player-list-1">
+              <h2 class="title">Remaining</h2>
+              <i class="fas fa-angle-up"></i>
+            </button>
+            <div id="player-list-1" role="region" aria-labelledby="accordion-1">
+              <!-- data -->
+            </div>
+          </div>
+
+        </div>
+      </section>
+    </section>
+  </div>
+  <script type="text/javascript" src="assets/js/dom-purify/dist/purify.min.js"></script>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/helpers.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script src="assets/js/ui.js"></script>
+</body>
+</html>
