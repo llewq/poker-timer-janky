@@ -41,6 +41,7 @@
 
   --size-4xl: 15rem; /* 240px */
   --size-3xl: 5rem; /* 80px */
+  --size-2xl: 6.25rem; /* 100px */
   --size-large: 2rem; /* 32px */
   --size-medium: 1.5rem; /* 24px */
   --size-small: 1.25rem; /* 20px */
@@ -353,13 +354,10 @@ form .mover button:last-child {
 #main {
   display: flex;
   flex-direction: column;
+  gap: 2.5rem;
   padding: 36px;
   border-left: solid 1px var(--color-gray-500);
   border-right: solid 1px var(--color-gray-500);
-}
-
-#main .timer {
-  background-color: var(--color-black);
 }
 
 #main .controls {
@@ -392,8 +390,6 @@ form .mover button:last-child {
   }
 }
 
-
-
 #main .timer {
   display: flex;
   flex-direction: column;
@@ -402,6 +398,7 @@ form .mover button:last-child {
   gap: 24px;
   padding: 20px;
   border-radius: 8px;
+  background-color: var(--color-black);
   .display {
     display: flex;
     flex-direction: column;
@@ -423,35 +420,21 @@ form .mover button:last-child {
   }
 }
 
-// #main .minutes,
-// #main .seconds {
-//   font-family: Noto;
-// }
-
-#main .minutes {
-  text-align: right;
-}
-
-
-// #main .next {
-//   flex: 0 0 7.75rem; /* 124px */
-// }
-
 #main .blinds {
-  display: flex;
-  flex-direction: row;
-  align-items: flex-end;
-  justify-content: center;
-  gap: 5rem; /* 80px */
-}
-
-#main .blinds .blind {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 0;
+  justify-content: flex-start;
+  gap: 2rem; /* 32px */
+  .blind {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0;
+  }
 }
+
 
 #main .blind .label {
   font-size: var(--size-large);
@@ -459,7 +442,7 @@ form .mover button:last-child {
 }
 
 #main .blind .value {
-  font-size: 6rem  /* 64px */;
+  font-size: var(--size-2xl);
   line-height: 1;
   color: var(--color-white);
 }

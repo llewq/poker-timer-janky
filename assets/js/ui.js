@@ -31,8 +31,8 @@ HELPERS.getPlayBtn().addEventListener('click', function(){
 HELPERS.getNextBtn().addEventListener('click', function(){
   isRunning = false;
   if(currentLevel < defaultBlindsData.length - 1) {
-    HELPERS.getPlayBtn().classList.add('fa-play');
-    HELPERS.getPlayBtn().classList.remove('fa-pause');
+    HELPERS.getPlayBtn().querySelector('i').classList.add('fa-play');
+    HELPERS.getPlayBtn().querySelector('i').classList.remove('fa-pause');
     clearInterval(timerInterval);
     updateLevel(++currentLevel);
     getLevel();
@@ -45,8 +45,8 @@ HELPERS.getNextBtn().addEventListener('click', function(){
 HELPERS.getPrevBtn().addEventListener('click', function(){
   isRunning = false;
   if(currentLevel > 0) {
-    HELPERS.getPlayBtn().classList.add('fa-play');
-    HELPERS.getPlayBtn().classList.remove('fa-pause');
+    HELPERS.getPlayBtn().querySelector('i').classList.add('fa-play');
+    HELPERS.getPlayBtn().querySelector('i').classList.remove('fa-pause');
     clearInterval(timerInterval);
     updateLevel(--currentLevel);
     getLevel();
@@ -54,8 +54,8 @@ HELPERS.getPrevBtn().addEventListener('click', function(){
     initTimer();
     // timeRemaining = defaultBlindsData[currentLevel].time * 60 - 1;
   } else if (currentLevel == 0) {
-    HELPERS.getPlayBtn().classList.add('fa-play');
-    HELPERS.getPlayBtn().classList.remove('fa-pause');
+    HELPERS.getPlayBtn().querySelector('i').classList.add('fa-play');
+    HELPERS.getPlayBtn().querySelector('i').classList.remove('fa-pause');
     clearInterval(timerInterval);
     localStorage.setItem('timeRemaining', (defaultBlinds[currentLevel].time * 60));
     initTimer();
