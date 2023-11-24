@@ -61,15 +61,15 @@ HELPERS.getToolsCont = function() {
 }
 
 HELPERS.getPlayBtn = function() {
-  return this.getToolsCont().querySelector('.play');
+  return HELPERS.getMainPanel().querySelector('.play');
 }
 
 HELPERS.getPrevBtn = function() {
-  return HELPERS.getToolsCont().querySelector('.prev');
+  return HELPERS.getMainPanel().querySelector('.prev');
 }
 
 HELPERS.getNextBtn = function() {
-  return HELPERS.getToolsCont().querySelector('.next');
+  return HELPERS.getMainPanel().querySelector('.next');
 }
 
 HELPERS.getResetBtn = function() {
@@ -109,19 +109,19 @@ HELPERS.getAnteCont = function() {
 }
 
 HELPERS.getNextBlindsCont = function() {
-  return HELPERS.getMainPanel().querySelector('.next');
+  return HELPERS.getInfoPanel().querySelector('#next');
 }
 
 HELPERS.getNextSmallBlindCont = function() {
-  return HELPERS.getNextBlindsCont().querySelector('.small-blind .value');
+  return HELPERS.getInfoPanel().querySelector('.small-blind .value');
 }
 
 HELPERS.getNextBigBlindCont = function() {
-  return HELPERS.getNextBlindsCont().querySelector('.big-blind .value');
+  return HELPERS.getInfoPanel().querySelector('.big-blind .value');
 }
 
 HELPERS.getNextAnteCont = function() {
-  return HELPERS.getNextBlindsCont().querySelector('.ante .value');
+  return HELPERS.getInfoPanel().querySelector('.ante .value');
 }
 
 //
