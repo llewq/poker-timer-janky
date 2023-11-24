@@ -428,7 +428,8 @@ function addPlayer( ) {
   playerList.push({
     pid: playerList.length,
     active: true,
-    name: ""
+    name: "",
+    placed: null
   });
 
   localStorage.setItem('playerList', JSON.stringify(playerList));
