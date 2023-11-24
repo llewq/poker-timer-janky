@@ -24,8 +24,8 @@ HELPERS.getPlayBtn().addEventListener('click', function(){
     isRunning = true;
 
   }
-  this.classList.toggle('fa-play');
-  this.classList.toggle('fa-pause');
+  this.querySelector('i').classList.toggle('fa-play');
+  this.querySelector('i').classList.toggle('fa-pause');
 });
 
 HELPERS.getNextBtn().addEventListener('click', function(){

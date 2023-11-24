@@ -40,6 +40,7 @@
   --color-error-90: rgba(var(--color-error-rgb), 0.9);
 
   --size-4xl: 15rem; /* 240px */
+  --size-3xl: 5rem; /* 80px */
   --size-large: 2rem; /* 32px */
   --size-medium: 1.5rem; /* 24px */
   --size-small: 1.25rem; /* 20px */
@@ -374,6 +375,7 @@ form .mover button:last-child {
     border-radius: 50%;
     width: 36px;
     height: 36px;
+    font-size: 1.5rem;
   }
   button:nth-of-type(2) {
     width: 50px;
@@ -385,36 +387,46 @@ form .mover button:last-child {
     left: 50%;
     transform: translate(-50%, -50%);
   }
-  i.play.fa-play:before {
+  i.fa-play:before {
     transform: translate(-40%, -50%);
   }
 }
 
 
-#main .inner {
-  flex: 1 1 100%;
+
+#main .timer {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 24px;
+  padding: 20px;
+  border-radius: 8px;
+  .display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    > span {
+      display: block;
+    }
+    .level {
+      font-size: var(--size-large);
+      color: var(--color-gray-300);
+    }
+    .time {
+      position: relative;
+      font-family: 'Noto', monospace;
+      font-size: var(--size-3xl);
+      letter-spacing: 0.05em;
+      line-height: 1;
+    }
+  }
 }
 
-#main .level {
-  font-size: var(--size-medium);
-  color: var(--color-gray-300);
-}
-
-#main .timer {
-  margin: -20px 0 60px;
-  font-family: Noto;
-  font-size: var(--size-4xl);
-  line-height: 1;
-}
-
-#main .minutes,
-#main .seconds {
-  font-family: Noto;
-}
+// #main .minutes,
+// #main .seconds {
+//   font-family: Noto;
+// }
 
 #main .minutes {
   text-align: right;
