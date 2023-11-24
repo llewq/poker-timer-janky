@@ -349,6 +349,22 @@ form .mover button:last-child {
   color: var(--color-gray-100);
 }
 
+#info .blind {
+  margin-bottom: 16px;
+  font-size: var(--size-medium);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  .label {
+    color: var(--color-gray-300);
+  }
+  .value {
+    line-height: 1;
+    color: var(--color-gray-100);
+  }
+}
+
 /*  main section */
 
 #main {
