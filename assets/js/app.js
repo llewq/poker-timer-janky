@@ -136,13 +136,16 @@ function addPayoutBadges() {
 
 function resetTournament() {
   clearInterval(timerInterval);
-  HELPERS.getPlayBtn().classList.add('fa-play');
-  HELPERS.getPlayBtn().classList.remove('fa-pause');
+  HELPERS.getPlayBtn().querySelector('i').classList.add('fa-play');
+  HELPERS.getPlayBtn().querySelector('i').classList.remove('fa-pause');
   isRunning = false;
   localStorage.setItem('currentLevel', JSON.stringify( 0 ));
   getLevel();
+  timeRemaining = defaultBlindsData[currentLevel].time * 60;
+  localStorage.setItem('timeRemaining', timeRemaining);
   initTimer();
-  timeRemaining = defaultBlindsData[currentLevel].time * 60 - 1;
+  setBreakTimer();
+  localStorage.setItem('timeToBreak', timeToBreak);
 }
 
 // get level data
@@ -188,6 +191,40 @@ function initTimer() {
 
 initTimer();
 
+// initialize break timer
+
+let timeToBreak = 0;
+
+function setBreakTimer() {
+
+  // find next blind level
+  let levelsUntilBreak = 0;
+  timeToBreak = 0;
+  
+  for (let level = currentLevel; level < defaultBlindsData.length; level++) {
+      let blindLevel = defaultBlindsData[level];
+
+      if ( blindLevel.type == 'break' ) {
+        break;
+      } else {
+        timeToBreak += blindLevel.time * 60;
+        levelsUntilBreak++;
+      }
+
+  }
+
+  if( !localStorage.getItem('timeToBreak') ) {
+
+    localStorage.setItem('timeToBreak', JSON.stringify(timeToBreak));
+  }
+
+  HELPERS.getBreakTimerCont().textContent = parseInt(timeToBreak / 60) + ' minutes';
+
+  // caluclate time
+}
+
+setBreakTimer();
+
 // start timer
 
 let timerInterval;
@@ -204,12 +241,17 @@ function setTimer(timeRemaining) {
   HELPERS.getSecondsCont().textContent = seconds;
 }
 
-function startTimer(timeRemaining) {
+function startTimer(timeRemaining, timeToBreak) {
 
   isRunning = true;
 
   var minutes, seconds;
   timerInterval = setInterval(function () {
+      --timeRemaining;
+      --timeToBreak;
+      localStorage.setItem('timeRemaining', timeRemaining);
+      localStorage.setItem('timeToBreak', timeToBreak);
+
       minutes = parseInt(timeRemaining / 60, 10)
       seconds = parseInt(timeRemaining % 60, 10);
 
@@ -218,6 +260,8 @@ function startTimer(timeRemaining) {
 
       HELPERS.getMinutesCont().textContent = minutes;
       HELPERS.getSecondsCont().textContent = seconds;
+
+      HELPERS.getBreakTimerCont().textContent = parseInt(timeToBreak / 60) + ' minutes';
 
       
       if (timeRemaining == 59) {
@@ -237,8 +281,7 @@ function startTimer(timeRemaining) {
         startTimer(timeRemaining);
       }
 
-      --timeRemaining;
-      localStorage.setItem('timeRemaining', timeRemaining);
+      
   }, 1000);
 }
 
@@ -256,6 +299,14 @@ function getTimeRemaining() {
   // timeRemaining = parseInt( HELPERS.getMinutesCont().textContent) * 60 + parseInt( HELPERS.getSecondsCont().textContent);
   timeRemaining = localStorage.getItem('timeRemaining');
   return timeRemaining;
+}
+
+// get time remaining from timer display
+
+function getTimeToBreak() {
+  // timeRemaining = parseInt( HELPERS.getMinutesCont().textContent) * 60 + parseInt( HELPERS.getSecondsCont().textContent);
+  timeToBreak = localStorage.getItem('timeToBreak');
+  return timeToBreak;
 }
 
 

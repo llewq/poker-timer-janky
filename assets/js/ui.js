@@ -9,8 +9,9 @@ HELPERS.getPlayBtn().addEventListener('click', function(){
 
   } else {
     timeRemaining = getTimeRemaining();
+    timeToBreak = getTimeToBreak();
 
-    startTimer(timeRemaining - 1);
+    startTimer(timeRemaining, timeToBreak);
 
     // if( !timeRemaining == defaultBlindsData[currentLevel].time * 60 ) {
     //   startTimer(timeRemaining - 1); // subtracting 1 to offset initial interval
@@ -38,6 +39,8 @@ HELPERS.getNextBtn().addEventListener('click', function(){
     getLevel();
     localStorage.setItem('timeRemaining', (defaultBlinds[currentLevel].time * 60));
     initTimer();
+    setBreakTimer();
+    localStorage.setItem('timeToBreak', timeToBreak);
     timeRemaining = defaultBlindsData[currentLevel].time * 60 - 1;
   }
 });
@@ -52,14 +55,16 @@ HELPERS.getPrevBtn().addEventListener('click', function(){
     getLevel();
     localStorage.setItem('timeRemaining', (defaultBlinds[currentLevel].time * 60));
     initTimer();
-    // timeRemaining = defaultBlindsData[currentLevel].time * 60 - 1;
+    setBreakTimer();
+    localStorage.setItem('timeToBreak', timeToBreak);
   } else if (currentLevel == 0) {
     HELPERS.getPlayBtn().querySelector('i').classList.add('fa-play');
     HELPERS.getPlayBtn().querySelector('i').classList.remove('fa-pause');
     clearInterval(timerInterval);
     localStorage.setItem('timeRemaining', (defaultBlinds[currentLevel].time * 60));
     initTimer();
-    // timeRemaining = defaultBlindsData[currentLevel].time * 60 - 1;
+    setBreakTimer();
+    localStorage.setItem('timeToBreak', timeToBreak);
   }
 });
 

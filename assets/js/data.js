@@ -98,7 +98,7 @@ const defaultBlinds = [
     sb: 25,
     bb: 50,
     ante: 0,
-    time: 0.1
+    time: 15
   },
   {
     type: 'blind',

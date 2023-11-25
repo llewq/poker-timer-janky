@@ -204,6 +204,9 @@ HELPERS.getAveargeStackCont = function() {
   return HELPERS.getInfoPanel().querySelector('#average-stack');
 }
 
+HELPERS.getBreakTimerCont = function() {
+  return HELPERS.getInfoPanel().querySelector('#break-timer p');
+}
 //
 // players panel
 //
