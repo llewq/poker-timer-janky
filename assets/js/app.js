@@ -219,26 +219,26 @@ function startTimer(timeRemaining) {
       HELPERS.getMinutesCont().textContent = minutes;
       HELPERS.getSecondsCont().textContent = seconds;
 
-      --timeRemaining;
-      localStorage.setItem('timeRemaining', timeRemaining);
-
+      
       if (timeRemaining == 59) {
         HELPERS.getAudioWarning().play();
       }
-
-      if (timeRemaining < 3) {
+      
+      if (timeRemaining == 3) {
         HELPERS.getAudioEndRound().play();
       }
-
-      if (timeRemaining < 0) {
-        clearInterval(timerInterval);
-        // update current level
+      
+      if (timeRemaining < 1) {
+        clearInterval(timerInterval); // stops timer from progressing
         updateLevel(++currentLevel);
         getLevel();
         initTimer();
         timeRemaining = defaultBlindsData[currentLevel].time * 60 - 1;
         startTimer(timeRemaining);
       }
+
+      --timeRemaining;
+      localStorage.setItem('timeRemaining', timeRemaining);
   }, 1000);
 }
 
