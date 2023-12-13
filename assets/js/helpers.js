@@ -31,16 +31,32 @@ const HELPERS = {
 // panels
 //
 
-HELPERS.getPlayersPanel = function() {
-  return document.querySelector('#players');
+HELPERS.getToolsPanel = function() {
+  return document.querySelector('#tools');
+}
+
+HELPERS.getPayoutsPanel = function() {
+  return document.querySelector('#payouts');
 }
 
 HELPERS.getInfoPanel = function() {
   return document.querySelector('#info');
 }
 
-HELPERS.getMainPanel = function() {
-  return document.querySelector('#main');
+HELPERS.getTimerPanel = function() {
+  return document.querySelector('#timer');
+}
+
+HELPERS.getPrevBlindsPanel = function() {
+  return document.querySelector('#blinds-prev');
+}
+
+HELPERS.getCurrentBlindsPanel = function() {
+  return document.querySelector('#blinds-current');
+}
+
+HELPERS.getNextBlindsPanel = function() {
+  return document.querySelector('#blinds-next');
 }
 
 //
@@ -56,24 +72,20 @@ const menuPanelPlayers = document.querySelector('#navPlayers');
 // controls 
 //
 
-HELPERS.getToolsCont = function() {
-  return document.querySelector('#tools');
-}
-
 HELPERS.getPlayBtn = function() {
-  return HELPERS.getMainPanel().querySelector('.play');
+  return HELPERS.getTimerPanel().querySelector('.play');
 }
 
 HELPERS.getPrevBtn = function() {
-  return HELPERS.getMainPanel().querySelector('.prev');
+  return HELPERS.getTimerPanel().querySelector('.prev');
 }
 
 HELPERS.getNextBtn = function() {
-  return HELPERS.getMainPanel().querySelector('.next');
+  return HELPERS.getTimerPanel().querySelector('.next');
 }
 
 HELPERS.getResetBtn = function() {
-  return HELPERS.getToolsCont().querySelector('.reset-btn');
+  return HELPERS.getToolsPanel().querySelector('.reset-btn');
 }
 
 //
@@ -81,47 +93,43 @@ HELPERS.getResetBtn = function() {
 //
 
 HELPERS.getLevelCont = function() {
-  return HELPERS.getMainPanel().querySelector('.level');
+  return HELPERS.getTimerPanel().querySelector('.level');
 }
 
 HELPERS.getMinutesCont = function() {
-  return HELPERS.getMainPanel().querySelector('.minutes');
+  return HELPERS.getTimerPanel().querySelector('.minutes');
 }
 
 HELPERS.getSecondsCont = function() {
-  return HELPERS.getMainPanel().querySelector('.seconds');
+  return HELPERS.getTimerPanel().querySelector('.seconds');
 }
 
 HELPERS.getBlindsCont = function() {
-  return HELPERS.getMainPanel().querySelector('.blinds');
+  return HELPERS.getCurrentBlindsPanel().querySelector('.blinds');
 }
 
 HELPERS.getSmallBlindCont = function() {
-  return HELPERS.getBlindsCont().querySelector('.small-blind .value');
+  return HELPERS.getCurrentBlindsPanel().querySelector('.small-blind .value');
 }
 
 HELPERS.getBigBlindCont = function() {
-  return HELPERS.getBlindsCont().querySelector('.big-blind .value');
+  return HELPERS.getCurrentBlindsPanel().querySelector('.big-blind .value');
 }
 
 HELPERS.getAnteCont = function() {
-  return HELPERS.getBlindsCont().querySelector('.ante .value');
-}
-
-HELPERS.getNextBlindsCont = function() {
-  return HELPERS.getInfoPanel().querySelector('#next');
+  return HELPERS.getCurrentBlindsPanel().querySelector('.ante .value');
 }
 
 HELPERS.getNextSmallBlindCont = function() {
-  return HELPERS.getInfoPanel().querySelector('.small-blind .value');
+  return HELPERS.getNextBlindsPanel().querySelector('.small-blind .value');
 }
 
 HELPERS.getNextBigBlindCont = function() {
-  return HELPERS.getInfoPanel().querySelector('.big-blind .value');
+  return HELPERS.getNextBlindsPanel().querySelector('.big-blind .value');
 }
 
 HELPERS.getNextAnteCont = function() {
-  return HELPERS.getInfoPanel().querySelector('.ante .value');
+  return HELPERS.getNextBlindsPanel().querySelector('.ante .value');
 }
 
 //
@@ -169,7 +177,7 @@ HELPERS.getAudioSubmenu = function() {
 //
 
 HELPERS.getAccordionBtns = function() {
-  return HELPERS.getPlayersPanel().querySelectorAll('button');
+  return HELPERS.getPayoutsPanel().querySelectorAll('button');
 }
 
 //
@@ -224,9 +232,9 @@ HELPERS.getAddPlayerBtn = function() {
 //
 
 HELPERS.getPlayersRemainingCont = function() {
-  return HELPERS.getPlayersPanel().querySelector('#players-remaining #player-list-1');
+  return HELPERS.getPayoutsPanel().querySelector('#players-remaining #player-list-1');
 }
 
 HELPERS.getPlayerResultsCont = function() {
-  return HELPERS.getPlayersPanel().querySelector('#results #player-list-2');
+  return HELPERS.getPayoutsPanel().querySelector('#results #player-list-2');
 }

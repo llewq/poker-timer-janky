@@ -605,7 +605,7 @@ allForms.forEach(form => {
 
 function updatePlayerResultsLists() {
   HELPERS.getPlayerResultsCont().innerHTML = null;
-  HELPERS.getPlayersRemainingCont().innerHTML = null;
+  // HELPERS.getPlayersRemainingCont().innerHTML = null;
   
   buildEmptyResults();
   
@@ -617,7 +617,7 @@ function updatePlayerResultsLists() {
       slots[player.placed - 1].replaceWith(playerEl);
     } else {
       playerEl.addEventListener('click', eliminatePlayer);
-      HELPERS.getPlayersRemainingCont().append(playerEl);
+      // HELPERS.getPlayersRemainingCont().append(playerEl);
     }
   });
 
