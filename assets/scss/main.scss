@@ -443,13 +443,26 @@ form .mover button:last-child {
     .level {
       font-size: var(--size-large);
       color: var(--color-gray-300);
+      margin-bottom: 8px;
     }
     .time {
       position: relative;
-      font-family: 'Noto', monospace;
+      // font-family: 'Noto', monospace;
       font-size: clamp(60px, 8vw, 120px);
       letter-spacing: 0.05em;
       line-height: 1;
+      display: flex;
+      gap: 8px;
+      > span {
+        text-align: center;
+        width: 22px;
+      }
+      > span:not(.colon) {
+        width: 100px;
+        padding-bottom: 4px;
+        background-color: var(--color-gray-900);
+        border-radius: 8px;
+      }
     }
   }
 }
@@ -459,7 +472,7 @@ form .mover button:last-child {
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  gap: 2rem; /* 32px */
+  gap: 2rem; 
   padding: 40px 32px;
   .blind {
     display: flex;
@@ -475,7 +488,7 @@ form .mover button:last-child {
   }
   .value {
     font-size: clamp(100px, 8vw, 200px);
-    line-height: 1;
+    line-height: 0.875;
     color: var(--color-white);
   }
 }

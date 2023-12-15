@@ -235,10 +235,12 @@ function setTimer(timeRemaining) {
   var minutes, seconds;
   minutes = parseInt(timeRemaining / 60, 10);
   seconds = parseInt(timeRemaining % 60, 10);
-  seconds = seconds < 10 ? "0" + seconds : seconds;
+  // seconds = seconds < 10 ? "0" + seconds : seconds;
 
-  HELPERS.getMinutesCont().textContent = minutes;
-  HELPERS.getSecondsCont().textContent = seconds;
+  HELPERS.getMinutesCont1().textContent = parseInt(minutes / 10, 10);
+  HELPERS.getMinutesCont2().textContent = parseInt(minutes % 10, 10);
+  HELPERS.getSecondsCont1().textContent = parseInt(seconds / 10, 10);
+  HELPERS.getSecondsCont2().textContent = parseInt(seconds % 10, 10);
 }
 
 function startTimer(timeRemaining, timeToBreak) {
@@ -256,10 +258,12 @@ function startTimer(timeRemaining, timeToBreak) {
       seconds = parseInt(timeRemaining % 60, 10);
 
       // minutes = minutes < 10 ? "0" + minutes : minutes;
-      seconds = seconds < 10 ? "0" + seconds : seconds;
+      // seconds = seconds < 10 ? "0" + seconds : seconds;
 
-      HELPERS.getMinutesCont().textContent = minutes;
-      HELPERS.getSecondsCont().textContent = seconds;
+      HELPERS.getMinutesCont1().textContent = parseInt(minutes / 10, 10);
+      HELPERS.getMinutesCont2().textContent = parseInt(minutes % 10, 10);
+      HELPERS.getSecondsCont1().textContent = parseInt(seconds / 10, 10);
+      HELPERS.getSecondsCont2().textContent = parseInt(seconds % 10, 10);
 
       HELPERS.getBreakTimerCont().textContent = parseInt(timeToBreak / 60) + ' minutes';
 

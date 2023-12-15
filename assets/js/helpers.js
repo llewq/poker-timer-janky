@@ -96,12 +96,20 @@ HELPERS.getLevelCont = function() {
   return HELPERS.getTimerPanel().querySelector('.level');
 }
 
-HELPERS.getMinutesCont = function() {
-  return HELPERS.getTimerPanel().querySelector('.minutes');
+HELPERS.getMinutesCont1 = function() {
+  return HELPERS.getTimerPanel().querySelector('.minutes-1');
 }
 
-HELPERS.getSecondsCont = function() {
-  return HELPERS.getTimerPanel().querySelector('.seconds');
+HELPERS.getMinutesCont2 = function() {
+  return HELPERS.getTimerPanel().querySelector('.minutes-2');
+}
+
+HELPERS.getSecondsCont1 = function() {
+  return HELPERS.getTimerPanel().querySelector('.seconds-1');
+}
+
+HELPERS.getSecondsCont2 = function() {
+  return HELPERS.getTimerPanel().querySelector('.seconds-2');
 }
 
 HELPERS.getBlindsCont = function() {
