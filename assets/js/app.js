@@ -166,13 +166,13 @@ function updateLevel() {
 
 // initialize timer - runs when app is loaded and at start of new round
 
-function initTimer() {
+function initTimer( timeRemaining ) {
   // setup timer to begin running the first level
   HELPERS.getLevelCont().textContent = defaultBlindsData[currentLevel].label;
   // HELPERS.getMinutesCont().textContent = defaultBlindsData[currentLevel].time;
   // HELPERS.getSecondsCont().textContent = '00';
 
-  setTimer( localStorage.getItem('timeRemaining'));
+  setTimer( timeRemaining );
 
   HELPERS.getSmallBlindCont().textContent = defaultBlindsData[currentLevel].sb ? defaultBlindsData[currentLevel].sb : '-';
   HELPERS.getBigBlindCont().textContent = defaultBlindsData[currentLevel].bb ? defaultBlindsData[currentLevel].bb : '-';
@@ -189,7 +189,7 @@ function initTimer() {
   }
 }
 
-initTimer();
+initTimer( localStorage.getItem('timeRemaining') );
 
 // initialize break timer
 
@@ -276,13 +276,13 @@ function startTimer(timeRemaining, timeToBreak) {
         HELPERS.getAudioEndRound().play();
       }
       
-      if (timeRemaining < 1) {
+      if (timeRemaining == 0) {
         clearInterval(timerInterval); // stops timer from progressing
         updateLevel(++currentLevel);
         getLevel();
-        initTimer();
-        timeRemaining = defaultBlindsData[currentLevel].time * 60 - 1;
-        startTimer(timeRemaining);
+        timeRemaining = defaultBlindsData[currentLevel].time * 60;
+        initTimer( timeRemaining );
+        startTimer(timeRemaining, timeToBreak);
       }
 
       
