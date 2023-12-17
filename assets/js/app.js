@@ -104,7 +104,7 @@ buildPlayerListUI();
 function buildEmptyResults() {
   
   let i = 0;
-  while (i < playerList.length ) {
+  while (i < payouts.length + 1 ) {
     let emptyResult = document.createElement('div');
     emptyResult.setAttribute('data-empty', true);
     emptyResult.classList.add('player');
@@ -121,11 +121,17 @@ function addPayoutBadges() {
   let emptyResults = HELPERS.getPlayerResultsCont().querySelectorAll('.player');
   let i = 0;
   
-  while (i < payouts.length) {
+  while (i < payouts.length + 1) {
     let tag = document.createElement('span');
     tag.classList.add('prize');
-    tag.innerHTML =
-    `<sup>$</sup>${ payouts[i] }`;
+
+    if ( i < payouts.length ) {
+      tag.innerHTML =
+      `<sup>$</sup>${ payouts[i] }`;
+    } else {
+      tag.innerHTML =
+      '<i class="fa-solid fa-face-dizzy"></i>'
+    }
 
     emptyResults[i].querySelector('.field').append(tag);
     i++;
@@ -334,16 +340,15 @@ function buildPlayerEl( playerID ) {
 
   playerEl.innerHTML = 
   `<form action="">
-    <div class="mover">
-      <button><i class="fas fa-angle-up"></i></button>
-      <button><i class="fas fa-angle-down"></i></button>
+    <div class="delete">
+      <button data-delete="${ pid }"><i class="fa-solid fa-trash"></i></button>
     </div>
     <div>
       <label for="player-${ pid }">Player Name</label>
       <input type="text" id="player-${ pid }" data-pid="${ pid }" name="Small Blind 1" value="${ name }">
     </div>
-    <div class="delete">
-      <button data-delete="${ pid }"><i class="fas fa-times"></i></button>
+    <div class="eliminate">
+      <button data-delete="${ pid }"><i class="fa-solid fa-user-slash"></i></button>
     </div>
   </form>`;
 
@@ -533,8 +538,6 @@ function renumberPlayers() {
 
 function eliminatePlayer() {
   pid = this.dataset.player;
-
-  console.log(nextEliminatedPosition);
   
   playerList[pid].placed = nextEliminatedPosition;
   playerList[pid].active = false;
@@ -611,6 +614,7 @@ function updatePlayerResultsLists() {
   HELPERS.getPlayerResultsCont().innerHTML = null;
   // HELPERS.getPlayersRemainingCont().innerHTML = null;
   
+  updatePrizePool();
   buildEmptyResults();
   
   playerList.forEach(player => {
@@ -625,7 +629,6 @@ function updatePlayerResultsLists() {
     }
   });
 
-  updatePrizePool();
 
   if ( prizePool > 0 ) { addPayoutBadges(); }
 }
