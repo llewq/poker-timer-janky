@@ -248,7 +248,7 @@ HELPERS.getPlayerResultsCont = function() {
 }
 
 HELPERS.getPayoutsCont = function() {
-  return HELPERS.getPayoutsPanel().querySelector('#results #player-list-2');
+  return HELPERS.getPayoutsPanel().querySelector('#results .content');
 }
 
 

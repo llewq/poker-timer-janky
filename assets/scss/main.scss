@@ -166,6 +166,11 @@ label {
   cursor: pointer;
 }
 
+#results .content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
 #players-remaining .field:after,
 #results .field:after {
   content: '';
@@ -299,6 +304,11 @@ form .mover button:last-child {
   color: var(--color-primary);
   background-color: transparent;
   border: solid 1px var(--color-primary);
+}
+
+.player .field {
+  display: flex;
+  align-items: center;
 }
 
 

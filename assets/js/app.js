@@ -107,6 +107,8 @@ function buildPayoutResults() {
   
   let i = 0;
 
+  let playerList = JSON.parse(localStorage.getItem('playerList'));
+
   if ( playerList.length > 1 ) {
 
     while ( i < playerList.length ) {
@@ -122,6 +124,15 @@ function buildPayoutResults() {
       i++;
     }
   }
+
+  let payoutSlots = HELPERS.getPayoutsCont().querySelectorAll('.player');
+
+  playerList.forEach(player => {
+    if ( player.placed < payouts.length + 2 && player.placed ) {
+      console.log(player.placed - 1);
+      payoutSlots[player.placed - 1].querySelector('.field').innerText = player.name.toString();
+    }
+  });
 }
 
 // add payout badges to results
