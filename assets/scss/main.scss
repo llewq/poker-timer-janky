@@ -248,7 +248,8 @@ form .eliminate {
   flex: 0 0 32px;
 }
 
-form button {
+form button,
+.player button {
   width: 100%;
   height: 100%;
   border: none;
@@ -260,12 +261,15 @@ form button {
   transition: all ease 400ms;
 }
 
-form button:hover {
+form button:hover,
+.player button:hover {
   color: var(--color-white);
   background-color: var(--color-error);
 }
 
-form .eliminate button:hover {
+form .eliminate button:hover,
+.player button:hover {
+  color: var(--color-black);
   background-color: var(--color-primary);
 }
 
@@ -659,3 +663,19 @@ form .mover button:last-child {
   text-align: center;
 }
 
+#menu #active-players {
+  margin-bottom: 32px;
+}
+
+#menu #inactive-players {
+  .player {
+    display: flex;
+    align-items: stretch;
+    gap: 4px;
+  }
+  .re-enroll {
+    flex: 0 0 32px;
+    height: inherit;
+    cursor: pointer;
+  }
+}

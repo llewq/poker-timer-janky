@@ -114,15 +114,21 @@
 
       <div id="navPlayers" class="nav-panel">
         <span class="back"><i class="fas fa-angle-left"></i>Settings</span>
-        <h2>Players</h2>
-        <div class="content">
-          <div class="action-row">
-            <form action="" onsubmit="return false">
-              <div class="add">
-                <button class="primary"><i class="fas fa-plus"></i></button>
-              </div>
-            </form>
+        <div id="active-players">
+          <h2>Players</h2>
+          <div class="content">
+            <div class="action-row">
+              <form action="" onsubmit="return false">
+                <div class="add">
+                  <button class="primary"><i class="fas fa-plus"></i></button>
+                </div>
+              </form>
+            </div>
           </div>
+        </div>
+        <div id="inactive-players">
+          <h2 class="title">Busted</h2>
+          <div class="content"></div>
         </div>
       </div>
 
@@ -261,7 +267,7 @@
       <section id="payouts">
           <div id="results">
             <div class="inner">
-              <h2 class="title">Results</h2>
+              <h2 class="title">Payouts</h2>
               <div class="list-wrapper">
                 <div id="player-list-2" role="region" aria-labelledby="accordion-2">
                   <!-- data -->

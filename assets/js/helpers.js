@@ -240,9 +240,16 @@ HELPERS.getAddPlayerBtn = function() {
 //
 
 HELPERS.getPlayersRemainingCont = function() {
-  return HELPERS.getPayoutsPanel().querySelector('#players-remaining #player-list-1');
+  return HELPERS.getPlayersMenu().querySelector('#active-players');
 }
 
 HELPERS.getPlayerResultsCont = function() {
+  return HELPERS.getPlayersMenu().querySelector('#inactive-players .content');
+}
+
+HELPERS.getPayoutsCont = function() {
   return HELPERS.getPayoutsPanel().querySelector('#results #player-list-2');
 }
+
+
+
