@@ -140,6 +140,18 @@ HELPERS.getNextAnteCont = function() {
   return HELPERS.getNextBlindsPanel().querySelector('.ante .value');
 }
 
+HELPERS.getPrevSmallBlindCont = function() {
+  return HELPERS.getPrevBlindsPanel().querySelector('.small-blind .value');
+}
+
+HELPERS.getPrevBigBlindCont = function() {
+  return HELPERS.getPrevBlindsPanel().querySelector('.big-blind .value');
+}
+
+HELPERS.getPrevAnteCont = function() {
+  return HELPERS.getPrevBlindsPanel().querySelector('.ante .value');
+}
+
 //
 // submenu nav items
 //

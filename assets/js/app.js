@@ -205,13 +205,27 @@ function initTimer( timeRemaining ) {
   HELPERS.getAnteCont().textContent = defaultBlindsData[currentLevel].ante ? defaultBlindsData[currentLevel].ante : '-';
 
   if( currentLevel < (defaultBlindsData.length - 1)) {
+    console.log('next blind check', currentLevel);
     HELPERS.getNextSmallBlindCont().textContent = defaultBlindsData[currentLevel + 1].sb ? defaultBlindsData[currentLevel + 1].sb : '-';
     HELPERS.getNextBigBlindCont().textContent = defaultBlindsData[currentLevel + 1].bb ? defaultBlindsData[currentLevel + 1].bb : '-';
     HELPERS.getNextAnteCont().textContent = defaultBlindsData[currentLevel + 1].ante ? defaultBlindsData[currentLevel + 1].ante : '-';
-  } else {
+  } 
+  
+  if( currentLevel == (defaultBlindsData.length - 1)) {
     HELPERS.getNextSmallBlindCont().textContent = '-';
     HELPERS.getNextBigBlindCont().textContent = '-';
     HELPERS.getNextAnteCont().textContent = '-';
+  }
+
+  if( currentLevel > 0 ) {
+    console.log('prev blind check');
+    HELPERS.getPrevSmallBlindCont().textContent = defaultBlindsData[currentLevel - 1].sb ? defaultBlindsData[currentLevel - 1].sb : '-';
+    HELPERS.getPrevBigBlindCont().textContent = defaultBlindsData[currentLevel - 1].bb ? defaultBlindsData[currentLevel - 1].bb : '-';
+    HELPERS.getPrevAnteCont().textContent = defaultBlindsData[currentLevel - 1].ante ? defaultBlindsData[currentLevel - 1].ante : '-';
+  } else {
+    HELPERS.getPrevSmallBlindCont().textContent = '-';
+    HELPERS.getPrevBigBlindCont().textContent = '-';
+    HELPERS.getPrevAnteCont().textContent = '-';
   }
 }
 
