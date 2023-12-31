@@ -205,7 +205,6 @@ function initTimer( timeRemaining ) {
   HELPERS.getAnteCont().textContent = defaultBlindsData[currentLevel].ante ? defaultBlindsData[currentLevel].ante : '-';
 
   if( currentLevel < (defaultBlindsData.length - 1)) {
-    console.log('next blind check', currentLevel);
     HELPERS.getNextSmallBlindCont().textContent = defaultBlindsData[currentLevel + 1].sb ? defaultBlindsData[currentLevel + 1].sb : '-';
     HELPERS.getNextBigBlindCont().textContent = defaultBlindsData[currentLevel + 1].bb ? defaultBlindsData[currentLevel + 1].bb : '-';
     HELPERS.getNextAnteCont().textContent = defaultBlindsData[currentLevel + 1].ante ? defaultBlindsData[currentLevel + 1].ante : '-';
@@ -387,7 +386,7 @@ function buildPlayerEl( playerID ) {
       <input type="text" id="player-${ pid }" data-pid="${ pid }" name="Small Blind 1" value="${ name }">
     </div>
     <div class="eliminate">
-      <button data-delete="${ pid }"><i class="fa-solid fa-user-slash"></i></button>
+      <button data-eliminate="${ pid }"><i class="fa-solid fa-user-slash"></i></button>
     </div>
   </form>`;
 
@@ -581,7 +580,20 @@ function deletePlayer( pid ) {
   localStorage.setItem('nextEliminatedPosition', JSON.stringify(nextEliminatedPosition));
   updateInitialCount();
   updateRemainingCount();
+  reorderPlacements();
   updatePlayerResultsLists();
+}
+
+// reorder placements
+
+function reorderPlacements() {
+  playerList = JSON.parse(localStorage.getItem('playerList'));
+
+  playerList.forEach(player => {
+    if ( !player.active ) { --player.placed; }
+  });
+
+  localStorage.setItem('playerList', JSON.stringify( playerList ));
 }
 
 // renumber players 
@@ -729,6 +741,7 @@ const deletePlayerBtns = HELPERS.getPlayersMenu().querySelectorAll('.delete butt
 
 deletePlayerBtns.forEach(button => {
   button.addEventListener('click', function(e){
+    console.log(this);
     let pid = e.target.parentElement.parentElement.parentElement.parentElement.dataset.player;
     
     if (window.confirm("Are you sure you want to delete this player?")) {
