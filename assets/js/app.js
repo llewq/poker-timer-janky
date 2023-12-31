@@ -92,40 +92,66 @@ updateRemainingCount();
 function buildPlayerListUI() {
   
   playerList.forEach(player => {
-    player = buildPlayerEl(player.pid);
-    HELPERS.getPlayerActionRow().before(player);
+    if( player.active ) {
+      player = buildPlayerEl(player.pid);
+      HELPERS.getPlayerActionRow().before(player);
+    }
   });
 }
 
 buildPlayerListUI();
 
-// build empty results
+// build payout results
 
-function buildEmptyResults() {
+function buildPayoutResults() {
   
   let i = 0;
-  while (i < playerList.length ) {
-    let emptyResult = document.createElement('div');
-    emptyResult.setAttribute('data-empty', true);
-    emptyResult.classList.add('player');
-    emptyResult.innerHTML = `<span class="field"></span>`;
 
-    HELPERS.getPlayerResultsCont().append( emptyResult );
-    i++;
+  let playerList = JSON.parse(localStorage.getItem('playerList'));
+
+  if ( playerList.length > 1 ) {
+
+    while ( i < playerList.length ) {
+      let emptyResult = document.createElement('div');
+      emptyResult.setAttribute('data-empty', true);
+      emptyResult.classList.add('player');
+      emptyResult.innerHTML = `<span class="field"></span>`;
+  
+      if (i < payouts.length + 1 ) {
+        HELPERS.getPayoutsCont().append( emptyResult );
+      }
+  
+      i++;
+    }
   }
+
+  let payoutSlots = HELPERS.getPayoutsCont().querySelectorAll('.player');
+
+  playerList.forEach(player => {
+    if ( player.placed < payouts.length + 2 && player.placed ) {
+      console.log(player.placed - 1);
+      payoutSlots[player.placed - 1].querySelector('.field').innerText = player.name.toString();
+    }
+  });
 }
 
 // add payout badges to results
 
 function addPayoutBadges() {
-  let emptyResults = HELPERS.getPlayerResultsCont().querySelectorAll('.player');
+  let emptyResults = HELPERS.getPayoutsCont().querySelectorAll('.player');
   let i = 0;
   
-  while (i < payouts.length) {
+  while (i < payouts.length + 1) {
     let tag = document.createElement('span');
     tag.classList.add('prize');
-    tag.innerHTML =
-    `<sup>$</sup>${ payouts[i] }`;
+
+    if ( i < payouts.length ) {
+      tag.innerHTML =
+      `<sup>$</sup>${ payouts[i] }`;
+    } else {
+      tag.innerHTML =
+      '<i class="fa-solid fa-face-dizzy"></i>'
+    }
 
     emptyResults[i].querySelector('.field').append(tag);
     i++;
@@ -166,13 +192,13 @@ function updateLevel() {
 
 // initialize timer - runs when app is loaded and at start of new round
 
-function initTimer() {
+function initTimer( timeRemaining ) {
   // setup timer to begin running the first level
   HELPERS.getLevelCont().textContent = defaultBlindsData[currentLevel].label;
   // HELPERS.getMinutesCont().textContent = defaultBlindsData[currentLevel].time;
   // HELPERS.getSecondsCont().textContent = '00';
 
-  setTimer( localStorage.getItem('timeRemaining'));
+  setTimer( timeRemaining );
 
   HELPERS.getSmallBlindCont().textContent = defaultBlindsData[currentLevel].sb ? defaultBlindsData[currentLevel].sb : '-';
   HELPERS.getBigBlindCont().textContent = defaultBlindsData[currentLevel].bb ? defaultBlindsData[currentLevel].bb : '-';
@@ -182,14 +208,27 @@ function initTimer() {
     HELPERS.getNextSmallBlindCont().textContent = defaultBlindsData[currentLevel + 1].sb ? defaultBlindsData[currentLevel + 1].sb : '-';
     HELPERS.getNextBigBlindCont().textContent = defaultBlindsData[currentLevel + 1].bb ? defaultBlindsData[currentLevel + 1].bb : '-';
     HELPERS.getNextAnteCont().textContent = defaultBlindsData[currentLevel + 1].ante ? defaultBlindsData[currentLevel + 1].ante : '-';
-  } else {
+  } 
+  
+  if( currentLevel == (defaultBlindsData.length - 1)) {
     HELPERS.getNextSmallBlindCont().textContent = '-';
     HELPERS.getNextBigBlindCont().textContent = '-';
     HELPERS.getNextAnteCont().textContent = '-';
   }
+
+  if( currentLevel > 0 ) {
+    console.log('prev blind check');
+    HELPERS.getPrevSmallBlindCont().textContent = defaultBlindsData[currentLevel - 1].sb ? defaultBlindsData[currentLevel - 1].sb : '-';
+    HELPERS.getPrevBigBlindCont().textContent = defaultBlindsData[currentLevel - 1].bb ? defaultBlindsData[currentLevel - 1].bb : '-';
+    HELPERS.getPrevAnteCont().textContent = defaultBlindsData[currentLevel - 1].ante ? defaultBlindsData[currentLevel - 1].ante : '-';
+  } else {
+    HELPERS.getPrevSmallBlindCont().textContent = '-';
+    HELPERS.getPrevBigBlindCont().textContent = '-';
+    HELPERS.getPrevAnteCont().textContent = '-';
+  }
 }
 
-initTimer();
+initTimer( localStorage.getItem('timeRemaining') );
 
 // initialize break timer
 
@@ -235,10 +274,12 @@ function setTimer(timeRemaining) {
   var minutes, seconds;
   minutes = parseInt(timeRemaining / 60, 10);
   seconds = parseInt(timeRemaining % 60, 10);
-  seconds = seconds < 10 ? "0" + seconds : seconds;
+  // seconds = seconds < 10 ? "0" + seconds : seconds;
 
-  HELPERS.getMinutesCont().textContent = minutes;
-  HELPERS.getSecondsCont().textContent = seconds;
+  HELPERS.getMinutesCont1().textContent = parseInt(minutes / 10, 10);
+  HELPERS.getMinutesCont2().textContent = parseInt(minutes % 10, 10);
+  HELPERS.getSecondsCont1().textContent = parseInt(seconds / 10, 10);
+  HELPERS.getSecondsCont2().textContent = parseInt(seconds % 10, 10);
 }
 
 function startTimer(timeRemaining, timeToBreak) {
@@ -256,10 +297,12 @@ function startTimer(timeRemaining, timeToBreak) {
       seconds = parseInt(timeRemaining % 60, 10);
 
       // minutes = minutes < 10 ? "0" + minutes : minutes;
-      seconds = seconds < 10 ? "0" + seconds : seconds;
+      // seconds = seconds < 10 ? "0" + seconds : seconds;
 
-      HELPERS.getMinutesCont().textContent = minutes;
-      HELPERS.getSecondsCont().textContent = seconds;
+      HELPERS.getMinutesCont1().textContent = parseInt(minutes / 10, 10);
+      HELPERS.getMinutesCont2().textContent = parseInt(minutes % 10, 10);
+      HELPERS.getSecondsCont1().textContent = parseInt(seconds / 10, 10);
+      HELPERS.getSecondsCont2().textContent = parseInt(seconds % 10, 10);
 
       HELPERS.getBreakTimerCont().textContent = parseInt(timeToBreak / 60) + ' minutes';
 
@@ -272,13 +315,13 @@ function startTimer(timeRemaining, timeToBreak) {
         HELPERS.getAudioEndRound().play();
       }
       
-      if (timeRemaining < 1) {
+      if (timeRemaining == 0) {
         clearInterval(timerInterval); // stops timer from progressing
         updateLevel(++currentLevel);
         getLevel();
-        initTimer();
-        timeRemaining = defaultBlindsData[currentLevel].time * 60 - 1;
-        startTimer(timeRemaining);
+        timeRemaining = defaultBlindsData[currentLevel].time * 60;
+        initTimer( timeRemaining );
+        startTimer(timeRemaining, timeToBreak);
       }
 
       
@@ -328,18 +371,22 @@ function buildPlayerEl( playerID ) {
   playerEl.setAttribute('class', 'player-row');
   playerEl.setAttribute('data-player', pid );
 
+  
+  if ( playerList[pid].placed ) { 
+    playerEl.setAttribute('data-placed', playerList[pid].placed );
+  }
+
   playerEl.innerHTML = 
   `<form action="">
-    <div class="mover">
-      <button><i class="fas fa-angle-up"></i></button>
-      <button><i class="fas fa-angle-down"></i></button>
+    <div class="delete">
+      <button data-delete="${ pid }"><i class="fa-solid fa-trash"></i></button>
     </div>
     <div>
       <label for="player-${ pid }">Player Name</label>
       <input type="text" id="player-${ pid }" data-pid="${ pid }" name="Small Blind 1" value="${ name }">
     </div>
-    <div class="delete">
-      <button data-delete="${ pid }"><i class="fas fa-times"></i></button>
+    <div class="eliminate">
+      <button data-eliminate="${ pid }"><i class="fa-solid fa-user-slash"></i></button>
     </div>
   </form>`;
 
@@ -349,9 +396,9 @@ function buildPlayerEl( playerID ) {
     
     if ( e.key === 'Enter' ) {
       e.preventDefault();
-      updatePlayer();
     }
   });
+  playerEl.querySelector('.eliminate').addEventListener('click', eliminatePlayer);
 
   return playerEl;
 }
@@ -359,12 +406,22 @@ function buildPlayerEl( playerID ) {
 // build player element to display in remaning/results containers
 
 function buildPlayerResultEl( pid ) {
+  playerList = JSON.parse(localStorage.getItem('playerList'));
   let playerEl = document.createElement('div');
   playerEl.classList.add('player');
   playerEl.setAttribute('data-player', pid);
 
+  if ( playerList[pid].placed ) { 
+    playerEl.setAttribute('data-placed', playerList[pid].placed );
+  }
+
   playerEl.innerHTML = 
-  `<span class="field"><span class="name">${ playerList[pid].name }</span></span>`
+  `<span class="field">
+    <span class="name">${ playerList[pid].name }</span>
+  </span>
+  <button class="re-enroll">
+    <i class="fa-solid fa-undo"></i>
+  </button>`
 
   return playerEl;
 }
@@ -373,7 +430,9 @@ function buildPlayerResultEl( pid ) {
 
 // create next eliminated player position
 
-let nextEliminatedPosition = playerList.length;
+if( !localStorage.getItem('nextEliminatedPosition') ) {
+  localStorage.setItem('nextEliminatedPosition', JSON.stringify(playerList.length));
+}
 
 
 // create prize pool
@@ -476,6 +535,7 @@ function updatePlayer() {
 // add player to player list in localStorage
 
 function addPlayer( ) {
+  playerList = JSON.parse(localStorage.getItem('playerList'));
   playerList.push({
     pid: playerList.length,
     active: true,
@@ -483,11 +543,19 @@ function addPlayer( ) {
     placed: null
   });
 
-  localStorage.setItem('playerList', JSON.stringify(playerList));
+  playerList.forEach(player => {
+    if ( player.placed != null ) {
+      ++player.placed;
+    }
+  });
 
+  localStorage.setItem('playerList', JSON.stringify(playerList));
+  
   initialPlayerCount++;
   remainingPlayerCount++;
+  nextEliminatedPosition = JSON.parse(localStorage.getItem('nextEliminatedPosition'));
   nextEliminatedPosition++;
+  localStorage.setItem('nextEliminatedPosition', JSON.stringify(nextEliminatedPosition));
   updateInitialCount();
   updateRemainingCount();
   updateAverageStack();
@@ -507,10 +575,25 @@ function deletePlayer( pid ) {
 
   initialPlayerCount--;
   remainingPlayerCount--;
+  nextEliminatedPosition = JSON.parse(localStorage.getItem('nextEliminatedPosition'));
   nextEliminatedPosition--;
+  localStorage.setItem('nextEliminatedPosition', JSON.stringify(nextEliminatedPosition));
   updateInitialCount();
   updateRemainingCount();
+  reorderPlacements();
   updatePlayerResultsLists();
+}
+
+// reorder placements
+
+function reorderPlacements() {
+  playerList = JSON.parse(localStorage.getItem('playerList'));
+
+  playerList.forEach(player => {
+    if ( !player.active ) { --player.placed; }
+  });
+
+  localStorage.setItem('playerList', JSON.stringify( playerList ));
 }
 
 // renumber players 
@@ -528,14 +611,17 @@ function renumberPlayers() {
 
 
 function eliminatePlayer() {
-  pid = this.dataset.player;
+  pid = this.parentElement.parentElement.dataset.player;
 
-  console.log(nextEliminatedPosition);
+  this.parentElement.parentElement.remove();
+
+  let nextEliminatedPosition = JSON.parse(localStorage.getItem('nextEliminatedPosition'));
   
   playerList[pid].placed = nextEliminatedPosition;
   playerList[pid].active = false;
   localStorage.setItem('playerList', JSON.stringify(playerList));
   --nextEliminatedPosition;
+  localStorage.setItem('nextEliminatedPosition', JSON.stringify(nextEliminatedPosition));
 
   updatePlayerResultsLists();
 
@@ -547,16 +633,28 @@ function eliminatePlayer() {
 // re-enroll player
 
 function reEnrollPlayer() {
-  pid = this.dataset.player;
+  pid = this.parentElement.dataset.player;
+  playerList = JSON.parse(localStorage.getItem('playerList'));
+  nextEliminatedPosition = JSON.parse(localStorage.getItem('nextEliminatedPosition'));
 
+  playerList.forEach(player => {
+    if ( player.placed != null && player.placed < playerList[pid].placed ) {
+      ++player.placed;
+    }
+  });
+  
   playerList[pid].active = true;
   playerList[pid].placed = null;
   localStorage.setItem('playerList', JSON.stringify(playerList));
+
+  let playerEl = buildPlayerEl(pid);
+  HELPERS.getPlayerActionRow().before( playerEl );
 
   updatePlayerResultsLists();
 
   remainingPlayerCount++;
   nextEliminatedPosition++;
+  localStorage.setItem('nextEliminatedPosition', JSON.stringify(nextEliminatedPosition));
   updateRemainingCount();
   updateAverageStack();
 }
@@ -604,26 +702,34 @@ allForms.forEach(form => {
 
 
 function updatePlayerResultsLists() {
+  HELPERS.getPayoutsCont().innerHTML = null;
   HELPERS.getPlayerResultsCont().innerHTML = null;
-  HELPERS.getPlayersRemainingCont().innerHTML = null;
+  // HELPERS.getPlayersRemainingCont().innerHTML = null;
   
-  buildEmptyResults();
+  updatePrizePool();
+  buildPayoutResults();
   
+  let resultsList = [];
+
+  playerList.sort((a, b) => a.placed - b.placed);
+
   playerList.forEach(player => {
-    let playerEl = buildPlayerResultEl(player.pid);
     if ( player.active === false ) {
-      playerEl.addEventListener('click', reEnrollPlayer);
-      slots = HELPERS.getPlayerResultsCont().querySelectorAll('.player');
-      slots[player.placed - 1].replaceWith(playerEl);
-    } else {
-      playerEl.addEventListener('click', eliminatePlayer);
-      HELPERS.getPlayersRemainingCont().append(playerEl);
+      let playerEl = buildPlayerResultEl(player.pid);
+      playerEl.querySelector('.re-enroll').addEventListener('click', reEnrollPlayer);
+      resultsList.push(playerEl);
     }
   });
 
-  updatePrizePool();
+  // let sortedList = resultsList.sort((a, b) => a.value - b.value)
+  // console.log(resultsList);
 
-  if ( prizePool > 0 ) { addPayoutBadges(); }
+  resultsList.forEach(player => {
+    HELPERS.getPlayerResultsCont().append(player);
+  });
+
+
+  if ( playerList.length > 1 ) { addPayoutBadges(); }
 }
 
 updatePlayerResultsLists();
@@ -635,6 +741,7 @@ const deletePlayerBtns = HELPERS.getPlayersMenu().querySelectorAll('.delete butt
 
 deletePlayerBtns.forEach(button => {
   button.addEventListener('click', function(e){
+    console.log(this);
     let pid = e.target.parentElement.parentElement.parentElement.parentElement.dataset.player;
     
     if (window.confirm("Are you sure you want to delete this player?")) {

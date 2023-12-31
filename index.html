@@ -114,15 +114,21 @@
 
       <div id="navPlayers" class="nav-panel">
         <span class="back"><i class="fas fa-angle-left"></i>Settings</span>
-        <h2>Players</h2>
-        <div class="content">
-          <div class="action-row">
-            <form action="" onsubmit="return false">
-              <div class="add">
-                <button class="primary"><i class="fas fa-plus"></i></button>
-              </div>
-            </form>
+        <div id="active-players">
+          <h2>Players</h2>
+          <div class="content">
+            <div class="action-row">
+              <form action="" onsubmit="return false">
+                <div class="add">
+                  <button class="primary"><i class="fas fa-plus"></i></button>
+                </div>
+              </form>
+            </div>
           </div>
+        </div>
+        <div id="inactive-players">
+          <h2 class="title">Busted</h2>
+          <div class="content"></div>
         </div>
       </div>
 
@@ -154,9 +160,9 @@
     </section>
 
 
-    <section id="content">
+    <main>
       <section id="info">
-        <div id="next">
+        <!-- <div id="next">
           <h2 class="title">Next Level</h2>
           <div class="blinds">
             <div class="blind small-blind">
@@ -172,7 +178,7 @@
               <span class="value">200</span>
             </div>
           </div>
-        </div>
+        </div> -->
         <div id="break-timer">
           <h2 class="title">Next Break</h2>
           <p><!-- data --></p>
@@ -191,71 +197,88 @@
             <span id="average-stack">$33,333</span>
           </p>
         </div>
-        <!-- <div id="next-break">
-          <h2 class="title">Next Break</h2>
-          <p>
-            <span class="time-til-break">37 minutes</span>
-          </p>
-        </div> -->
       </section>
 
 
-      <section id="main">
-        <div class="timer">
+      <section id="timer">
           <div class="display">
             <span class="level"><!-- data --></span>
-            <span class="time"><span class="minutes"><!-- data --></span>:<span class="seconds"><!-- data --></span></span>
+            <span class="time">
+              <span class="minutes-1"></span>
+              <span class="minutes-2"></span>
+              <span class="colon">:</span>
+              <span class="seconds-1"></span>
+              <span class="seconds-2"></span>
           </div>
           <div class="controls">
             <button class="prev"><i class=" fas fa-caret-left"></i></button>
             <button class="play"><i class=" fas fa-play"></i></button>
             <button class="next"><i class=" fas fa-caret-right"></i></button>
           </div>
-        </div>
-          
-        <div class="blinds">
-          <div class="blind small-blind">
-            <span class="label">Small Blind</span>
-            <span class="value">100</span>
-          </div>
-          <div class="blind big-blind">
-            <span class="label">Big Blind</span>
-            <span class="value">200</span>
-          </div>
-          <div class="blind ante">
-            <span class="label">Ante</span>
-            <span class="value">200</span>
-          </div>
-        </div>
-        
       </section>
 
+      <section id="blinds-prev">
+        <h2 class="title">Previous</h2>
+        <div class="blind small-blind">
+          <span class="label">Small Blind</span>
+          <span class="value">100</span>
+        </div>
+        <div class="blind big-blind">
+          <span class="label">Big Blind</span>
+          <span class="value">200</span>
+        </div>
+        <div class="blind ante">
+          <span class="label">Ante</span>
+          <span class="value">200</span>
+        </div>
+      </section>
+          
+      <section id="blinds-current">
+        <div class="blind small-blind">
+          <span class="label">Small Blind</span>
+          <span class="value">100</span>
+        </div>
+        <div class="blind big-blind">
+          <span class="label">Big Blind</span>
+          <span class="value">200</span>
+        </div>
+        <div class="blind ante">
+          <span class="label">Ante</span>
+          <span class="value">200</span>
+        </div>
+      </section>
+      
+      <section id="blinds-next">
+        <h2 class="title">Next</h2>
+        <div class="blind small-blind">
+          <span class="label">Small Blind</span>
+          <span class="value">100</span>
+        </div>
+        <div class="blind big-blind">
+          <span class="label">Big Blind</span>
+          <span class="value">200</span>
+        </div>
+        <div class="blind ante">
+          <span class="label">Ante</span>
+          <span class="value">200</span>
+        </div>
+      </section>
 
-      <section id="players">
-
-          <div id="players-remaining">
-            <div class="inner">
-              <h2 class="title">Remaining</h2>
-              <div class="list-wrapper">
-                <div id="player-list-1" role="region" aria-labelledby="accordion-1">
-                  <!-- data -->
-                </div>
-              </div>
-            </div>
-          </div>
-
+      <section id="payouts">
           <div id="results">
             <div class="inner">
-              <h2 class="title">Results</h2>
+              <h2 class="title">Payouts</h2>
               <div class="list-wrapper">
-                <div id="player-list-2" role="region" aria-labelledby="accordion-2">
+                <div class="content">
                   <!-- data -->
                 </div>
               </div>
             </div>
           </div>
       </section>
-    </section>
+
+    </main>
+    
   </div>
   <script type="text/javascript" src="assets/js/dom-purify/dist/purify.min.js"></script>
   <script src="assets/js/data.js"></script>

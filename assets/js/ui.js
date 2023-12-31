@@ -38,7 +38,7 @@ HELPERS.getNextBtn().addEventListener('click', function(){
     updateLevel(++currentLevel);
     getLevel();
     localStorage.setItem('timeRemaining', (defaultBlinds[currentLevel].time * 60));
-    initTimer();
+    initTimer( localStorage.getItem('timeRemaining') );
     setBreakTimer();
     localStorage.setItem('timeToBreak', timeToBreak);
     timeRemaining = defaultBlindsData[currentLevel].time * 60 - 1;
@@ -54,7 +54,7 @@ HELPERS.getPrevBtn().addEventListener('click', function(){
     updateLevel(--currentLevel);
     getLevel();
     localStorage.setItem('timeRemaining', (defaultBlinds[currentLevel].time * 60));
-    initTimer();
+    initTimer( localStorage.getItem('timeRemaining') );
     setBreakTimer();
     localStorage.setItem('timeToBreak', timeToBreak);
   } else if (currentLevel == 0) {
@@ -62,7 +62,7 @@ HELPERS.getPrevBtn().addEventListener('click', function(){
     HELPERS.getPlayBtn().querySelector('i').classList.remove('fa-pause');
     clearInterval(timerInterval);
     localStorage.setItem('timeRemaining', (defaultBlinds[currentLevel].time * 60));
-    initTimer();
+    initTimer( localStorage.getItem('timeRemaining') );
     setBreakTimer();
     localStorage.setItem('timeToBreak', timeToBreak);
   }
