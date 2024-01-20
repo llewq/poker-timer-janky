@@ -217,7 +217,6 @@ function initTimer( timeRemaining ) {
   }
 
   if( currentLevel > 0 ) {
-    console.log('prev blind check');
     HELPERS.getPrevSmallBlindCont().textContent = defaultBlindsData[currentLevel - 1].sb ? defaultBlindsData[currentLevel - 1].sb : '-';
     HELPERS.getPrevBigBlindCont().textContent = defaultBlindsData[currentLevel - 1].bb ? defaultBlindsData[currentLevel - 1].bb : '-';
     HELPERS.getPrevAnteCont().textContent = defaultBlindsData[currentLevel - 1].ante ? defaultBlindsData[currentLevel - 1].ante : '-';
@@ -228,38 +227,42 @@ function initTimer( timeRemaining ) {
   }
 }
 
-initTimer( localStorage.getItem('timeRemaining') );
+initTimer( JSON.parse(localStorage.getItem('timeRemaining')) );
 
 // initialize break timer
 
-let timeToBreak = 0;
+let timeToBreak;
+let onBreak;
 
 function setBreakTimer() {
 
-  // find next blind level
-  let levelsUntilBreak = 0;
   timeToBreak = 0;
+
+  // if the current level is a break, set onBreak to true
+  onBreak = ( defaultBlindsData[currentLevel].type == 'break' ) ? true : false;
   
+  // loop through the blinds
   for (let level = currentLevel; level < defaultBlindsData.length; level++) {
+    
       let blindLevel = defaultBlindsData[level];
 
+      // stop when a break level is reached
       if ( blindLevel.type == 'break' ) {
         break;
       } else {
+        // add up the minutes in each round that's not a blind
         timeToBreak += blindLevel.time * 60;
-        levelsUntilBreak++;
       }
-
   }
 
-  if( !localStorage.getItem('timeToBreak') ) {
+  // 
+  // timeToBreak = ( onBreak ) ? (timeToBreak + defaultBlindsData[currentLevel].time * 60) : timeToBreak;
 
-    localStorage.setItem('timeToBreak', JSON.stringify(timeToBreak));
-  }
+  localStorage.setItem('timeToBreak', JSON.stringify(timeToBreak));
 
-  HELPERS.getBreakTimerCont().textContent = parseInt(timeToBreak / 60) + ' minutes';
+  HELPERS.getBreakTimerCont().textContent = (onBreak) ? 0 + ' minutes' : parseInt(timeToBreak / 60) + ' minutes';
 
-  // caluclate time
+  return timeToBreak;
 }
 
 setBreakTimer();
@@ -288,43 +291,49 @@ function startTimer(timeRemaining, timeToBreak) {
 
   var minutes, seconds;
   timerInterval = setInterval(function () {
-      --timeRemaining;
-      --timeToBreak;
-      localStorage.setItem('timeRemaining', timeRemaining);
-      localStorage.setItem('timeToBreak', timeToBreak);
+    console.log(currentLevel, onBreak, timeToBreak);
 
-      minutes = parseInt(timeRemaining / 60, 10)
-      seconds = parseInt(timeRemaining % 60, 10);
+    --timeRemaining;
+    timeToBreak = ( !onBreak ) ? --timeToBreak : 0;
+    // --timeToBreak;
 
-      // minutes = minutes < 10 ? "0" + minutes : minutes;
-      // seconds = seconds < 10 ? "0" + seconds : seconds;
+    localStorage.setItem('timeRemaining', timeRemaining);
+    localStorage.setItem('timeToBreak', timeToBreak);
 
-      HELPERS.getMinutesCont1().textContent = parseInt(minutes / 10, 10);
-      HELPERS.getMinutesCont2().textContent = parseInt(minutes % 10, 10);
-      HELPERS.getSecondsCont1().textContent = parseInt(seconds / 10, 10);
-      HELPERS.getSecondsCont2().textContent = parseInt(seconds % 10, 10);
+    minutes = parseInt(timeRemaining / 60, 10)
+    seconds = parseInt(timeRemaining % 60, 10);
 
-      HELPERS.getBreakTimerCont().textContent = parseInt(timeToBreak / 60) + ' minutes';
+    // minutes = minutes < 10 ? "0" + minutes : minutes;
+    // seconds = seconds < 10 ? "0" + seconds : seconds;
 
-      
-      if (timeRemaining == 59) {
-        HELPERS.getAudioWarning().play();
-      }
-      
-      if (timeRemaining == 3) {
-        HELPERS.getAudioEndRound().play();
-      }
-      
-      if (timeRemaining == 0) {
-        clearInterval(timerInterval); // stops timer from progressing
-        updateLevel(++currentLevel);
-        getLevel();
-        timeRemaining = defaultBlindsData[currentLevel].time * 60;
-        initTimer( timeRemaining );
-        startTimer(timeRemaining, timeToBreak);
-      }
+    HELPERS.getMinutesCont1().textContent = parseInt(minutes / 10, 10);
+    HELPERS.getMinutesCont2().textContent = parseInt(minutes % 10, 10);
+    HELPERS.getSecondsCont1().textContent = parseInt(seconds / 10, 10);
+    HELPERS.getSecondsCont2().textContent = parseInt(seconds % 10, 10);
 
-      
+    HELPERS.getBreakTimerCont().textContent = parseInt(timeToBreak / 60) + ' minutes';
+
+    
+    if (timeRemaining == 59) {
+      HELPERS.getAudioWarning().play();
+    }
+    
+    if (timeRemaining == 3) {
+      HELPERS.getAudioEndRound().play();
+    }
+
+    
+    if (timeRemaining == 0) {
+      clearInterval(timerInterval); // stops timer from progressing
+      updateLevel(++currentLevel);
+      getLevel();
+      timeRemaining = defaultBlindsData[currentLevel].time * 60;
+      initTimer( timeRemaining );
+      setBreakTimer();
+      // setBreakTimer put the value in localStorage, go get it
+      timeToBreak = JSON.parse( localStorage.getItem('timeToBreak'));
+      startTimer(timeRemaining, timeToBreak);
+    } 
   }, 1000);
 }
 
@@ -348,7 +357,7 @@ function getTimeRemaining() {
 
 function getTimeToBreak() {
   // timeRemaining = parseInt( HELPERS.getMinutesCont().textContent) * 60 + parseInt( HELPERS.getSecondsCont().textContent);
-  timeToBreak = localStorage.getItem('timeToBreak');
+  timeToBreak = parseInt( localStorage.getItem('timeToBreak') );
   return timeToBreak;
 }
 

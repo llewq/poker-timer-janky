@@ -38,11 +38,13 @@ HELPERS.getNextBtn().addEventListener('click', function(){
     updateLevel(++currentLevel);
     getLevel();
     localStorage.setItem('timeRemaining', (defaultBlinds[currentLevel].time * 60));
-    initTimer( localStorage.getItem('timeRemaining') );
+    // timeRemaining = parseInt( localStorage.getItem('timeRemaining') );
+    initTimer( parseInt( localStorage.getItem('timeRemaining') ) );
     setBreakTimer();
     localStorage.setItem('timeToBreak', timeToBreak);
     timeRemaining = defaultBlindsData[currentLevel].time * 60 - 1;
   }
+  console.log(onBreak);
 });
 
 HELPERS.getPrevBtn().addEventListener('click', function(){
@@ -66,6 +68,7 @@ HELPERS.getPrevBtn().addEventListener('click', function(){
     setBreakTimer();
     localStorage.setItem('timeToBreak', timeToBreak);
   }
+  console.log(onBreak);
 });
 
 HELPERS.getResetBtn().addEventListener('click', function(){
