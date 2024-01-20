@@ -63,6 +63,10 @@ body, * {
   padding: 0;
 }
 
+img {
+  max-width: 100%;
+}
+
 .icon::before {
   /* removed font- based rules */
   display: inline-block;
@@ -365,12 +369,17 @@ form .mover button:last-child {
 /* info section */
 
 #info {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 3.5rem;
   padding: 2rem; /* 36px */
 }
 
-#info > div {
-  margin-bottom: 3.5rem; /* 56px */
-}
+// #info > div {
+//   margin-bottom: 3.5rem; /* 56px */
+// }
 
 #info .title {
   font-size: var(--size-large);
@@ -398,6 +407,10 @@ form .mover button:last-child {
     line-height: 1;
     color: var(--color-gray-100);
   }
+}
+
+#info #spotify {
+  margin-top: auto;
 }
 
 /*  main section */
