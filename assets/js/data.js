@@ -382,6 +382,46 @@ const defaultNumPayouts = [
   {
     entries: 30,
     placesPaid: 7
+  },
+  {
+    entries: 31,
+    placesPaid: 7
+  },
+  {
+    entries: 32,
+    placesPaid: 7
+  },
+  {
+    entries: 33,
+    placesPaid: 7
+  },
+  {
+    entries: 34,
+    placesPaid: 7
+  },
+  {
+    entries: 35,
+    placesPaid: 7
+  },
+  {
+    entries: 36,
+    placesPaid: 8
+  },
+  {
+    entries: 37,
+    placesPaid: 8
+  },
+  {
+    entries: 38,
+    placesPaid: 8
+  },
+  {
+    entries: 39,
+    placesPaid: 8
+  },
+  {
+    entries: 40,
+    placesPaid: 8
   }
 ]
 
@@ -413,5 +453,9 @@ const defaultPrizes = [
   {
     placesPaid: 7,
     prizes: [0.35, 0.21, 0.15, 0.11, 0.08, 0.06, 0.04] 
+  },
+  {
+    placesPaid: 8,
+    prizes: [0.27, 0.19, 0.16, 0.13, 0.10, 0.07, 0.05, 0.03] 
   }
 ];
