@@ -98,7 +98,7 @@ const defaultBlinds = [
     sb: 25,
     bb: 50,
     ante: 0,
-    time: 0.1
+    time: 15
   },
   {
     type: 'blind',
@@ -106,7 +106,7 @@ const defaultBlinds = [
     sb: 50,
     bb: 100,
     ante: 0,
-    time: 1
+    time: 15
   },
   {
     type: 'blind',
@@ -114,7 +114,7 @@ const defaultBlinds = [
     sb: 75,
     bb: 150,
     ante: 0,
-    time: 1
+    time: 15
   },
   {
     type: 'blind',
@@ -122,12 +122,12 @@ const defaultBlinds = [
     sb: 100,
     bb: 200,
     ante: 0,
-    time: 1
+    time: 15
   },
   {
     type: 'break',
     label: 'Break',
-    time: 1
+    time: 15
   },
   {
     type: 'blind',
