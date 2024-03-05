@@ -127,7 +127,7 @@ const defaultBlinds = [
   {
     type: 'break',
     label: 'Break',
-    time: 30
+    time: 20
   },
   {
     type: 'blind',
