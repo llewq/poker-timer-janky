@@ -91,6 +91,15 @@ img {
   height: 90px;
 }
 
+#seating {
+  position: absolute;
+  z-index: 80;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+
 main {
   display: grid;
   grid-template-rows: auto 1fr;
@@ -348,22 +357,93 @@ form .mover button:last-child {
 }
 
 
-#tools button {
-  display: flex;
-  gap: 10px;
-  padding: 10px 20px;
-  border: solid 1px var(--color-gray-100);
-  border-radius: 25px;
-  background-color: transparent;
-  color: var(--color-gray-100);
-  cursor: pointer;
-  &:hover {
-    background-color: var(--color-gray-900);
-    color: var(--color-white);
+#tools, 
+#seating {
+  button {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 20px;
+    font-family: var(--font-kanit);
+    border: solid 1px var(--color-gray-100);
+    border-radius: 25px;
+    background-color: transparent;
+    color: var(--color-gray-100);
+    cursor: pointer;
+    &:hover {
+      background-color: var(--color-gray-900);
+      color: var(--color-white);
+    }
   }
 }
 
+// Seating Section
 
+#seating {
+  display: none;
+  &.active {
+    display: flex;
+  }
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  padding: 5rem;
+  padding-bottom: 8rem;
+  background-color: rgba(#444, 0.9);
+  backdrop-filter: blur(5px);
+  .table-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    gap: 2rem;
+    width: 100%;
+  }
+  .table {
+    flex: 1 1 15%;
+    display: inline-block;
+    min-width: 30ch;
+    max-width: 20vw;
+    vertical-align: top;
+    background-color: var(--color-gray-900);
+    padding: 2rem;
+    border-radius: 1rem;
+    &:nth-child(1) {
+      border-top: solid 8px #359BE1;
+      border-bottom: solid 8px #359BE1;
+    }
+    &:nth-child(2) {
+      border-top: solid 8px #F10437;
+      border-bottom: solid 8px #F10437;
+    }
+    &:nth-child(3) {
+      border-top: solid 8px #92B71A;
+      border-bottom: solid 8px #92B71A;
+    }
+    &:nth-child(4) {
+      border-top: solid 8px #FFC933;
+      border-bottom: solid 8px #FFC933;
+    }
+  }
+  h2 {
+    font-size: 2.5rem;
+    margin-bottom: 2rem;
+  }
+  li {
+    list-style-position: inside;
+    margin-bottom: 1rem;
+    font-size: 2rem;
+  }
+  .buttons {
+    position: absolute;
+    left: 50%;
+    bottom: 3rem;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+  }
+}
 
 
 /* info section */

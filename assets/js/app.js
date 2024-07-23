@@ -291,7 +291,6 @@ function startTimer(timeRemaining, timeToBreak) {
 
   var minutes, seconds;
   timerInterval = setInterval(function () {
-    console.log(currentLevel, onBreak, timeToBreak);
 
     --timeRemaining;
     timeToBreak = ( !onBreak ) ? --timeToBreak : 0;
@@ -549,6 +548,8 @@ function addPlayer( ) {
     pid: playerList.length,
     active: true,
     name: "",
+    table: "",
+    seat: "",
     placed: null
   });
 
@@ -578,7 +579,7 @@ function deletePlayer( pid ) {
 
   playerList.splice( pid, 1);
 
-  renumberPlayers();
+  // renumberPlayers( playerList );
 
   localStorage.setItem('playerList', JSON.stringify( playerList ));
 
@@ -607,9 +608,9 @@ function reorderPlacements() {
 
 // renumber players 
 
-function renumberPlayers() {
+function renumberPlayers( players ) {
   i = 0;
-  playerList.forEach(player => {
+  players.forEach(player => {
     player.pid = i;
     i++;
   });
@@ -750,7 +751,7 @@ const deletePlayerBtns = HELPERS.getPlayersMenu().querySelectorAll('.delete butt
 
 deletePlayerBtns.forEach(button => {
   button.addEventListener('click', function(e){
-    console.log(this);
+
     let pid = e.target.parentElement.parentElement.parentElement.parentElement.dataset.player;
     
     if (window.confirm("Are you sure you want to delete this player?")) {
@@ -765,4 +766,76 @@ function closeMenuPanels() {
     panel.classList.remove('active');
   });
   
+}
+
+function assignSeats() {
+  playerCount = JSON.parse( localStorage.getItem( 'initialPlayerCount' ) );
+
+  tableCount = Math.ceil( playerCount / 9 );
+  localStorage.setItem( 'tableCount', JSON.stringify(tableCount) );
+
+  playerList = JSON.parse( localStorage.getItem( 'playerList' ) );
+
+  remainingPlayers = playerList.filter(player => {
+    return player.active === true;
+  });
+
+
+  shuffledList = shufflePlayers( remainingPlayers );
+
+  for (let i = 0, s = 0; i < shuffledList.length; i++) {
+    shuffledList[i].table = ( i % tableCount ) + 1;
+    if ( i % tableCount == 0 ) { s++; }
+    shuffledList[i].seat = s;
+  }
+
+  localStorage.setItem( 'playerList', JSON.stringify( shuffledList ));
+
+  displaySeatingChart( tableCount, shuffledList );
+}
+
+function shufflePlayers( players ) {
+
+  players.sort(() => Math.random() - 0.5); 
+  // renumberPlayers( players );
+  updatePlayerResultsLists();
+
+  return players;
+
+}
+
+function displaySeatingChart( tableCount, shuffledList ) {
+
+  if ( document.querySelector('.table-wrapper') ) {
+    document.querySelector('.table-wrapper').remove();
+  }
+
+  let tableWrapper = document.createElement('div');
+  tableWrapper.classList.add('table-wrapper');
+
+  for (let i = 0; i < tableCount; i++) {
+    let tableContainer = document.createElement('div');
+    tableContainer.classList.add('table');
+
+    let tableName = document.createElement('h2');
+    tableName.innerText = 'Table ' + (i + 1);
+    
+    tableContainer.append( tableName );
+
+    let tableList = document.createElement('ol');
+
+    tablePlayers = shuffledList.filter((player) => player.table === (i + 1));
+
+    for (let p = 0; p < tablePlayers.length; p++) {
+      let player = document.createElement('li');
+      player.innerText = tablePlayers[p].name;
+
+      tableList.append(player);
+    }
+
+    tableContainer.append( tableList );
+    tableWrapper.append( tableContainer );
+  }
+  
+  HELPERS.getSeatingPanel().append( tableWrapper );
 }

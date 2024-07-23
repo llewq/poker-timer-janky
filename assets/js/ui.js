@@ -119,3 +119,38 @@ HELPERS.getAddPlayerBtn().addEventListener('click', function(){
 
   HELPERS.getPlayerActionRow().before( playerEl );
 });
+
+HELPERS.getSeatingOpenBtn().addEventListener('click', function() {
+
+  HELPERS.getSeatingPanel().classList.add('active');
+
+  tableCount = JSON.parse( localStorage.getItem( 'tableCount' ) );
+
+  if ( tableCount ) { 
+    shuffledList = JSON.parse( localStorage.getItem( 'playerList' ) );
+    displaySeatingChart( tableCount, shuffledList );
+   }
+
+});
+
+HELPERS.getSeatingCloseBtn().addEventListener('click', function() {
+
+  HELPERS.getSeatingPanel().classList.remove('active');
+
+});
+
+HELPERS.getAssignSeatingBtn().addEventListener('click', function() {
+
+  if ( HELPERS.getAssignSeatingBtn().querySelector('i').classList.contains('fa-play') ) {
+    assignSeats();
+    HELPERS.getAssignSeatingBtn().querySelector('i').classList.remove('fa-play');
+    HELPERS.getAssignSeatingBtn().querySelector('i').classList.add('fa-shuffle');
+    HELPERS.getAssignSeatingBtn().querySelector('span').innerText = 'Reassign Seats';
+    return;
+  }
+
+  if (window.confirm("Are you sure you want to shuffle the seat assignments?")) {
+    assignSeats();
+  } else {}
+
+});
