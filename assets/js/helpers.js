@@ -35,6 +35,10 @@ HELPERS.getToolsPanel = function() {
   return document.querySelector('#tools');
 }
 
+HELPERS.getSeatingPanel = function() {
+  return document.querySelector('#seating');
+}
+
 HELPERS.getPayoutsPanel = function() {
   return document.querySelector('#payouts');
 }
@@ -67,6 +71,26 @@ HELPERS.getPlayersMenu = function() {
   return document.querySelector('#navPlayers');
 }
 const menuPanelPlayers = document.querySelector('#navPlayers');
+
+// 
+// tools
+//
+
+HELPERS.getSeatingOpenBtn = function() {
+  return HELPERS.getToolsPanel().querySelector('.seating-btn');
+}
+
+// 
+// seating
+//
+
+HELPERS.getSeatingCloseBtn = function() {
+  return HELPERS.getSeatingPanel().querySelector('.seating-close-btn');
+}
+
+HELPERS.getAssignSeatingBtn = function() {
+  return HELPERS.getSeatingPanel().querySelector('.seating-seat-btn');
+}
 
 //
 // controls 
