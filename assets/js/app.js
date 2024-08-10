@@ -587,21 +587,22 @@ function updatePlayer() {
   playerList = JSON.parse(localStorage.getItem('playerList'));
   player = playerList.find(player => player.pid === pid);
   player.name = cleanName;
-  // playerList[pid].name = cleanName;
   this.value = cleanName;
   
   localStorage.setItem('playerList', JSON.stringify(playerList));
 
   // add player to remainingPlayers array
-  
-  //
-  //
-  // check to see if player exists on the list before adding
-  //
-  //
 
   let remainingPlayers = JSON.parse(localStorage.getItem('remainingPlayers'));
-  remainingPlayers.push(playerList[pid]);
+  let playerInRemaining = remainingPlayers.find(player => player.pid === pid);
+
+  // check to see if player exists in the remainingPlayers array before adding a new entry
+  
+  if ( playerInRemaining ) {
+    playerInRemaining.name = cleanName;
+  } else {
+    remainingPlayers.push(playerList[pid]);
+  }
   localStorage.setItem('remainingPlayers', JSON.stringify(remainingPlayers));
 
   updatePlayerResultsLists();
@@ -723,7 +724,6 @@ function eliminatePlayer() {
   }
 }
 
-
 // re-enroll player
 
 function reEnrollPlayer() {
@@ -833,9 +833,6 @@ function updatePlayerResultsLists() {
 
 updatePlayerResultsLists();
 
-
-
-
 const deletePlayerBtns = HELPERS.getPlayersMenu().querySelectorAll('.delete button');
 
 deletePlayerBtns.forEach(button => {
@@ -856,5 +853,26 @@ function closeMenuPanels() {
   panels.forEach(panel => {
     panel.classList.remove('active');
   });
-  
+}
+
+function assignSeats() {
+
+
+
+}
+
+function shufflePlayers () {
+
+  remainingPlayers = JSON.parse(localStorage.getItem('remainingPlayers'));
+
+  remainingPlayers.sort(() => Math.random() - 0.5);
+
+  return remainingPlayers;
+
+}
+
+function displaySeatingChart( tableCount, shuffledList ) {
+
+
+
 }

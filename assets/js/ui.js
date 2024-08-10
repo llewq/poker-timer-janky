@@ -13,15 +13,6 @@ HELPERS.getPlayBtn().addEventListener('click', function(){
 
     startTimer(timeRemaining, timeToBreak);
 
-    // if( !timeRemaining == defaultBlindsData[currentLevel].time * 60 ) {
-    //   startTimer(timeRemaining - 1); // subtracting 1 to offset initial interval
-    //   if(audioTimer.paused) { setTimeout(() => {
-    //     audioTimer.play();
-    //   }, 1000);  }
-    // } else {
-    //   startTimer(defaultBlindsData[currentLevel].time * 60 - 1); // subtracting 1 to offset initial interval 
-    // }
-
     isRunning = true;
 
   }
