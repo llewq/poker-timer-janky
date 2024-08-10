@@ -458,4 +458,7 @@ const defaultPrizes = [
     placesPaid: 8,
     prizes: [0.27, 0.19, 0.16, 0.13, 0.10, 0.07, 0.05, 0.03] 
   }
-];
+]
+
+let seating = []
+let remainingPlayers = [];

@@ -138,3 +138,16 @@ HELPERS.getSeatingCloseBtn().addEventListener('click', function() {
   HELPERS.getSeatingPanel().classList.remove('active');
 
 });
+
+HELPERS.getAssignSeatingBtn().addEventListener('click', function() {
+
+  console.log('assign');
+
+  // build seating table in localstorage if it doesn't exist
+  buildRemainingPlayersList();
+
+  // get data from seating table
+
+  // display seating chart
+
+});
