@@ -597,7 +597,7 @@ function updatePlayer() {
   let playerInRemaining = remainingPlayers.find(player => player.pid === pid);
 
   // check to see if player exists in the remainingPlayers array before adding a new entry
-  
+
   if ( playerInRemaining ) {
     playerInRemaining.name = cleanName;
   } else {
@@ -857,7 +857,27 @@ function closeMenuPanels() {
 
 function assignSeats() {
 
+  playerCount = JSON.parse( localStorage.getItem( 'remainingPlayerCount' ) );
 
+  tableCount = Math.ceil( playerCount / 9 );
+  localStorage.setItem( 'tableCount', JSON.stringify(tableCount) );
+
+  playerList = JSON.parse( localStorage.getItem( 'remainingPlayers' ) );
+
+  shuffledList = shufflePlayers();
+
+  for (let i = 0, s = 0; i < shuffledList.length; i++) {
+    shuffledList[i].table = ( i % tableCount ) + 1;
+
+    if ( i % tableCount == 0 ) { s++; }
+
+    shuffledList[i].seat = s;
+    
+  }
+
+  localStorage.setItem( 'remainingPlayers', JSON.stringify( shuffledList ));
+
+  displaySeatingChart( tableCount, shuffledList );
 
 }
 
@@ -873,6 +893,38 @@ function shufflePlayers () {
 
 function displaySeatingChart( tableCount, shuffledList ) {
 
+  if ( document.querySelector('.table-wrapper')) {
+    document.querySelector('.table-wrapper').remove();
+  }
 
+  let tableWrapper = document.createElement('div');
+  tableWrapper.classList.add('table-wrapper');
+
+  for (let i = 0; i < tableCount; i++) {
+    let tableContainer = document.createElement('div');
+    tableContainer.classList.add('table');
+
+    let tableName = document.createElement('h2');
+    tableName.innerText = 'Table ' + (i + 1);
+
+    tableContainer.append( tableName );
+
+    let tableList = document.createElement('ol');
+
+    tablePlayers = shuffledList.filter(player => player.table === (i + 1));
+
+    for (let p = 0; p < tablePlayers.length; p++) {
+      let player = document.createElement('li');
+      player.innerText = tablePlayers[p].name;
+
+      tableList.append(player);
+    }
+
+    tableContainer.append( tableList );
+    tableWrapper.append( tableContainer );
+    
+  }
+
+  HELPERS.getSeatingPanel().append( tableWrapper );
 
 }
