@@ -119,3 +119,35 @@ HELPERS.getAddPlayerBtn().addEventListener('click', function(){
 
   HELPERS.getPlayerActionRow().before( playerEl );
 });
+
+HELPERS.getSeatingOpenBtn().addEventListener('click', function() {
+
+  HELPERS.getSeatingPanel().classList.add('active');
+
+  // tableCount = JSON.parse( localStorage.getItem( 'tableCount' ) );
+
+  // if ( tableCount ) { 
+  //   shuffledList = JSON.parse( localStorage.getItem( 'playerList' ) );
+  //   displaySeatingChart( tableCount, shuffledList );
+  //  }
+
+});
+
+HELPERS.getSeatingCloseBtn().addEventListener('click', function() {
+
+  HELPERS.getSeatingPanel().classList.remove('active');
+
+});
+
+HELPERS.getAssignSeatingBtn().addEventListener('click', function() {
+
+  console.log('assign');
+
+  // build seating table in localstorage if it doesn't exist
+  buildRemainingPlayersList();
+
+  // get data from seating table
+
+  // display seating chart
+
+});

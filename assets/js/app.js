@@ -8,6 +8,24 @@ if( !localStorage.getItem('playerList') ) {
 }
 
 /**
+ * Adds default player list to local storage, if no local storage exists
+ */
+
+if( !localStorage.getItem('seating') ) {
+
+  localStorage.setItem('seating', JSON.stringify(seating));
+}
+
+/**
+ * Adds default player list to local storage, if no local storage exists
+ */
+
+if( !localStorage.getItem('remainingPlayers') ) {
+
+  localStorage.setItem('remainingPlayers', JSON.stringify(remainingPlayers));
+}
+
+/**
  * Adds default current level to local storage, if no local storage exists
 */
 
@@ -87,6 +105,25 @@ function updateRemainingCount() {
 
 updateRemainingCount();
 
+// create an object that holds the names and ids of players still in the tournament
+
+function buildRemainingPlayersList() {
+
+  playerList = JSON.parse(localStorage.getItem('playerList'));
+  
+  let remainingPlayers = [];
+
+  playerList.forEach(player => {
+    
+    if( player.active ) {
+      remainingPlayers.push(player);
+    }
+  });
+
+  localStorage.setItem('remainingPlayers', JSON.stringify(remainingPlayers));
+
+}
+
 // initialize existing player list
 
 function buildPlayerListUI() {
@@ -129,7 +166,6 @@ function buildPayoutResults() {
 
   playerList.forEach(player => {
     if ( player.placed < payouts.length + 2 && player.placed ) {
-      console.log(player.placed - 1);
       payoutSlots[player.placed - 1].querySelector('.field').innerText = player.name.toString();
     }
   });
@@ -391,8 +427,8 @@ function buildPlayerEl( playerID ) {
       <button data-delete="${ pid }"><i class="fa-solid fa-trash"></i></button>
     </div>
     <div>
-      <label for="player-${ pid }">Player Name</label>
-      <input type="text" id="player-${ pid }" data-pid="${ pid }" name="Small Blind 1" value="${ name }">
+      <label for="player-${ pid }"></label>
+      <input type="text" id="player-${ pid }" data-pid="${ pid }" name="" value="${ name }">
     </div>
     <div class="eliminate">
       <button data-eliminate="${ pid }"><i class="fa-solid fa-user-slash"></i></button>
@@ -408,6 +444,16 @@ function buildPlayerEl( playerID ) {
     }
   });
   playerEl.querySelector('.eliminate').addEventListener('click', eliminatePlayer);
+  playerEl.querySelector('.delete').addEventListener('click', function(e){
+
+    e.preventDefault();
+    
+    let pid = e.target.parentElement.parentElement.parentElement.parentElement.dataset.player;
+    
+    if (window.confirm("Are you sure you want to delete this player?")) {
+      deletePlayer( pid );
+    } else {}
+  });
 
   return playerEl;
 }
@@ -415,18 +461,21 @@ function buildPlayerEl( playerID ) {
 // build player element to display in remaning/results containers
 
 function buildPlayerResultEl( pid ) {
+  pid = parseInt(pid, 10);
   playerList = JSON.parse(localStorage.getItem('playerList'));
   let playerEl = document.createElement('div');
   playerEl.classList.add('player');
   playerEl.setAttribute('data-player', pid);
 
-  if ( playerList[pid].placed ) { 
-    playerEl.setAttribute('data-placed', playerList[pid].placed );
+  let player = playerList.find(player => player.pid === pid);
+
+  if ( player.placed ) { 
+    playerEl.setAttribute('data-placed', player.placed );
   }
 
   playerEl.innerHTML = 
   `<span class="field">
-    <span class="name">${ playerList[pid].name }</span>
+    <span class="name">${ player.name }</span>
   </span>
   <button class="re-enroll">
     <i class="fa-solid fa-undo"></i>
@@ -531,12 +580,29 @@ updateAverageStack();
 
 function updatePlayer() {
   let pid = this.dataset.pid;
+  pid = parseInt(pid, 10);
+
   let cleanName = DOMPurify.sanitize(this.value);
 
-  playerList[pid].name = cleanName;
+  playerList = JSON.parse(localStorage.getItem('playerList'));
+  player = playerList.find(player => player.pid === pid);
+  player.name = cleanName;
+  // playerList[pid].name = cleanName;
   this.value = cleanName;
   
   localStorage.setItem('playerList', JSON.stringify(playerList));
+
+  // add player to remainingPlayers array
+  
+  //
+  //
+  // check to see if player exists on the list before adding
+  //
+  //
+
+  let remainingPlayers = JSON.parse(localStorage.getItem('remainingPlayers'));
+  remainingPlayers.push(playerList[pid]);
+  localStorage.setItem('remainingPlayers', JSON.stringify(remainingPlayers));
 
   updatePlayerResultsLists();
 }
@@ -573,14 +639,19 @@ function addPlayer( ) {
 // delete player 
 
 function deletePlayer( pid ) {
+  pid = parseInt(pid, 10);
   remove = HELPERS.getPlayersMenu().querySelector(`[data-player='${ pid }']`);
   remove.remove();
 
-  playerList.splice( pid, 1);
+  // remove player from playerList array
+  playerList = JSON.parse(localStorage.getItem('playerList'));
+  playerList = playerList.filter( player => player.pid !== pid);
+  localStorage.setItem('playerList', JSON.stringify(playerList));
 
-  renumberPlayers();
-
-  localStorage.setItem('playerList', JSON.stringify( playerList ));
+  // remove player from remainingPlayers array
+  remainingPlayers = JSON.parse(localStorage.getItem('remainingPlayers'));
+  remainingPlayers = remainingPlayers.filter( player => player.pid !== pid);
+  localStorage.setItem('remainingPlayers', JSON.stringify(remainingPlayers));
 
   initialPlayerCount--;
   remainingPlayerCount--;
@@ -617,27 +688,41 @@ function renumberPlayers() {
 
 // eliminate player
 
-
-
 function eliminatePlayer() {
   pid = this.parentElement.parentElement.dataset.player;
+  pid = parseInt(pid, 10);
 
   this.parentElement.parentElement.remove();
 
   let nextEliminatedPosition = JSON.parse(localStorage.getItem('nextEliminatedPosition'));
   
-  playerList[pid].placed = nextEliminatedPosition;
-  playerList[pid].active = false;
-  localStorage.setItem('playerList', JSON.stringify(playerList));
-  --nextEliminatedPosition;
-  localStorage.setItem('nextEliminatedPosition', JSON.stringify(nextEliminatedPosition));
+  playerList = JSON.parse(localStorage.getItem('playerList'));
 
-  updatePlayerResultsLists();
+  let eliminatedPlayer = playerList.find(player => player.pid === pid);
+  
+  // Ensure eliminatedPlayer is a reference to the object in playerList
+  if (eliminatedPlayer) {
+    eliminatedPlayer.placed = nextEliminatedPosition;
+    eliminatedPlayer.active = false;
 
-  remainingPlayerCount--;
-  updateRemainingCount();
-  updateAverageStack();
+    // Save the updated playerList back to localStorage
+    localStorage.setItem('playerList', JSON.stringify(playerList));
+
+    // Remove player from remainingPlayers array
+    let remainingPlayers = JSON.parse(localStorage.getItem('remainingPlayers'));
+    remainingPlayers = remainingPlayers.filter(player => player.pid !== eliminatedPlayer.pid);
+    localStorage.setItem('remainingPlayers', JSON.stringify(remainingPlayers));
+
+    --nextEliminatedPosition;
+    localStorage.setItem('nextEliminatedPosition', JSON.stringify(nextEliminatedPosition));
+
+    updatePlayerResultsLists();
+    remainingPlayerCount--;
+    updateRemainingCount();
+    updateAverageStack();
+  }
 }
+
 
 // re-enroll player
 
@@ -655,6 +740,10 @@ function reEnrollPlayer() {
   playerList[pid].active = true;
   playerList[pid].placed = null;
   localStorage.setItem('playerList', JSON.stringify(playerList));
+
+  let remainingPlayers = JSON.parse(localStorage.getItem('remainingPlayers'));
+  remainingPlayers.push(playerList[pid]);
+  localStorage.setItem('remainingPlayers', JSON.stringify(remainingPlayers));
 
   let playerEl = buildPlayerEl(pid);
   HELPERS.getPlayerActionRow().before( playerEl );
@@ -720,6 +809,7 @@ function updatePlayerResultsLists() {
   
   let resultsList = [];
 
+  playerList = JSON.parse(localStorage.getItem('playerList'));
   playerList.sort((a, b) => a.placed - b.placed);
 
   playerList.forEach(player => {
@@ -750,7 +840,9 @@ const deletePlayerBtns = HELPERS.getPlayersMenu().querySelectorAll('.delete butt
 
 deletePlayerBtns.forEach(button => {
   button.addEventListener('click', function(e){
-    console.log(this);
+
+    e.preventDefault();
+    
     let pid = e.target.parentElement.parentElement.parentElement.parentElement.dataset.player;
     
     if (window.confirm("Are you sure you want to delete this player?")) {
