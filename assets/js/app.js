@@ -587,21 +587,22 @@ function updatePlayer() {
   playerList = JSON.parse(localStorage.getItem('playerList'));
   player = playerList.find(player => player.pid === pid);
   player.name = cleanName;
-  // playerList[pid].name = cleanName;
   this.value = cleanName;
   
   localStorage.setItem('playerList', JSON.stringify(playerList));
 
   // add player to remainingPlayers array
-  
-  //
-  //
-  // check to see if player exists on the list before adding
-  //
-  //
 
   let remainingPlayers = JSON.parse(localStorage.getItem('remainingPlayers'));
-  remainingPlayers.push(playerList[pid]);
+  let playerInRemaining = remainingPlayers.find(player => player.pid === pid);
+
+  // check to see if player exists in the remainingPlayers array before adding a new entry
+
+  if ( playerInRemaining ) {
+    playerInRemaining.name = cleanName;
+  } else {
+    remainingPlayers.push(playerList[pid]);
+  }
   localStorage.setItem('remainingPlayers', JSON.stringify(remainingPlayers));
 
   updatePlayerResultsLists();
@@ -723,7 +724,6 @@ function eliminatePlayer() {
   }
 }
 
-
 // re-enroll player
 
 function reEnrollPlayer() {
@@ -833,9 +833,6 @@ function updatePlayerResultsLists() {
 
 updatePlayerResultsLists();
 
-
-
-
 const deletePlayerBtns = HELPERS.getPlayersMenu().querySelectorAll('.delete button');
 
 deletePlayerBtns.forEach(button => {
@@ -856,5 +853,78 @@ function closeMenuPanels() {
   panels.forEach(panel => {
     panel.classList.remove('active');
   });
-  
+}
+
+function assignSeats() {
+
+  playerCount = JSON.parse( localStorage.getItem( 'remainingPlayerCount' ) );
+
+  tableCount = Math.ceil( playerCount / 9 );
+  localStorage.setItem( 'tableCount', JSON.stringify(tableCount) );
+
+  playerList = JSON.parse( localStorage.getItem( 'remainingPlayers' ) );
+
+  shuffledList = shufflePlayers();
+
+  for (let i = 0, s = 0; i < shuffledList.length; i++) {
+    shuffledList[i].table = ( i % tableCount ) + 1;
+
+    if ( i % tableCount == 0 ) { s++; }
+
+    shuffledList[i].seat = s;
+    
+  }
+
+  localStorage.setItem( 'remainingPlayers', JSON.stringify( shuffledList ));
+
+  displaySeatingChart( tableCount, shuffledList );
+
+}
+
+function shufflePlayers () {
+
+  remainingPlayers = JSON.parse(localStorage.getItem('remainingPlayers'));
+
+  remainingPlayers.sort(() => Math.random() - 0.5);
+
+  return remainingPlayers;
+
+}
+
+function displaySeatingChart( tableCount, shuffledList ) {
+
+  if ( document.querySelector('.table-wrapper')) {
+    document.querySelector('.table-wrapper').remove();
+  }
+
+  let tableWrapper = document.createElement('div');
+  tableWrapper.classList.add('table-wrapper');
+
+  for (let i = 0; i < tableCount; i++) {
+    let tableContainer = document.createElement('div');
+    tableContainer.classList.add('table');
+
+    let tableName = document.createElement('h2');
+    tableName.innerText = 'Table ' + (i + 1);
+
+    tableContainer.append( tableName );
+
+    let tableList = document.createElement('ol');
+
+    tablePlayers = shuffledList.filter(player => player.table === (i + 1));
+
+    for (let p = 0; p < tablePlayers.length; p++) {
+      let player = document.createElement('li');
+      player.innerText = tablePlayers[p].name;
+
+      tableList.append(player);
+    }
+
+    tableContainer.append( tableList );
+    tableWrapper.append( tableContainer );
+    
+  }
+
+  HELPERS.getSeatingPanel().append( tableWrapper );
+
 }
