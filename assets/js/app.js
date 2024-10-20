@@ -197,17 +197,22 @@ function addPayoutBadges() {
 // reset tournament
 
 function resetTournament() {
-  clearInterval(timerInterval);
-  HELPERS.getPlayBtn().querySelector('i').classList.add('fa-play');
-  HELPERS.getPlayBtn().querySelector('i').classList.remove('fa-pause');
-  isRunning = false;
-  localStorage.setItem('currentLevel', JSON.stringify( 0 ));
-  getLevel();
-  timeRemaining = defaultBlindsData[currentLevel].time * 60;
-  localStorage.setItem('timeRemaining', timeRemaining);
-  initTimer();
-  setBreakTimer();
-  localStorage.setItem('timeToBreak', timeToBreak);
+  // clearInterval(timerInterval);
+  // HELPERS.getPlayBtn().querySelector('i').classList.add('fa-play');
+  // HELPERS.getPlayBtn().querySelector('i').classList.remove('fa-pause');
+  // isRunning = false;
+  // localStorage.setItem('currentLevel', JSON.stringify( 0 ));
+  // getLevel();
+  // timeRemaining = defaultBlindsData[currentLevel].time * 60;
+  // localStorage.setItem('timeRemaining', timeRemaining);
+  // initTimer();
+  // setBreakTimer();
+  // localStorage.setItem('timeToBreak', timeToBreak);
+  // debugger;
+  pauseTimer();
+  timeRemaining = 0;
+  localStorage.clear();
+  location.reload();
 }
 
 // get level data
