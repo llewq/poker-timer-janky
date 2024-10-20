@@ -63,7 +63,7 @@ HELPERS.getPrevBtn().addEventListener('click', function(){
 });
 
 HELPERS.getResetBtn().addEventListener('click', function(){
-  if (window.confirm("Are you sure you want to restart this tournament?")) {
+  if (window.confirm("Are you sure you want to reset timer? This will remove all players, restart the rounds, and cannot be undone.")) {
     resetTournament();
   } else {}
   
