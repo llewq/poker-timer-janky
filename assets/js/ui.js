@@ -69,6 +69,10 @@ HELPERS.getResetBtn().addEventListener('click', function(){
   
 });
 
+HELPERS.getExportBtn().addEventListener('click', function(){
+  exportCSV();
+});
+
 HELPERS.getMenuBtn().addEventListener('click', function(){
   HELPERS.getMenu().classList.add('active');
 });

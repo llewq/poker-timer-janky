@@ -112,6 +112,10 @@ HELPERS.getResetBtn = function() {
   return HELPERS.getToolsPanel().querySelector('.reset-btn');
 }
 
+HELPERS.getExportBtn = function() {
+  return HELPERS.getToolsPanel().querySelector('.export-btn');
+}
+
 //
 // timer 
 //

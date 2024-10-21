@@ -197,23 +197,105 @@ function addPayoutBadges() {
 // reset tournament
 
 function resetTournament() {
-  // clearInterval(timerInterval);
-  // HELPERS.getPlayBtn().querySelector('i').classList.add('fa-play');
-  // HELPERS.getPlayBtn().querySelector('i').classList.remove('fa-pause');
-  // isRunning = false;
-  // localStorage.setItem('currentLevel', JSON.stringify( 0 ));
-  // getLevel();
-  // timeRemaining = defaultBlindsData[currentLevel].time * 60;
-  // localStorage.setItem('timeRemaining', timeRemaining);
-  // initTimer();
-  // setBreakTimer();
-  // localStorage.setItem('timeToBreak', timeToBreak);
-  // debugger;
   pauseTimer();
   timeRemaining = 0;
   localStorage.clear();
   location.reload();
 }
+
+// get date for export file name
+
+function getCurrentDateFormatted() {
+  const today = new Date();
+
+  // Get the month (returns 0-11, so add 1)
+  let month = today.getMonth() + 1;
+  month = month < 10 ? '0' + month : month; // Add leading zero if necessary
+
+  // Get the day
+  let day = today.getDate();
+  day = day < 10 ? '0' + day : day; // Add leading zero if necessary
+
+  // Get the last two digits of the year
+  let year = today.getFullYear().toString().slice(-2);
+
+  return `${month}-${day}-${year}`;
+}
+
+// converst data to csv
+function generateHTML(tournamentResults, payouts) {
+
+  // sort results by placement
+  tournamentResults = tournamentResults.sort((a, b) => a.placed - b.placed);
+
+  let htmlContent = `<figure class="wp-block-table is-style-stripes">
+  <table>
+    <thead>
+      <tr>
+        <th class="has-text-align-center" data-align="center">Place</th>
+        <th class="has-text-align-center" data-align="center">Player</th>
+        <th class="has-text-align-center" data-align="center">Rebuys</th>
+        <th class="has-text-align-center" data-align="center">Winnings</th>
+      </tr>
+    </thead>
+    <tbody>`;
+  // Loop through both arrays and add rows to the table
+  for (let i = 0; i < tournamentResults.length; i++) {
+    const name = tournamentResults[i]?.name || "";
+    const placed = tournamentResults[i]?.placed || "";
+    const payout = payouts[i] ? `$${payouts[i]}` : "-";
+
+    // Add a row to the HTML table
+    htmlContent += `
+    <tr>
+        <td class="has-text-align-center" data-align="center">${placed}</td>
+        <td class="has-text-align-center" data-align="center">${name}</td>
+        <td class="has-text-align-center" data-align="center"></td>
+        <td class="has-text-align-center" data-align="center">${payout}</td>
+    </tr>`;
+
+    
+}
+
+  htmlContent += `
+    </tbody>
+    </table>
+    </figure>`;
+
+  return htmlContent;
+}
+
+
+// export tournament results (playerList)
+
+function exportCSV() {
+
+  let tournamentResults = JSON.parse(localStorage.getItem('playerList'));
+  payouts = JSON.parse(localStorage.getItem('payouts'))
+  
+  // converts the array of objects to CSV format
+  const html = generateHTML(tournamentResults, payouts);
+
+  // creates a blob from the csv data
+  const blob = new Blob([html], {type: 'text/html'});
+
+  // creates a download link and sets the url to the blog object
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+
+  date = getCurrentDateFormatted();
+
+  a.download = `tournament-results-${date}.html`;
+
+  // triggers the download
+  a.click();
+
+  // cleans up the URL
+  URL.revokeObjectURL(url);
+}
+
+
 
 // get level data
 
@@ -557,6 +639,8 @@ function updatePrizePool() {
   }
 
   payouts = payouts.reverse();
+
+  localStorage.setItem('payouts', JSON.stringify(payouts));
 
   return payouts;
 }
