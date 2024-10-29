@@ -137,6 +137,10 @@ form {
   flex-wrap: nowrap;
 }
 
+button {
+  position: relative;
+}
+
 form > div {
   position: relative;
   flex: 1 1 33%;
@@ -262,7 +266,8 @@ form .mover {
 }
 
 form .delete,
-form .eliminate {
+form .eliminate,
+form .rebuy {
   flex: 0 0 32px;
 }
 
@@ -273,6 +278,7 @@ form button,
   border: none;
   border-radius: 4px;
   outline: none;
+  font-size: 0.75rem;
   background-color: var(--color-gray-700);
   color: var(--color-gray-300);
   cursor: pointer;
@@ -286,9 +292,14 @@ form button:hover,
 }
 
 form .eliminate button:hover,
+form .rebuy button:hover,
 .player button:hover {
   color: var(--color-black);
   background-color: var(--color-primary);
+}
+
+form .rebuy button {
+  font-size: 0.875rem;
 }
 
 form .mover button:first-child {
@@ -782,4 +793,59 @@ form .mover button:last-child {
     height: inherit;
     cursor: pointer;
   }
+}
+
+.tooltip:before {
+  content: "Tooltip";
+  position: absolute;
+  opacity: 0;
+  padding: 4px 8px;
+  font-size: 12px;
+  font-family: "Kanit";
+  color: var(--color-gray-900);
+  background-color: var(--color-gray-100);
+  border-radius: 4px;
+  transform: translate(-50%, -100%);
+  left: 50%;
+  top: 2px;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.tooltip:after {
+  content: "";
+  position: absolute;
+  opacity: 0;
+  width: 5px;
+  height: 5px;
+  transform: translate(-50%, -100%) rotate(45deg);
+  top: 4px;
+  left: 50%;
+  background-color: white;
+  pointer-events: none;
+}
+
+.tooltip:hover:after,
+.tooltip:hover:before {
+  opacity: 1;
+  transition: all ease 0.2s 0.75s;
+}
+
+.tooltip:hover:before { top: -2px; }
+.tooltip:hover:after { top: 0; }
+
+.re-enroll .tooltip:before {
+  content: "Re-enroll";
+}
+
+.eliminate .tooltip:before {
+  content: "Eliminate";
+}
+
+.delete .tooltip:before {
+  content: "Delete";
+}
+
+.rebuy .tooltip:before {
+  content: "Re-buy";
 }

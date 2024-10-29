@@ -511,14 +511,17 @@ function buildPlayerEl( playerID ) {
   playerEl.innerHTML = 
   `<form action="">
     <div class="delete">
-      <button data-delete="${ pid }"><i class="fa-solid fa-trash"></i></button>
+      <button data-delete="${ pid }" class="tooltip"><i class="fa-solid fa-trash"></i></button>
     </div>
     <div>
       <label for="player-${ pid }"></label>
       <input type="text" id="player-${ pid }" data-pid="${ pid }" name="" value="${ name }">
     </div>
+    <div class="rebuy">
+      <button data-rebuy="${ pid }" class="tooltip"><i class="fa-solid fa-dollar"></i></button>
+    </div>
     <div class="eliminate">
-      <button data-eliminate="${ pid }"><i class="fa-solid fa-user-slash"></i></button>
+      <button data-eliminate="${ pid }" class="tooltip"><i class="fa-solid fa-user-slash"></i></button>
     </div>
   </form>`;
 
@@ -564,9 +567,11 @@ function buildPlayerResultEl( pid ) {
   `<span class="field">
     <span class="name">${ player.name }</span>
   </span>
-  <button class="re-enroll">
-    <i class="fa-solid fa-undo"></i>
-  </button>`
+  <div class="re-enroll">
+    <button class="tooltip">
+      <i class="fa-solid fa-undo"></i>
+    </button>
+  </div>`
 
   return playerEl;
 }
