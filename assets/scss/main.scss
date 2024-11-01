@@ -300,6 +300,9 @@ form .rebuy button:hover,
 
 form .rebuy button {
   font-size: 0.875rem;
+  > * {
+    pointer-events: none;
+  }
 }
 
 form .mover button:first-child {

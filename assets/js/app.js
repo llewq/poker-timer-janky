@@ -72,22 +72,24 @@ function getPlayerList() {
 getPlayerList();
 
 
-// create initial player count - does not change as players are elimintated
+// create entry count - does not change as players are elimintated
 
-let initialPlayerCount = 0;
+let entryCount = 0;
 
-if( !localStorage.getItem('initialPlayerCount') ) {
-  initialPlayerCount = playerList.length;
+if( !localStorage.getItem('entryCount') ) {
+  entryCount = playerList.length;
 } else {
-  initialPlayerCount = JSON.parse(localStorage.getItem('initialPlayerCount'));
+  entryCount = JSON.parse(localStorage.getItem('entryCount'));
+  entryCount = parseInt(entryCount, 10);
 }
 
-function updateInitialCount() {
-  HELPERS.getInitialCountCont().textContent = initialPlayerCount;
-  localStorage.setItem('initialPlayerCount', JSON.stringify(initialPlayerCount));
+function updateEntryCount() {
+  entryCount = parseInt(entryCount, 10);
+  HELPERS.getEntryCountCont().textContent = entryCount;
+  localStorage.setItem('entryCount', JSON.stringify(entryCount));
 }
 
-updateInitialCount();
+updateEntryCount();
 
 // create remaining player count - updates when a player is eliminated or re-enters
 let remainingPlayerCount = playerList.length;
@@ -534,6 +536,14 @@ function buildPlayerEl( playerID ) {
     }
   });
   playerEl.querySelector('.eliminate').addEventListener('click', eliminatePlayer);
+
+  playerEl.querySelector('.rebuy').addEventListener('click', function(e){
+    e.preventDefault();
+    // console.log(e.target);
+    let pid = e.target.dataset.rebuy;
+    // console.log(pid);
+    rebuyPlayer(pid);
+  });
   playerEl.querySelector('.delete').addEventListener('click', function(e){
 
     e.preventDefault();
@@ -587,22 +597,22 @@ if( !localStorage.getItem('nextEliminatedPosition') ) {
 
 // create prize pool
 
-let prizePool = initialPlayerCount * 10;
+let prizePool = entryCount * 10;
 
 let payouts = []; // array of payouts
 let placesPaid = 1;
 
 function updatePrizePool() {
 
-  initialPlayerCount = localStorage.getItem('initialPlayerCount');
-  prizePool = initialPlayerCount * 10;
+  entryCount = localStorage.getItem('entryCount');
+  prizePool = entryCount * 10;
 
   let payoutIndex;
 
-  if ( initialPlayerCount <= 4 ) {
+  if ( entryCount <= 4 ) {
     payoutIndex = 0;
   } else {
-    payoutIndex = initialPlayerCount - 4;
+    payoutIndex = entryCount - 4;
   }
 
   let numPayouts = defaultNumPayouts[payoutIndex];
@@ -656,10 +666,10 @@ function updatePrizePool() {
 let averageStack;
 
 function updateAverageStack() {
-  if ( initialPlayerCount > 0 && remainingPlayerCount > 0 ) {
-    averageStack = Math.round(initialPlayerCount * 10000 / remainingPlayerCount);
-  } else if ( initialPlayerCount > 0 && remainingPlayerCount == 0 ) {
-    averageStack = initialPlayerCount * 10000;
+  if ( entryCount > 0 && remainingPlayerCount > 0 ) {
+    averageStack = Math.round(entryCount * 10000 / remainingPlayerCount);
+  } else if ( entryCount > 0 && remainingPlayerCount == 0 ) {
+    averageStack = entryCount * 10000;
   } else {
     averageStack = 0;
   }
@@ -710,6 +720,7 @@ function addPlayer( ) {
     pid: playerList.length,
     active: true,
     name: "",
+    rebuys: 0,
     placed: null
   });
 
@@ -721,13 +732,31 @@ function addPlayer( ) {
 
   localStorage.setItem('playerList', JSON.stringify(playerList));
   
-  initialPlayerCount++;
+  entryCount++;
   remainingPlayerCount++;
   nextEliminatedPosition = JSON.parse(localStorage.getItem('nextEliminatedPosition'));
   nextEliminatedPosition++;
   localStorage.setItem('nextEliminatedPosition', JSON.stringify(nextEliminatedPosition));
-  updateInitialCount();
+  updateEntryCount();
   updateRemainingCount();
+  updateAverageStack();
+}
+
+function rebuyPlayer( pid ) {
+  // update player's rebuy record
+  console.log(pid);
+  playerList = JSON.parse(localStorage.getItem('playerList'));
+  player = playerList.find(player => player.pid == pid);
+  console.log(player);
+  player.rebuys++;
+  console.log(playerList);
+  localStorage.setItem('playerList', JSON.stringify(playerList));
+
+  
+
+  entryCount++;
+  updateEntryCount();
+  updatePlayerResultsLists();
   updateAverageStack();
 }
 
@@ -748,12 +777,12 @@ function deletePlayer( pid ) {
   remainingPlayers = remainingPlayers.filter( player => player.pid !== pid);
   localStorage.setItem('remainingPlayers', JSON.stringify(remainingPlayers));
 
-  initialPlayerCount--;
+  entryCount--;
   remainingPlayerCount--;
   nextEliminatedPosition = JSON.parse(localStorage.getItem('nextEliminatedPosition'));
   nextEliminatedPosition--;
   localStorage.setItem('nextEliminatedPosition', JSON.stringify(nextEliminatedPosition));
-  updateInitialCount();
+  updateEntryCount();
   updateRemainingCount();
   reorderPlacements();
   updatePlayerResultsLists();
