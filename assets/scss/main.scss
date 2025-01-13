@@ -292,7 +292,6 @@ form button:hover,
 }
 
 form .eliminate button:hover,
-form .rebuy button:hover,
 .player button:hover {
   color: var(--color-black);
   background-color: var(--color-primary);
@@ -306,6 +305,29 @@ form .rebuy button,
 form .delete button {
   > * {
     pointer-events: none;
+  }
+}
+
+form .rebuy {
+  flex: 0 0 64px;
+  display: flex;
+  background-color: var(--color-gray-700);
+  border-radius: 4px;
+  span {
+    display: flex;
+    align-items: center;
+    padding: 0 8px;
+  }
+  button {
+    font-size: 1rem;
+    &:hover {
+      color: var(--color-black);
+      background-color: var(--color-primary);
+    }
+    &.disabled {
+      opacity: 0.25;
+      pointer-events: none;
+    }
   }
 }
 
@@ -854,6 +876,6 @@ form .mover button:last-child {
   content: "Delete";
 }
 
-.rebuy .tooltip:before {
+.rebuy.tooltip:before {
   content: "Re-buy";
 }

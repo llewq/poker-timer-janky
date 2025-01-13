@@ -122,10 +122,8 @@ updateRemainingCount();
 
 function buildPlayerListUI() {
   playerList = JSON.parse(localStorage.getItem('playerList'));
-  console.log(playerList);
   playerList.forEach(player => {
     if( player.active ) {
-      console.log(player.pid);
       player = buildPlayerEl(player.pid);
       HELPERS.getPlayerActionRow().before(player);
     }
@@ -489,17 +487,18 @@ function buildPlayerEl( playerID ) {
   if( playerList[playerID] ) {
     pid = playerList[playerID].pid;
     name = playerList[playerID].name;
+    rebuys = playerList[playerID].rebuys || 0;
   } else {
     addPlayer(); // adds empty player
     pid = playerID;
     name = "";
+    rebuys = 0;
   }
 
   let playerEl = document.createElement('div');
   playerEl.setAttribute('class', 'player-row');
   playerEl.setAttribute('data-player', pid );
 
-  console.log(playerList[pid]);
   if ( playerList[pid].placed ) { 
     playerEl.setAttribute('data-placed', playerList[pid].placed );
   }
@@ -513,8 +512,10 @@ function buildPlayerEl( playerID ) {
       <label for="player-${ pid }"></label>
       <input type="text" id="player-${ pid }" data-pid="${ pid }" name="" value="${ name }">
     </div>
-    <div class="rebuy">
-      <button data-rebuy="${ pid }" class="tooltip"><i class="fa-solid fa-dollar"></i></button>
+    <div data-rebuy="${ pid }" class="rebuy tooltip">
+      <button class="rebuy-minus disabled">-</button>
+      <span class="rebuy-count">${rebuys}</span>
+      <button class="rebuy-plus">+</button>
     </div>
     <div class="eliminate">
       <button data-eliminate="${ pid }" class="tooltip"><i class="fa-solid fa-user-slash"></i></button>
@@ -531,13 +532,20 @@ function buildPlayerEl( playerID ) {
   });
   playerEl.querySelector('.eliminate').addEventListener('click', eliminatePlayer);
 
-  playerEl.querySelector('.rebuy').addEventListener('click', function(e){
-    e.preventDefault();
-    // console.log(e.target);
-    let pid = e.target.dataset.rebuy;
-    // console.log(pid);
-    rebuyPlayer(pid);
-  });
+  if ( playerEl.querySelector('.rebuy-plus') ) {
+    playerEl.querySelector('.rebuy-plus').addEventListener('click', function(e){
+      e.preventDefault();
+      let pid = e.target.parentElement.dataset.rebuy;
+      rebuyPlayer(pid, 1, playerEl);
+    });
+  }
+  // if ( playerEl.querySelector('.rebuy-minus') ) {
+  //   playerEl.querySelector('.rebuy-minus').addEventListener('click', function(e){
+  //     e.preventDefault();
+  //     let pid = e.target.parentElement.dataset.rebuy;
+  //     rebuyPlayer(pid, -1, playerEl);
+  //   });
+  // }
 
   playerEl.querySelector('.delete').addEventListener('click', function(e){
     e.preventDefault();
@@ -550,7 +558,6 @@ function buildPlayerEl( playerID ) {
     }
 
     if (window.confirm("Are you sure you want to delete this player? This cannot be undone.")) {
-      console.log(pid);
       deletePlayer( pid );
     } else {}
   });
@@ -743,20 +750,70 @@ function addPlayer( ) {
   updateAverageStack();
 }
 
-function rebuyPlayer( pid ) {
-  // update player's rebuy record
-  console.log(pid);
-  playerList = JSON.parse(localStorage.getItem('playerList'));
-  player = playerList.find(player => player.pid == pid);
-  player.rebuys++;
-  localStorage.setItem('playerList', JSON.stringify(playerList));
+function rebuyPlayer( pid, value, playerEl ) {
 
-  remainingPlayers = JSON.parse(localStorage.getItem('remainingPlayers'));
-  player = remainingPlayers.find(player => player.pid == pid);
-  player.rebuys++;
-  localStorage.setItem('remainingPlayers', JSON.stringify(remainingPlayers));
+  if ( value > 0 ) {
+    // update player's rebuy record
+    playerList = JSON.parse(localStorage.getItem('playerList'));
+    player = playerList.find(player => player.pid == pid);
+    player.rebuys++;
+    localStorage.setItem('playerList', JSON.stringify(playerList));
 
-  entryCount++;
+    remainingPlayers = JSON.parse(localStorage.getItem('remainingPlayers'));
+    player = remainingPlayers.find(player => player.pid == pid);
+    player.rebuys++;
+    localStorage.setItem('remainingPlayers', JSON.stringify(remainingPlayers));
+    
+    entryCount++;
+  } else {
+    // update player's rebuy record
+    playerList = JSON.parse(localStorage.getItem('playerList'));
+    player = playerList.find(player => player.pid == pid);
+    player.rebuys--;
+    localStorage.setItem('playerList', JSON.stringify(playerList));
+
+    remainingPlayers = JSON.parse(localStorage.getItem('remainingPlayers'));
+    player = remainingPlayers.find(player => player.pid == pid);
+    player.rebuys--;
+    localStorage.setItem('remainingPlayers', JSON.stringify(remainingPlayers));
+
+    entryCount--;
+  }
+  
+
+  const rebuyButton = playerEl.querySelector('.rebuy');
+  const newRebuyButton = document.createElement('div');
+  newRebuyButton.classList.add('rebuy', 'tooltip');
+  newRebuyButton.dataset.rebuy = pid;
+  if (player.rebuys > 0) {
+    newRebuyButton.innerHTML = `
+        <button class="rebuy-minus">-</button>
+        <span class="rebuy-count">${player.rebuys}</span>
+        <button class="rebuy-plus">+</button>`;
+  } else {
+    newRebuyButton.innerHTML = `
+        <button class="rebuy-minus disabled">-</button>
+        <span class="rebuy-count">${player.rebuys}</span>
+        <button class="rebuy-plus">+</button>`;
+  }
+
+  rebuyButton.replaceWith(newRebuyButton);
+
+  if ( playerEl.querySelector('.rebuy-plus') ) {
+    playerEl.querySelector('.rebuy-plus').addEventListener('click', function(e){
+      e.preventDefault();
+      let pid = e.target.parentElement.dataset.rebuy;
+      rebuyPlayer(pid, 1, playerEl);
+    });
+  }
+  if ( playerEl.querySelector('.rebuy-minus') ) {
+    playerEl.querySelector('.rebuy-minus').addEventListener('click', function(e){
+      e.preventDefault();
+      let pid = e.target.parentElement.dataset.rebuy;
+      rebuyPlayer(pid, -1, playerEl);
+    });
+  }
+
   updateEntryCount();
   updatePlayerResultsLists();
   updateAverageStack();
@@ -949,8 +1006,6 @@ function updatePlayerResultsLists() {
     }
   });
 
-  // let sortedList = resultsList.sort((a, b) => a.value - b.value)
-  // console.log(resultsList);
 
   resultsList.forEach(player => {
     HELPERS.getPlayerResultsCont().append(player);
