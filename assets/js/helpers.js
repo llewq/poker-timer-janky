@@ -248,8 +248,8 @@ HELPERS.getAudioWarning = function() {
 // info panel
 //
 
-HELPERS.getEntryCountCont = function() {
-  return HELPERS.getInfoPanel().querySelector('#player-count-entries');
+HELPERS.getInitialCountCont = function() {
+  return HELPERS.getInfoPanel().querySelector('#player-count-initial');
 }
 
 HELPERS.getRemainingCountCont = function() {

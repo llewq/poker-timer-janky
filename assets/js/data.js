@@ -164,7 +164,7 @@ const defaultBlinds = [
   {
     type: 'break',
     label: 'Break - Color Up 25s',
-    time: 15
+    time: 10
   },
   {
     type: 'blind',
@@ -201,7 +201,7 @@ const defaultBlinds = [
   {
     type: 'break',
     label: 'Break - Color Up 100s',
-    time: 15
+    time: 10
   },
   {
     type: 'blind',
@@ -238,7 +238,7 @@ const defaultBlinds = [
   {
     type: 'break',
     label: 'Break - Color Up 500s',
-    time: 15
+    time: 10
   },
   {
     type: 'blind',
@@ -385,23 +385,23 @@ const defaultNumPayouts = [
   },
   {
     entries: 31,
-    placesPaid: 7
+    placesPaid: 8
   },
   {
     entries: 32,
-    placesPaid: 7
+    placesPaid: 8
   },
   {
     entries: 33,
-    placesPaid: 7
+    placesPaid: 8
   },
   {
     entries: 34,
-    placesPaid: 7
+    placesPaid: 8
   },
   {
     entries: 35,
-    placesPaid: 7
+    placesPaid: 8
   },
   {
     entries: 36,
@@ -440,23 +440,23 @@ const defaultPrizes = [
   },
   {
     placesPaid: 4,
-    prizes: [0.45, 0.25, 0.18, 0.12] 
+    prizes: [0.4, 0.3, 0.2, 0.1] 
   },
   {
     placesPaid: 5,
-    prizes: [0.435, 0.24, 0.16, 0.1, 0.065] 
+    prizes: [0.36, 0.26, 0.18, 0.12, 0.08] 
   },
   {
     placesPaid: 6,
-    prizes: [0.38, 0.22, 0.15, 0.11, 0.08, 0.06] 
+    prizes: [0.32, 0.24, 0.18, 0.12, 0.08, 0.06] 
   },
   {
     placesPaid: 7,
-    prizes: [0.35, 0.21, 0.15, 0.11, 0.08, 0.06, 0.04] 
+    prizes: [0.3, 0.22, 0.17, 0.12, 0.08, 0.06, 0.05] 
   },
   {
     placesPaid: 8,
-    prizes: [0.27, 0.19, 0.16, 0.13, 0.10, 0.07, 0.05, 0.03] 
+    prizes: [0.28, 0.20, 0.15, 0.12, 0.09, 0.07, 0.05, 0.04] 
   }
 ]
 

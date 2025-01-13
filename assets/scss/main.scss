@@ -300,6 +300,10 @@ form .rebuy button:hover,
 
 form .rebuy button {
   font-size: 0.875rem;
+}
+
+form .rebuy button,
+form .delete button {
   > * {
     pointer-events: none;
   }
@@ -696,6 +700,7 @@ form .mover button:last-child {
   padding-top: 96px;
   background-color: var(--color-gray-900-90);
   overflow-y: scroll;
+  overflow-x: hidden;
   backdrop-filter: blur(5px);
   transform: translateX(-105%);
   transition: transform var(--ease-in-cubic) 400ms;
@@ -707,7 +712,7 @@ form .mover button:last-child {
   position: absolute;
   z-index: 100;
   width: 100%;
-  height: 36px;
+  height: 12px;
   background: linear-gradient(to bottom, var(--color-gray-900), var(--color-gray-900-00));
 }
 

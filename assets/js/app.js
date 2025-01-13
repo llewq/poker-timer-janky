@@ -1,3 +1,5 @@
+let averageStack;
+
 /**
  * Adds default player list to local storage, if no local storage exists
  */
@@ -75,21 +77,30 @@ getPlayerList();
 // create entry count - does not change as players are elimintated
 
 let entryCount = 0;
+let initialCount = 0;
 
 if( !localStorage.getItem('entryCount') ) {
   entryCount = playerList.length;
+  initialCount = playerList.length;
 } else {
   entryCount = JSON.parse(localStorage.getItem('entryCount'));
   entryCount = parseInt(entryCount, 10);
+  initialCount = JSON.parse(localStorage.getItem('initialCount'));
+  initialCount = parseInt(initialCount, 10);
 }
 
 function updateEntryCount() {
   entryCount = parseInt(entryCount, 10);
-  HELPERS.getEntryCountCont().textContent = entryCount;
   localStorage.setItem('entryCount', JSON.stringify(entryCount));
 }
-
 updateEntryCount();
+
+function updateInitialCount() {
+  initialCount = parseInt(initialCount, 10);
+  HELPERS.getInitialCountCont().textContent = initialCount;
+  localStorage.setItem('initialCount', JSON.stringify(initialCount));
+}
+updateInitialCount();
 
 // create remaining player count - updates when a player is eliminated or re-enters
 let remainingPlayerCount = playerList.length;
@@ -107,31 +118,14 @@ function updateRemainingCount() {
 
 updateRemainingCount();
 
-// create an object that holds the names and ids of players still in the tournament
-
-function buildRemainingPlayersList() {
-
-  playerList = JSON.parse(localStorage.getItem('playerList'));
-  
-  let remainingPlayers = [];
-
-  playerList.forEach(player => {
-    
-    if( player.active ) {
-      remainingPlayers.push(player);
-    }
-  });
-
-  localStorage.setItem('remainingPlayers', JSON.stringify(remainingPlayers));
-
-}
-
 // initialize existing player list
 
 function buildPlayerListUI() {
-  
+  playerList = JSON.parse(localStorage.getItem('playerList'));
+  console.log(playerList);
   playerList.forEach(player => {
     if( player.active ) {
+      console.log(player.pid);
       player = buildPlayerEl(player.pid);
       HELPERS.getPlayerActionRow().before(player);
     }
@@ -245,6 +239,7 @@ function generateHTML(tournamentResults, payouts) {
   for (let i = 0; i < tournamentResults.length; i++) {
     const name = tournamentResults[i]?.name || "";
     const placed = tournamentResults[i]?.placed || "";
+    const rebuys = tournamentResults[i]?.rebuys || "";
     const payout = payouts[i] ? `$${payouts[i]}` : "-";
 
     // Add a row to the HTML table
@@ -252,7 +247,7 @@ function generateHTML(tournamentResults, payouts) {
     <tr>
         <td class="has-text-align-center" data-align="center">${placed}</td>
         <td class="has-text-align-center" data-align="center">${name}</td>
-        <td class="has-text-align-center" data-align="center"></td>
+        <td class="has-text-align-center" data-align="center">${rebuys}</td>
         <td class="has-text-align-center" data-align="center">${payout}</td>
     </tr>`;
 
@@ -416,7 +411,6 @@ function startTimer(timeRemaining, timeToBreak) {
 
   var minutes, seconds;
   timerInterval = setInterval(function () {
-    console.log(currentLevel, onBreak, timeToBreak);
 
     --timeRemaining;
     timeToBreak = ( !onBreak ) ? --timeToBreak : 0;
@@ -505,7 +499,7 @@ function buildPlayerEl( playerID ) {
   playerEl.setAttribute('class', 'player-row');
   playerEl.setAttribute('data-player', pid );
 
-  
+  console.log(playerList[pid]);
   if ( playerList[pid].placed ) { 
     playerEl.setAttribute('data-placed', playerList[pid].placed );
   }
@@ -544,13 +538,19 @@ function buildPlayerEl( playerID ) {
     // console.log(pid);
     rebuyPlayer(pid);
   });
-  playerEl.querySelector('.delete').addEventListener('click', function(e){
 
+  playerEl.querySelector('.delete').addEventListener('click', function(e){
     e.preventDefault();
-    
-    let pid = e.target.parentElement.parentElement.parentElement.parentElement.dataset.player;
-    
-    if (window.confirm("Are you sure you want to delete this player?")) {
+    let pid = e.target.dataset.delete;
+    playerList = JSON.parse(localStorage.getItem('playerList'));
+
+    if (playerList[pid].rebuys > 0) {
+      window.alert("Players who have purchased rebuys cannot be removed from the tournament.");
+      return;
+    }
+
+    if (window.confirm("Are you sure you want to delete this player? This cannot be undone.")) {
+      console.log(pid);
       deletePlayer( pid );
     } else {}
   });
@@ -603,16 +603,15 @@ let payouts = []; // array of payouts
 let placesPaid = 1;
 
 function updatePrizePool() {
-
-  entryCount = localStorage.getItem('entryCount');
+  initialCount = localStorage.getItem('initialCount');
   prizePool = entryCount * 10;
 
   let payoutIndex;
 
-  if ( entryCount <= 4 ) {
+  if ( initialCount <= 4 ) {
     payoutIndex = 0;
   } else {
-    payoutIndex = entryCount - 4;
+    payoutIndex = initialCount - 4;
   }
 
   let numPayouts = defaultNumPayouts[payoutIndex];
@@ -663,7 +662,7 @@ function updatePrizePool() {
 
 // update average stack
 
-let averageStack;
+
 
 function updateAverageStack() {
   if ( entryCount > 0 && remainingPlayerCount > 0 ) {
@@ -733,11 +732,13 @@ function addPlayer( ) {
   localStorage.setItem('playerList', JSON.stringify(playerList));
   
   entryCount++;
+  initialCount++;
   remainingPlayerCount++;
   nextEliminatedPosition = JSON.parse(localStorage.getItem('nextEliminatedPosition'));
   nextEliminatedPosition++;
   localStorage.setItem('nextEliminatedPosition', JSON.stringify(nextEliminatedPosition));
   updateEntryCount();
+  updateInitialCount();
   updateRemainingCount();
   updateAverageStack();
 }
@@ -747,12 +748,13 @@ function rebuyPlayer( pid ) {
   console.log(pid);
   playerList = JSON.parse(localStorage.getItem('playerList'));
   player = playerList.find(player => player.pid == pid);
-  console.log(player);
   player.rebuys++;
-  console.log(playerList);
   localStorage.setItem('playerList', JSON.stringify(playerList));
 
-  
+  remainingPlayers = JSON.parse(localStorage.getItem('remainingPlayers'));
+  player = remainingPlayers.find(player => player.pid == pid);
+  player.rebuys++;
+  localStorage.setItem('remainingPlayers', JSON.stringify(remainingPlayers));
 
   entryCount++;
   updateEntryCount();
@@ -762,8 +764,10 @@ function rebuyPlayer( pid ) {
 
 // delete player 
 
-function deletePlayer( pid ) {
+function deletePlayer(pid) {
+    
   pid = parseInt(pid, 10);
+  
   remove = HELPERS.getPlayersMenu().querySelector(`[data-player='${ pid }']`);
   remove.remove();
 
@@ -778,11 +782,13 @@ function deletePlayer( pid ) {
   localStorage.setItem('remainingPlayers', JSON.stringify(remainingPlayers));
 
   entryCount--;
+  initialCount--;
   remainingPlayerCount--;
   nextEliminatedPosition = JSON.parse(localStorage.getItem('nextEliminatedPosition'));
   nextEliminatedPosition--;
   localStorage.setItem('nextEliminatedPosition', JSON.stringify(nextEliminatedPosition));
   updateEntryCount();
+  updateInitialCount();
   updateRemainingCount();
   reorderPlacements();
   updatePlayerResultsLists();
@@ -956,20 +962,20 @@ function updatePlayerResultsLists() {
 
 updatePlayerResultsLists();
 
-const deletePlayerBtns = HELPERS.getPlayersMenu().querySelectorAll('.delete button');
+// const deletePlayerBtns = HELPERS.getPlayersMenu().querySelectorAll('.delete button');
 
-deletePlayerBtns.forEach(button => {
-  button.addEventListener('click', function(e){
+// deletePlayerBtns.forEach(button => {
+//   button.addEventListener('click', function(e){
 
-    e.preventDefault();
+//     e.preventDefault();
     
-    let pid = e.target.parentElement.parentElement.parentElement.parentElement.dataset.player;
+//     let pid = e.target.parentElement.parentElement.parentElement.parentElement.dataset.player;
     
-    if (window.confirm("Are you sure you want to delete this player?")) {
-      deletePlayer( pid );
-    } else {}
-  });
-});
+//     if (window.confirm("Are you sure you want to delete this player?")) {
+//       deletePlayer( pid );
+//     } else {}
+//   });
+// });
 
 function closeMenuPanels() {
   let panels = HELPERS.getMenuPanels();
