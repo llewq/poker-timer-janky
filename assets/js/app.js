@@ -520,7 +520,7 @@ function buildPlayerEl( pid ) {
       <input type="text" id="player-${ pid }" data-pid="${ pid }" name="" value="${ name }">
     </div>
     <div data-rebuy="${ pid }" class="rebuy tooltip">
-      <button class="rebuy-minus disabled">-</button>
+      <button class="rebuy-minus ${rebuys > 0 ? '' : 'disabled'}">-</button>
       <span class="rebuy-count">${rebuys}</span>
       <button class="rebuy-plus">+</button>
     </div>
@@ -546,13 +546,13 @@ function buildPlayerEl( pid ) {
       rebuyPlayer(pid, 1, playerEl);
     });
   }
-  // if ( playerEl.querySelector('.rebuy-minus') ) {
-  //   playerEl.querySelector('.rebuy-minus').addEventListener('click', function(e){
-  //     e.preventDefault();
-  //     let pid = e.target.parentElement.dataset.rebuy;
-  //     rebuyPlayer(pid, -1, playerEl);
-  //   });
-  // }
+  if ( playerEl.querySelector('.rebuy-minus') ) {
+    playerEl.querySelector('.rebuy-minus').addEventListener('click', function(e){
+      e.preventDefault();
+      let pid = e.target.parentElement.dataset.rebuy;
+      rebuyPlayer(pid, -1, playerEl);
+    });
+  }
 
   playerEl.querySelector('.delete').addEventListener('click', function(e){
     e.preventDefault();
