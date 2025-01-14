@@ -554,7 +554,7 @@ function buildPlayerEl( pid ) {
     });
   }
 
-  playerEl.querySelector('.delete').addEventListener('click', function(e){
+  playerEl.querySelector('.delete button').addEventListener('click', function(e){
     e.preventDefault();
     let pid = e.target.dataset.delete;
     playerList = JSON.parse(localStorage.getItem('playerList'));

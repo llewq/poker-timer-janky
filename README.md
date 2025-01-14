@@ -1,5 +1,7 @@
 # Poker Timer - the janky version
 
+Version 0.3.2 - Bug fixes, unique PIDs.
+
 Version 0.3.1 - Updates to Rebuy UI. Adds incrementation.
 
 Version 0.3.0 - New Rebuy feature
