@@ -132,6 +132,16 @@ function buildPlayerListUI() {
 
 buildPlayerListUI();
 
+// renumbers the players in the player management panel
+function renumberPlayerListUI() {
+  playerRowCounters = HELPERS.getPlayersMenu().querySelectorAll('.player-row .counter span');
+  let counter = 1;
+  playerRowCounters.forEach(row => {
+    row.innerText = counter;
+    counter++;
+  });
+}
+
 // build payout results
 
 function buildPayoutResults() {
@@ -515,6 +525,9 @@ function buildPlayerEl( pid ) {
     <div class="delete">
       <button data-delete="${ pid }" class="tooltip"><i class="fa-solid fa-trash"></i></button>
     </div>
+    <div class="counter">
+      <span></span>
+    </div>
     <div>
       <label for="player-${ pid }"></label>
       <input type="text" id="player-${ pid }" data-pid="${ pid }" name="" value="${ name }">
@@ -569,6 +582,7 @@ function buildPlayerEl( pid ) {
     } else {}
   });
 
+  renumberPlayerListUI();
   return playerEl;
 }
 
@@ -721,6 +735,7 @@ function updatePlayer() {
   }
   localStorage.setItem('remainingPlayers', JSON.stringify(remainingPlayers));
 
+  renumberPlayerListUI();
   updatePlayerResultsLists();
 }
 
@@ -757,6 +772,7 @@ function addPlayer( pid ) {
   updateInitialCount();
   updateRemainingCount();
   updateAverageStack();
+  renumberPlayerListUI();
 }
 
 function rebuyPlayer( pid, value, playerEl ) {
@@ -858,6 +874,7 @@ function deletePlayer(pid) {
   updateRemainingCount();
   reorderPlacements();
   updatePlayerResultsLists();
+  renumberPlayerListUI();
 }
 
 // reorder placements
@@ -918,6 +935,7 @@ function eliminatePlayer() {
     remainingPlayerCount--;
     updateRemainingCount();
     updateAverageStack();
+    renumberPlayerListUI();
   }
 
   console.log('After elimination:', playerList);
@@ -957,6 +975,7 @@ function reEnrollPlayer() {
   localStorage.setItem('nextEliminatedPosition', JSON.stringify(nextEliminatedPosition));
   updateRemainingCount();
   updateAverageStack();
+  renumberPlayerListUI();
 }
 
 // build blind level
@@ -1133,3 +1152,5 @@ function displaySeatingChart( tableCount, shuffledList ) {
   HELPERS.getSeatingPanel().append( tableWrapper );
 
 }
+
+renumberPlayerListUI();

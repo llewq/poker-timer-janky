@@ -339,6 +339,18 @@ form .mover button:last-child {
   border-radius: 0 0 4px 4px;
 }
 
+form .counter {
+  flex: 0 0 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-gray-700);
+  border-radius: 4px;
+  span {
+    display: block;
+  }
+}
+
 .action-row form button,
 .option-row form button {
   font-family: var(--font-kanit);
@@ -358,6 +370,7 @@ form .mover button:last-child {
   background-color: transparent;
   border: solid 1px var(--color-primary);
 }
+
 
 .player .field {
   display: flex;
