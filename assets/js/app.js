@@ -569,21 +569,27 @@ function buildPlayerEl( pid ) {
 
   playerEl.querySelector('.delete button').addEventListener('click', function(e){
     e.preventDefault();
-    let pid = e.target.dataset.delete;
-    playerList = JSON.parse(localStorage.getItem('playerList'));
-
-    if (player.rebuys > 0) {
-      window.alert("Players who have purchased rebuys cannot be removed from the tournament.");
-      return;
-    }
-
-    if (window.confirm("Are you sure you want to delete this player? This cannot be undone.")) {
-      deletePlayer( pid );
-    } else {}
+    deleteWarning(e);
   });
 
   renumberPlayerListUI();
   return playerEl;
+}
+
+// checks status of rebuys when the delete player button is clicked
+function deleteWarning(e) {
+
+  let pid = e.target.dataset.delete;
+  playerList = JSON.parse(localStorage.getItem('playerList'));
+
+  if (player.rebuys > 0) {
+    window.alert("Players who have purchased rebuys cannot be removed from the tournament.");
+    return;
+  }
+
+  if (window.confirm("Are you sure you want to delete this player? This cannot be undone.")) {
+    deletePlayer( pid );
+  } else {}
 }
 
 // build player element to display in remaning/results containers
@@ -1057,20 +1063,6 @@ function updatePlayerResultsLists() {
 
 updatePlayerResultsLists();
 
-// const deletePlayerBtns = HELPERS.getPlayersMenu().querySelectorAll('.delete button');
-
-// deletePlayerBtns.forEach(button => {
-//   button.addEventListener('click', function(e){
-
-//     e.preventDefault();
-    
-//     let pid = e.target.parentElement.parentElement.parentElement.parentElement.dataset.player;
-    
-//     if (window.confirm("Are you sure you want to delete this player?")) {
-//       deletePlayer( pid );
-//     } else {}
-//   });
-// });
 
 function closeMenuPanels() {
   let panels = HELPERS.getMenuPanels();
