@@ -482,26 +482,33 @@ function getTimeToBreak() {
 
 // build player
 
-function buildPlayerEl( playerID ) {
-  let pid, name;
-  if( playerList[playerID] ) {
-    pid = playerList[playerID].pid;
-    name = playerList[playerID].name;
-    rebuys = playerList[playerID].rebuys || 0;
+function buildPlayerEl( pid ) {
+  playerList = JSON.parse(localStorage.getItem('playerList'));
+  let name;
+  let player = playerList.find(player => player.pid === pid);
+  if( player ) {
+    pid = player.pid;
+    name = player.name;
+    rebuys = player.rebuys || 0;
   } else {
-    addPlayer(); // adds empty player
-    pid = playerID;
+    addPlayer( pid ); // adds empty player
+    pid = pid;
     name = "";
     rebuys = 0;
+
+    // refreshes playerList if a new player was added
+    playerList = JSON.parse(localStorage.getItem('playerList'));
+    player = playerList.find(player => player.pid === pid);
   }
 
   let playerEl = document.createElement('div');
   playerEl.setAttribute('class', 'player-row');
   playerEl.setAttribute('data-player', pid );
 
-  if ( playerList[pid].placed ) { 
-    playerEl.setAttribute('data-placed', playerList[pid].placed );
+  if ( player.placed ) { 
+    playerEl.setAttribute('data-placed', player.placed );
   }
+
 
   playerEl.innerHTML = 
   `<form action="">
@@ -552,7 +559,7 @@ function buildPlayerEl( playerID ) {
     let pid = e.target.dataset.delete;
     playerList = JSON.parse(localStorage.getItem('playerList'));
 
-    if (playerList[pid].rebuys > 0) {
+    if (player.rebuys > 0) {
       window.alert("Players who have purchased rebuys cannot be removed from the tournament.");
       return;
     }
@@ -689,8 +696,7 @@ updateAverageStack();
 // update player in player list
 
 function updatePlayer() {
-  let pid = this.dataset.pid;
-  pid = parseInt(pid, 10);
+  let pid = parseInt(this.dataset.pid, 10);
 
   let cleanName = DOMPurify.sanitize(this.value);
 
@@ -707,11 +713,11 @@ function updatePlayer() {
   let playerInRemaining = remainingPlayers.find(player => player.pid === pid);
 
   // check to see if player exists in the remainingPlayers array before adding a new entry
-
+ 
   if ( playerInRemaining ) {
     playerInRemaining.name = cleanName;
   } else {
-    remainingPlayers.push(playerList[pid]);
+    remainingPlayers.push(player);
   }
   localStorage.setItem('remainingPlayers', JSON.stringify(remainingPlayers));
 
@@ -720,15 +726,18 @@ function updatePlayer() {
 
 // add player to player list in localStorage
 
-function addPlayer( ) {
+function addPlayer( pid ) {
   playerList = JSON.parse(localStorage.getItem('playerList'));
-  playerList.push({
-    pid: playerList.length,
+  remainingList = JSON.parse(localStorage.getItem('remainingPlayers'));
+  player = {
+    pid: pid,
     active: true,
     name: "",
     rebuys: 0,
     placed: null
-  });
+  };
+  playerList.push(player);
+  remainingList.push(player);
 
   playerList.forEach(player => {
     if ( player.placed != null ) {
@@ -876,14 +885,16 @@ function renumberPlayers() {
 // eliminate player
 
 function eliminatePlayer() {
+  
   pid = this.parentElement.parentElement.dataset.player;
   pid = parseInt(pid, 10);
-
+  
   this.parentElement.parentElement.remove();
-
+  
   let nextEliminatedPosition = JSON.parse(localStorage.getItem('nextEliminatedPosition'));
   
   playerList = JSON.parse(localStorage.getItem('playerList'));
+  console.log('Before elimination:', playerList);
 
   let eliminatedPlayer = playerList.find(player => player.pid === pid);
   
@@ -908,27 +919,32 @@ function eliminatePlayer() {
     updateRemainingCount();
     updateAverageStack();
   }
+
+  console.log('After elimination:', playerList);
 }
 
 // re-enroll player
 
 function reEnrollPlayer() {
-  pid = this.parentElement.dataset.player;
+  pid = parseInt(this.parentElement.dataset.player, 10);
   playerList = JSON.parse(localStorage.getItem('playerList'));
+  console.log(playerList);
+  let playerToReEnroll = playerList.find(player => player.pid === pid);
+  console.log(playerToReEnroll);
   nextEliminatedPosition = JSON.parse(localStorage.getItem('nextEliminatedPosition'));
 
   playerList.forEach(player => {
-    if ( player.placed != null && player.placed < playerList[pid].placed ) {
+    if ( player.placed != null && player.placed < playerToReEnroll.placed ) {
       ++player.placed;
     }
   });
   
-  playerList[pid].active = true;
-  playerList[pid].placed = null;
+  playerToReEnroll.active = true;
+  playerToReEnroll.placed = null;
   localStorage.setItem('playerList', JSON.stringify(playerList));
 
   let remainingPlayers = JSON.parse(localStorage.getItem('remainingPlayers'));
-  remainingPlayers.push(playerList[pid]);
+  remainingPlayers.push(playerToReEnroll);
   localStorage.setItem('remainingPlayers', JSON.stringify(remainingPlayers));
 
   let playerEl = buildPlayerEl(pid);
@@ -995,8 +1011,13 @@ function updatePlayerResultsLists() {
   
   let resultsList = [];
 
+  console.log('Before sorting:', playerList);
+
   playerList = JSON.parse(localStorage.getItem('playerList'));
   playerList.sort((a, b) => a.placed - b.placed);
+
+  console.log('after sorting:', playerList);
+
 
   playerList.forEach(player => {
     if ( player.active === false ) {

@@ -110,7 +110,7 @@ HELPERS.getAccordionBtns().forEach(button => {
 
 HELPERS.getAddPlayerBtn().addEventListener('click', function(){
 
-  playerEl = buildPlayerEl(playerList.length);  
+  playerEl = buildPlayerEl( Date.now() );  
 
   HELPERS.getPlayerActionRow().before( playerEl );
 });
