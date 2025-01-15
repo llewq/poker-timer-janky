@@ -1,5 +1,7 @@
 # Poker Timer - the janky version
 
+Version 0.3.5 - Rebuy count now displays in "Eliminated" list as well as in Player Management list
+
 Version 0.3.4 - Updated Add Player functionality. Players are added below button. Counter added above player list instead of numbering players inline. Also moved eventListener for delete button outside of buildPlayerEl
 
 Version 0.3.3 - Added counter to player rows in player management panel.

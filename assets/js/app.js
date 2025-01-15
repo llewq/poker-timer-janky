@@ -676,10 +676,19 @@ function buildPlayerResultEl( pid ) {
     playerEl.setAttribute('data-placed', player.placed );
   }
 
+  if ( player.rebuys > 0 ) {
+    rebuys = player.rebuys;
+  } else {
+    rebuys = "";
+  }
+
   playerEl.innerHTML = 
   `<span class="field">
     <span class="name">${ player.name }</span>
   </span>
+  <div class="rebuy tooltip">
+    <span class="rebuy-count">${rebuys}</span>
+  </div>
   <div class="re-enroll">
     <button class="tooltip">
       <i class="fa-solid fa-undo"></i>
@@ -977,7 +986,6 @@ function eliminatePlayer() {
   let nextEliminatedPosition = JSON.parse(localStorage.getItem('nextEliminatedPosition'));
   
   playerList = JSON.parse(localStorage.getItem('playerList'));
-  console.log('Before elimination:', playerList);
 
   let eliminatedPlayer = playerList.find(player => player.pid === pid);
   
@@ -1003,8 +1011,6 @@ function eliminatePlayer() {
     updateAverageStack();
     updatePlayerCountInNav();
   }
-
-  console.log('After elimination:', playerList);
 }
 
 // re-enroll player

@@ -318,6 +318,15 @@ form .rebuy button.disabled {
   pointer-events: none;
 }
 
+#inactive-players .rebuy {
+  flex: 0 0 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-gray-700);
+  border-radius: 4px;
+}
+
 form .mover button:first-child {
   border-radius: 4px 4px 0 0;
 }
