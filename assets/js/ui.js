@@ -112,7 +112,11 @@ HELPERS.getAddPlayerBtn().addEventListener('click', function(){
 
   playerEl = buildPlayerEl( Date.now() );  
 
-  HELPERS.getPlayerActionRow().before( playerEl );
+  // WIP - this function was started to swap add button for save/save-new buttons
+  // updateAddPlayerUI();
+
+
+  HELPERS.getPlayerActionRow().after( playerEl );
 });
 
 HELPERS.getSeatingOpenBtn().addEventListener('click', function() {

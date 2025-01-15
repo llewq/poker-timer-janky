@@ -360,6 +360,7 @@ form .counter {
 
 .action-row form button.primary,
 .option-row form button.primary {
+  padding: 4px;
   color: var(--color-gray-900);
   background-color: var(--color-primary);
 }
@@ -782,10 +783,20 @@ form .counter {
   margin-right: 8px;
 }
 
-#menu h2 {
-  margin-bottom: 1.5rem;
-  font-size: var(--size-large);
-  color: var(--color-gray-100);
+#menu {
+  h2 {
+    font-size: var(--size-large);
+    color: var(--color-gray-100);
+  }
+  #active-players h2 {
+    margin-bottom: 0rem;
+    + p {
+      margin-bottom: 2rem;
+      > span {
+        margin-right: 16px;
+      }
+    }
+  }
 }
 
 #menu nav a {

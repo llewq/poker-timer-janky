@@ -125,7 +125,7 @@ function buildPlayerListUI() {
   playerList.forEach(player => {
     if( player.active ) {
       player = buildPlayerEl(player.pid);
-      HELPERS.getPlayerActionRow().before(player);
+      HELPERS.getPlayerActionRow().after(player);
     }
   });
 }
@@ -133,13 +133,23 @@ function buildPlayerListUI() {
 buildPlayerListUI();
 
 // renumbers the players in the player management panel
-function renumberPlayerListUI() {
-  playerRowCounters = HELPERS.getPlayersMenu().querySelectorAll('.player-row .counter span');
-  let counter = 1;
-  playerRowCounters.forEach(row => {
-    row.innerText = counter;
-    counter++;
-  });
+function updatePlayerCountInNav() {
+
+  playerCount = JSON.parse(localStorage.getItem('initialCount'));
+  counter = HELPERS.getPlayersMenu().querySelector('.player-count');
+  counter.innerText = playerCount;
+  
+  remainingCount = JSON.parse(localStorage.getItem('remainingPlayerCount'));
+  counterRemaining = HELPERS.getPlayersMenu().querySelector('.remaining-count');
+  counterRemaining.innerText = remainingCount;
+
+  
+  // playerRowCounters = HELPERS.getPlayersMenu().querySelectorAll('.player-row .counter span');
+  // let counter = 1;
+  // playerRowCounters.forEach(row => {
+  //   row.innerText = counter;
+  //   counter++;
+  // });
 }
 
 // build payout results
@@ -545,11 +555,11 @@ function buildPlayerEl( pid ) {
 
   playerEl.querySelector('input').addEventListener('focusout', updatePlayer );
   playerEl.querySelector('input').addEventListener('keypress', function(e) {
-    
     if ( e.key === 'Enter' ) {
       e.preventDefault();
     }
   });
+  
   playerEl.querySelector('.eliminate').addEventListener('click', eliminatePlayer);
 
   if ( playerEl.querySelector('.rebuy-plus') ) {
@@ -566,21 +576,80 @@ function buildPlayerEl( pid ) {
       rebuyPlayer(pid, -1, playerEl);
     });
   }
-
-  playerEl.querySelector('.delete button').addEventListener('click', function(e){
-    e.preventDefault();
-    deleteWarning(e);
-  });
-
-  renumberPlayerListUI();
+  
+  updatePlayerCountInNav();
   return playerEl;
 }
 
-// checks status of rebuys when the delete player button is clicked
-function deleteWarning(e) {
+const activePlayersContainer = document.querySelector('#active-players');
 
-  let pid = e.target.dataset.delete;
+if (activePlayersContainer) {
+    activePlayersContainer.addEventListener('click', function (e) {
+        // Check if the clicked element is a delete button or its child
+        if (e.target.matches('.delete button')) {
+            e.preventDefault();
+            // Find the button and extract the associated player ID
+            const button = e.target.closest('button');
+            const pid = parseInt(button?.dataset.delete, 10);
+
+            if (pid) {
+                deleteWarning(pid);
+            }
+        }
+    });
+}
+
+function updateAddPlayerUI() {
+  const actionRow = HELPERS.getPlayerActionRow(); // Get the action row container
+
+  // Clear the existing content of the action row
+  actionRow.innerHTML = '';
+
+  // Create the form element
+  const form = document.createElement('form');
+
+  // Create the "Save" button container
+  const saveDiv = document.createElement('div');
+  saveDiv.classList.add('save'); // Add the 'save' class to the container
+  const saveButton = document.createElement('button');
+  saveButton.textContent = 'Save';
+  saveButton.setAttribute('type', 'button');
+  saveButton.classList.add('primary'); // Add the 'primary' class
+  saveButton.addEventListener('click', function (e) {
+      e.preventDefault();
+      savePlayer(); // Call your save function
+  });
+  saveDiv.appendChild(saveButton); // Add the button to the div
+
+  // Create the "Save and Add" button container
+  const saveNewDiv = document.createElement('div');
+  saveNewDiv.classList.add('save-new'); // Add the 'save-new' class to the container
+  const saveAndAddButton = document.createElement('button');
+  saveAndAddButton.textContent = 'Save and Add';
+  saveAndAddButton.setAttribute('type', 'button');
+  saveAndAddButton.classList.add('primary'); // Add the 'primary' class
+  saveAndAddButton.addEventListener('click', function (e) {
+      e.preventDefault();
+      savePlayer(); // Call your save function
+      updateAddPlayerUI(); // Reset the action row for adding another player
+  });
+  saveNewDiv.appendChild(saveAndAddButton); // Add the button to the div
+
+  // Append the button containers to the form
+  form.appendChild(saveDiv);
+  form.appendChild(saveNewDiv);
+
+  // Add the form to the action row
+  actionRow.appendChild(form);
+}
+
+
+
+// checks status of rebuys when the delete player button is clicked
+function deleteWarning(pid) {
+
   playerList = JSON.parse(localStorage.getItem('playerList'));
+  player = playerList.find(player => player.pid === pid);
 
   if (player.rebuys > 0) {
     window.alert("Players who have purchased rebuys cannot be removed from the tournament.");
@@ -741,7 +810,7 @@ function updatePlayer() {
   }
   localStorage.setItem('remainingPlayers', JSON.stringify(remainingPlayers));
 
-  renumberPlayerListUI();
+  updatePlayerCountInNav();
   updatePlayerResultsLists();
 }
 
@@ -778,7 +847,7 @@ function addPlayer( pid ) {
   updateInitialCount();
   updateRemainingCount();
   updateAverageStack();
-  renumberPlayerListUI();
+  updatePlayerCountInNav();
 }
 
 function rebuyPlayer( pid, value, playerEl ) {
@@ -880,7 +949,7 @@ function deletePlayer(pid) {
   updateRemainingCount();
   reorderPlacements();
   updatePlayerResultsLists();
-  renumberPlayerListUI();
+  updatePlayerCountInNav();
 }
 
 // reorder placements
@@ -895,15 +964,6 @@ function reorderPlacements() {
   localStorage.setItem('playerList', JSON.stringify( playerList ));
 }
 
-// renumber players 
-
-function renumberPlayers() {
-  i = 0;
-  playerList.forEach(player => {
-    player.pid = i;
-    i++;
-  });
-}
 
 // eliminate player
 
@@ -941,7 +1001,7 @@ function eliminatePlayer() {
     remainingPlayerCount--;
     updateRemainingCount();
     updateAverageStack();
-    renumberPlayerListUI();
+    updatePlayerCountInNav();
   }
 
   console.log('After elimination:', playerList);
@@ -972,7 +1032,7 @@ function reEnrollPlayer() {
   localStorage.setItem('remainingPlayers', JSON.stringify(remainingPlayers));
 
   let playerEl = buildPlayerEl(pid);
-  HELPERS.getPlayerActionRow().before( playerEl );
+  HELPERS.getPlayerActionRow().after( playerEl );
 
   updatePlayerResultsLists();
 
@@ -981,7 +1041,7 @@ function reEnrollPlayer() {
   localStorage.setItem('nextEliminatedPosition', JSON.stringify(nextEliminatedPosition));
   updateRemainingCount();
   updateAverageStack();
-  renumberPlayerListUI();
+  updatePlayerCountInNav();
 }
 
 // build blind level
@@ -1145,4 +1205,4 @@ function displaySeatingChart( tableCount, shuffledList ) {
 
 }
 
-renumberPlayerListUI();
+updatePlayerCountInNav();
