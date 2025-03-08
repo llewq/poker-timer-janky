@@ -1102,12 +1102,8 @@ function updatePlayerResultsLists() {
   
   let resultsList = [];
 
-  console.log('Before sorting:', playerList);
-
   playerList = JSON.parse(localStorage.getItem('playerList'));
   playerList.sort((a, b) => a.placed - b.placed);
-
-  console.log('after sorting:', playerList);
 
 
   playerList.forEach(player => {
