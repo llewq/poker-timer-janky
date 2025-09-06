@@ -881,4 +881,17 @@ form .counter span {
 
 .rebuy.tooltip:before {
   content: "Re-buy";
+}
+
+.hide-cursor,
+.hide-cursor * {
+  cursor: none !important;
+}
+
+/* Disable hover effects when cursor is hidden */
+.disable-hover * {
+  pointer-events: none !important;
+}
+.disable-hover * #tools {
+  opacity: 0 !important;
 }/*# sourceMappingURL=main.css.map */
