@@ -574,21 +574,17 @@ form .counter span {
 #timer .controls button {
   position: relative;
   color: var(--color-gray-300);
-  border: solid 2px var(--color-gray-300);
+  border: none;
   background-color: transparent;
   border-radius: 50%;
-  width: 36px;
-  height: 36px;
-  font-size: 1.25rem;
-  cursor: pointer;
+  width: 38px;
+  height: 38px;
+  font-size: 1.75rem;
 }
 #timer .controls button.play {
   color: var(--color-black);
   background-color: var(--color-gray-300);
-}
-#timer .controls button.prev, #timer .controls button.next {
-  color: var(--color-black);
-  background-color: var(--color-gray-300);
+  font-size: 1.5rem;
 }
 #timer .controls button.skip {
   border: none;
