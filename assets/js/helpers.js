@@ -293,3 +293,57 @@ HELPERS.getPayoutsCont = function() {
 
 
 
+// --- Levels editor helpers ---
+HELPERS.getLevelsPanel = function() {
+  return document.querySelector('#navLevels');
+}
+
+HELPERS.getLevelsContent = function() {
+  return HELPERS.getLevelsPanel().querySelector('.content');
+}
+
+HELPERS.getLevelsHeader = function() {
+  return HELPERS.getLevelsContent().querySelector('.header');
+}
+
+HELPERS.getLevelsOptionRow = function() {
+  return HELPERS.getLevelsPanel().querySelector('.option-row');
+}
+
+HELPERS.getLevelsActionRow = function() {
+  return HELPERS.getLevelsPanel().querySelector('.action-row');
+}
+
+HELPERS.getAddBlindBtn = function() {
+  return HELPERS.getLevelsOptionRow().querySelector('.blind button');
+}
+
+HELPERS.getAddBreakBtn = function() {
+  return HELPERS.getLevelsOptionRow().querySelector('.break button');
+}
+
+HELPERS.getLevelsResetBtn = function() {
+  return HELPERS.getLevelsActionRow().querySelector('.reset button');
+}
+
+HELPERS.getLevelsAddBtn = function() {
+  return HELPERS.getLevelsActionRow().querySelector('.add button');
+}
+
+HELPERS.getOptionBlindBtn = function() {
+  return HELPERS.getLevelsOptionRow().querySelector('.blind button');
+}
+HELPERS.getOptionBreakBtn = function() {
+  return HELPERS.getLevelsOptionRow().querySelector('.break button');
+}
+HELPERS.getOptionCancelBtn = function() {
+  return HELPERS.getLevelsOptionRow().querySelector('.cancel button');
+}
+
+// Skip controls
+HELPERS.getSkipBackBtn = function () {
+  return HELPERS.getTimerPanel().querySelector('.skip-back');
+}
+HELPERS.getSkipForwardBtn = function () {
+  return HELPERS.getTimerPanel().querySelector('.skip-forward');
+}

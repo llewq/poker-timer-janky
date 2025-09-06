@@ -40,6 +40,23 @@
   --ease-in-cubic: cubic-bezier(0.32, 0, 0.67, 0) ;
 }
 
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* utility */
+.is-hidden {
+  display: none !important;
+}
+
 html {
   overflow: hidden;
   font-family: var(--font-kanit);
@@ -160,6 +177,10 @@ input[type=text] {
   padding: 0 0.25rem;
 }
 
+#navLevels h2 {
+  margin-bottom: 24px;
+}
+
 label {
   position: absolute;
   width: 0;
@@ -247,11 +268,16 @@ label {
 }
 
 form .mover {
+  flex: 0 0 24px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: stretch;
   gap: 2px;
+}
+
+.field-time {
+  flex: 0 0 20%;
 }
 
 form .delete,
@@ -548,14 +574,26 @@ form .counter span {
 #timer .controls button {
   position: relative;
   color: var(--color-gray-300);
-  border: solid 1px var(--color-gray-300);
+  border: solid 2px var(--color-gray-300);
   background-color: transparent;
   border-radius: 50%;
   width: 36px;
   height: 36px;
-  font-size: 1.5rem;
+  font-size: 1.25rem;
+  cursor: pointer;
 }
-#timer .controls button:nth-of-type(2) {
+#timer .controls button.play {
+  color: var(--color-black);
+  background-color: var(--color-gray-300);
+}
+#timer .controls button.prev, #timer .controls button.next {
+  color: var(--color-black);
+  background-color: var(--color-gray-300);
+}
+#timer .controls button.skip {
+  border: none;
+}
+#timer .controls button:nth-of-type(3) {
   width: 50px;
   height: 50px;
 }
@@ -745,6 +783,19 @@ form .counter span {
   color: var(--color-gray-300);
   cursor: pointer;
   transition: all ease 400ms;
+}
+
+#menu .close-btn {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background-color: transparent;
+}
+#menu .close-btn:hover {
+  background-color: color-mix(in srgb, var(--color-black) 80%, transparent 20%);
 }
 
 #menu .close-btn:hover,

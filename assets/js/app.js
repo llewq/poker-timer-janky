@@ -3,83 +3,69 @@ let averageStack;
 /**
  * Adds default player list to local storage, if no local storage exists
  */
-
-if( !localStorage.getItem('playerList') ) {
-
+if (!localStorage.getItem('playerList')) {
   localStorage.setItem('playerList', JSON.stringify(players));
 }
 
 /**
- * Adds default player list to local storage, if no local storage exists
+ * Adds default seating to local storage, if no local storage exists
  */
-
-if( !localStorage.getItem('seating') ) {
-
+if (!localStorage.getItem('seating')) {
   localStorage.setItem('seating', JSON.stringify(seating));
 }
 
 /**
- * Adds default player list to local storage, if no local storage exists
+ * Adds default remaining players list to local storage, if no local storage exists
  */
-
-if( !localStorage.getItem('remainingPlayers') ) {
-
+if (!localStorage.getItem('remainingPlayers')) {
   localStorage.setItem('remainingPlayers', JSON.stringify(remainingPlayers));
 }
 
 /**
  * Adds default current level to local storage, if no local storage exists
 */
-
-if( !localStorage.getItem('currentLevel') ) {
+if (!localStorage.getItem('currentLevel')) {
   localStorage.setItem('currentLevel', JSON.stringify(0));
 }
 
 /**
- * Adds default current level to local storage, if no local storage exists
+ * Adds default timeRemaining to local storage, if no local storage exists
 */
-
-if( !localStorage.getItem('timeRemaining') ) {
+if (!localStorage.getItem('timeRemaining')) {
   localStorage.setItem('timeRemaining', JSON.stringify(900));
 }
 
 /**
  * Adds default blinds to local storage, if no local storage exists
 */
-
-if( !localStorage.getItem('defaultBlinds') ) {
+if (!localStorage.getItem('defaultBlinds')) {
   localStorage.setItem('defaultBlinds', JSON.stringify(defaultBlinds));
 }
 
-
+// keep a pristine backup of original defaults for Reset Levels
+if (!localStorage.getItem('defaultBlindsBackup')) {
+  localStorage.setItem('defaultBlindsBackup', JSON.stringify(defaultBlinds));
+}
 
 // get default blinds
-
 let defaultBlindsData;
-
 function getDefaultBlinds() {
   defaultBlindsData = JSON.parse(localStorage.getItem('defaultBlinds'));
 }
-
 getDefaultBlinds();
 
 // get player list 
-
 let playerList;
-
 function getPlayerList() {
   playerList = JSON.parse(localStorage.getItem('playerList'));
 }
-
 getPlayerList();
 
-
 // create entry count - does not change as players are elimintated
-
 let entryCount = 0;
 let initialCount = 0;
 
-if( !localStorage.getItem('entryCount') ) {
+if (!localStorage.getItem('entryCount')) {
   entryCount = playerList.length;
   initialCount = playerList.length;
 } else {
@@ -105,7 +91,7 @@ updateInitialCount();
 // create remaining player count - updates when a player is eliminated or re-enters
 let remainingPlayerCount = playerList.length;
 
-if( !localStorage.getItem('remainingPlayerCount') ) {
+if (!localStorage.getItem('remainingPlayerCount')) {
   remainingPlayerCount = playerList.length;
 } else {
   remainingPlayerCount = JSON.parse(localStorage.getItem('remainingPlayerCount'));
@@ -115,26 +101,22 @@ function updateRemainingCount() {
   HELPERS.getRemainingCountCont().textContent = remainingPlayerCount;
   localStorage.setItem('remainingPlayerCount', JSON.stringify(remainingPlayerCount));
 }
-
 updateRemainingCount();
 
 // initialize existing player list
-
 function buildPlayerListUI() {
   playerList = JSON.parse(localStorage.getItem('playerList'));
   playerList.forEach(player => {
-    if( player.active ) {
+    if (player.active) {
       player = buildPlayerEl(player.pid);
       HELPERS.getPlayerActionRow().after(player);
     }
   });
 }
-
 buildPlayerListUI();
 
 // renumbers the players in the player management panel
 function updatePlayerCountInNav() {
-
   playerCount = JSON.parse(localStorage.getItem('initialCount'));
   counter = HELPERS.getPlayersMenu().querySelector('.player-count');
   counter.innerText = playerCount;
@@ -142,36 +124,23 @@ function updatePlayerCountInNav() {
   remainingCount = JSON.parse(localStorage.getItem('remainingPlayerCount'));
   counterRemaining = HELPERS.getPlayersMenu().querySelector('.remaining-count');
   counterRemaining.innerText = remainingCount;
-
-  
-  // playerRowCounters = HELPERS.getPlayersMenu().querySelectorAll('.player-row .counter span');
-  // let counter = 1;
-  // playerRowCounters.forEach(row => {
-  //   row.innerText = counter;
-  //   counter++;
-  // });
 }
 
 // build payout results
-
 function buildPayoutResults() {
-  
   let i = 0;
-
   let playerList = JSON.parse(localStorage.getItem('playerList'));
 
-  if ( playerList.length > 1 ) {
-
-    while ( i < playerList.length ) {
+  if (playerList.length > 1) {
+    while (i < playerList.length) {
       let emptyResult = document.createElement('div');
       emptyResult.setAttribute('data-empty', true);
       emptyResult.classList.add('player');
       emptyResult.innerHTML = `<span class="field"></span>`;
   
       if (i < payouts.length + 1 ) {
-        HELPERS.getPayoutsCont().append( emptyResult );
+        HELPERS.getPayoutsCont().append(emptyResult);
       }
-  
       i++;
     }
   }
@@ -179,14 +148,13 @@ function buildPayoutResults() {
   let payoutSlots = HELPERS.getPayoutsCont().querySelectorAll('.player');
 
   playerList.forEach(player => {
-    if ( player.placed < payouts.length + 2 && player.placed ) {
+    if (player.placed < payouts.length + 2 && player.placed) {
       payoutSlots[player.placed - 1].querySelector('.field').innerText = player.name.toString();
     }
   });
 }
 
 // add payout badges to results
-
 function addPayoutBadges() {
   let emptyResults = HELPERS.getPayoutsCont().querySelectorAll('.player');
   let i = 0;
@@ -195,12 +163,10 @@ function addPayoutBadges() {
     let tag = document.createElement('span');
     tag.classList.add('prize');
 
-    if ( i < payouts.length ) {
-      tag.innerHTML =
-      `<sup>$</sup>${ payouts[i] }`;
+    if (i < payouts.length) {
+      tag.innerHTML = `<sup>$</sup>${payouts[i]}`;
     } else {
-      tag.innerHTML =
-      '<i class="fa-solid fa-face-dizzy"></i>'
+      tag.innerHTML = '<i class="fa-solid fa-face-dizzy"></i>'
     }
 
     emptyResults[i].querySelector('.field').append(tag);
@@ -209,7 +175,6 @@ function addPayoutBadges() {
 }
 
 // reset tournament
-
 function resetTournament() {
   pauseTimer();
   timeRemaining = 0;
@@ -218,28 +183,18 @@ function resetTournament() {
 }
 
 // get date for export file name
-
 function getCurrentDateFormatted() {
   const today = new Date();
-
-  // Get the month (returns 0-11, so add 1)
   let month = today.getMonth() + 1;
-  month = month < 10 ? '0' + month : month; // Add leading zero if necessary
-
-  // Get the day
+  month = month < 10 ? '0' + month : month;
   let day = today.getDate();
-  day = day < 10 ? '0' + day : day; // Add leading zero if necessary
-
-  // Get the last two digits of the year
+  day = day < 10 ? '0' + day : day;
   let year = today.getFullYear().toString().slice(-2);
-
   return `${month}-${day}-${year}`;
 }
 
-// converst data to csv
+// converts data to html (for download)
 function generateHTML(tournamentResults, payouts) {
-
-  // sort results by placement
   tournamentResults = tournamentResults.sort((a, b) => a.placed - b.placed);
 
   let htmlContent = `<figure class="wp-block-table is-style-stripes">
@@ -253,14 +208,13 @@ function generateHTML(tournamentResults, payouts) {
       </tr>
     </thead>
     <tbody>`;
-  // Loop through both arrays and add rows to the table
+
   for (let i = 0; i < tournamentResults.length; i++) {
     const name = tournamentResults[i]?.name || "";
     const placed = tournamentResults[i]?.placed || "";
     const rebuys = tournamentResults[i]?.rebuys || "";
     const payout = payouts[i] ? `$${payouts[i]}` : "-";
 
-    // Add a row to the HTML table
     htmlContent += `
     <tr>
         <td class="has-text-align-center" data-align="center">${placed}</td>
@@ -268,9 +222,7 @@ function generateHTML(tournamentResults, payouts) {
         <td class="has-text-align-center" data-align="center">${rebuys}</td>
         <td class="has-text-align-center" data-align="center">${payout}</td>
     </tr>`;
-
-    
-}
+  }
 
   htmlContent += `
     </tbody>
@@ -280,133 +232,148 @@ function generateHTML(tournamentResults, payouts) {
   return htmlContent;
 }
 
-
 // export tournament results (playerList)
-
 function exportCSV() {
-
   let tournamentResults = JSON.parse(localStorage.getItem('playerList'));
-  payouts = JSON.parse(localStorage.getItem('payouts'))
+  payouts = JSON.parse(localStorage.getItem('payouts'));
   
-  // converts the array of objects to CSV format
   const html = generateHTML(tournamentResults, payouts);
-
-  // creates a blob from the csv data
   const blob = new Blob([html], {type: 'text/html'});
-
-  // creates a download link and sets the url to the blog object
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
 
   date = getCurrentDateFormatted();
-
   a.download = `tournament-results-${date}.html`;
-
-  // triggers the download
   a.click();
-
-  // cleans up the URL
   URL.revokeObjectURL(url);
 }
 
-
-
 // get level data
-
 let currentLevel;
-
 function getLevel() {
   currentLevel = JSON.parse(localStorage.getItem('currentLevel'));
 }
-
 getLevel();
 
 // update level data
-
 function updateLevel() {
-  localStorage.setItem('currentLevel', JSON.stringify( currentLevel ));
+  localStorage.setItem('currentLevel', JSON.stringify(currentLevel));
 }
 
 // initialize timer - runs when app is loaded and at start of new round
-
-function initTimer( timeRemaining ) {
-  // setup timer to begin running the first level
+function initTimer(timeRemaining) {
   HELPERS.getLevelCont().textContent = defaultBlindsData[currentLevel].label;
-  // HELPERS.getMinutesCont().textContent = defaultBlindsData[currentLevel].time;
-  // HELPERS.getSecondsCont().textContent = '00';
 
-  setTimer( timeRemaining );
+  setTimer(timeRemaining);
 
   HELPERS.getSmallBlindCont().textContent = defaultBlindsData[currentLevel].sb ? defaultBlindsData[currentLevel].sb : '-';
   HELPERS.getBigBlindCont().textContent = defaultBlindsData[currentLevel].bb ? defaultBlindsData[currentLevel].bb : '-';
-  HELPERS.getAnteCont().textContent = defaultBlindsData[currentLevel].ante ? defaultBlindsData[currentLevel].ante : '-';
+  HELPERS.getAnteCont().textContent      = defaultBlindsData[currentLevel].ante ? defaultBlindsData[currentLevel].ante : '-';
 
-  if( currentLevel < (defaultBlindsData.length - 1)) {
+  if (currentLevel < (defaultBlindsData.length - 1)) {
     HELPERS.getNextSmallBlindCont().textContent = defaultBlindsData[currentLevel + 1].sb ? defaultBlindsData[currentLevel + 1].sb : '-';
-    HELPERS.getNextBigBlindCont().textContent = defaultBlindsData[currentLevel + 1].bb ? defaultBlindsData[currentLevel + 1].bb : '-';
-    HELPERS.getNextAnteCont().textContent = defaultBlindsData[currentLevel + 1].ante ? defaultBlindsData[currentLevel + 1].ante : '-';
+    HELPERS.getNextBigBlindCont().textContent   = defaultBlindsData[currentLevel + 1].bb ? defaultBlindsData[currentLevel + 1].bb : '-';
+    HELPERS.getNextAnteCont().textContent       = defaultBlindsData[currentLevel + 1].ante ? defaultBlindsData[currentLevel + 1].ante : '-';
   } 
   
-  if( currentLevel == (defaultBlindsData.length - 1)) {
+  if (currentLevel == (defaultBlindsData.length - 1)) {
     HELPERS.getNextSmallBlindCont().textContent = '-';
-    HELPERS.getNextBigBlindCont().textContent = '-';
-    HELPERS.getNextAnteCont().textContent = '-';
+    HELPERS.getNextBigBlindCont().textContent   = '-';
+    HELPERS.getNextAnteCont().textContent       = '-';
   }
 
-  if( currentLevel > 0 ) {
+  if (currentLevel > 0) {
     HELPERS.getPrevSmallBlindCont().textContent = defaultBlindsData[currentLevel - 1].sb ? defaultBlindsData[currentLevel - 1].sb : '-';
-    HELPERS.getPrevBigBlindCont().textContent = defaultBlindsData[currentLevel - 1].bb ? defaultBlindsData[currentLevel - 1].bb : '-';
-    HELPERS.getPrevAnteCont().textContent = defaultBlindsData[currentLevel - 1].ante ? defaultBlindsData[currentLevel - 1].ante : '-';
+    HELPERS.getPrevBigBlindCont().textContent   = defaultBlindsData[currentLevel - 1].bb ? defaultBlindsData[currentLevel - 1].bb : '-';
+    HELPERS.getPrevAnteCont().textContent       = defaultBlindsData[currentLevel - 1].ante ? defaultBlindsData[currentLevel - 1].ante : '-';
   } else {
     HELPERS.getPrevSmallBlindCont().textContent = '-';
-    HELPERS.getPrevBigBlindCont().textContent = '-';
-    HELPERS.getPrevAnteCont().textContent = '-';
+    HELPERS.getPrevBigBlindCont().textContent   = '-';
+    HELPERS.getPrevAnteCont().textContent       = '-';
   }
 }
-
-initTimer( JSON.parse(localStorage.getItem('timeRemaining')) );
+initTimer(JSON.parse(localStorage.getItem('timeRemaining')));
 
 // initialize break timer
-
 let timeToBreak;
 let onBreak;
 
 function setBreakTimer() {
-
   timeToBreak = 0;
-
-  // if the current level is a break, set onBreak to true
-  onBreak = ( defaultBlindsData[currentLevel].type == 'break' ) ? true : false;
+  onBreak = (defaultBlindsData[currentLevel].type == 'break') ? true : false;
   
   // loop through the blinds
   for (let level = currentLevel; level < defaultBlindsData.length; level++) {
-    
       let blindLevel = defaultBlindsData[level];
 
       // stop when a break level is reached
-      if ( blindLevel.type == 'break' ) {
+      if (blindLevel.type == 'break') {
         break;
       } else {
-        // add up the minutes in each round that's not a blind
-        timeToBreak += blindLevel.time * 60;
+        // add up the minutes in each round that's not a break
+        timeToBreak += (parseInt(blindLevel.time, 10) || 0) * 60;
       }
   }
 
-  // 
-  // timeToBreak = ( onBreak ) ? (timeToBreak + defaultBlindsData[currentLevel].time * 60) : timeToBreak;
-
   localStorage.setItem('timeToBreak', JSON.stringify(timeToBreak));
-
-  HELPERS.getBreakTimerCont().textContent = (onBreak) ? 0 + ' minutes' : parseInt(timeToBreak / 60) + ' minutes';
-
+  HELPERS.getBreakTimerCont().textContent = (onBreak) ? '0 minutes' : parseInt(timeToBreak / 60, 10) + ' minutes';
   return timeToBreak;
 }
-
 setBreakTimer();
 
-// start timer
+// --- Skip forward/back support ---
+const SKIP_SECONDS = 30;
+function adjustTimerSeconds(deltaSeconds) {
+  const levelTotal =
+    (defaultBlindsData[currentLevel]?.time ? parseInt(defaultBlindsData[currentLevel].time, 10) : 0) * 60;
 
+  let tr  = parseInt(localStorage.getItem('timeRemaining') || '0', 10);
+  let ttb = parseInt(localStorage.getItem('timeToBreak')   || '0', 10);
+
+  tr = tr + deltaSeconds;
+  if (tr < 0) tr = 0;
+  if (levelTotal > 0 && tr > levelTotal) tr = levelTotal;
+
+  if (!onBreak) {
+    ttb = ttb + deltaSeconds;           // move timeline together with the round
+    if (ttb < 0) ttb = 0;
+  } else {
+    ttb = 0;
+  }
+
+
+  localStorage.setItem('timeRemaining', tr);
+  localStorage.setItem('timeToBreak',  ttb);
+
+  if (isRunning && tr === 0) {
+    clearInterval(timerInterval);
+    if (currentLevel < defaultBlindsData.length - 1) {
+      updateLevel(++currentLevel);
+      getLevel();
+      const newTr  = (parseInt(defaultBlindsData[currentLevel].time, 10) || 0) * 60;
+      initTimer(newTr);
+      setBreakTimer();
+      const newTtb = parseInt(localStorage.getItem('timeToBreak') || '0', 10);
+      startTimer(newTr, newTtb);
+    } else {
+      // last level ended
+      initTimer(0);
+      HELPERS.getBreakTimerCont().textContent = '0 minutes';
+    }
+    return;
+  }
+
+  if (isRunning) {
+    clearInterval(timerInterval);
+    startTimer(tr, ttb);
+  } else {
+    setTimer(tr);
+    HELPERS.getBreakTimerCont().textContent = parseInt(ttb / 60, 10) + ' minutes';
+  }
+}
+
+// start timer
 let timerInterval;
 let isRunning = false;
 let timeRemaining; // value in seconds expressed as integer
@@ -415,7 +382,6 @@ function setTimer(timeRemaining) {
   var minutes, seconds;
   minutes = parseInt(timeRemaining / 60, 10);
   seconds = parseInt(timeRemaining % 60, 10);
-  // seconds = seconds < 10 ? "0" + seconds : seconds;
 
   HELPERS.getMinutesCont1().textContent = parseInt(minutes / 10, 10);
   HELPERS.getMinutesCont2().textContent = parseInt(minutes % 10, 10);
@@ -424,15 +390,12 @@ function setTimer(timeRemaining) {
 }
 
 function startTimer(timeRemaining, timeToBreak) {
-
   isRunning = true;
 
   var minutes, seconds;
   timerInterval = setInterval(function () {
-
     --timeRemaining;
-    timeToBreak = ( !onBreak ) ? --timeToBreak : 0;
-    // --timeToBreak;
+    timeToBreak = (!onBreak) ? --timeToBreak : 0;
 
     localStorage.setItem('timeRemaining', timeRemaining);
     localStorage.setItem('timeToBreak', timeToBreak);
@@ -440,17 +403,13 @@ function startTimer(timeRemaining, timeToBreak) {
     minutes = parseInt(timeRemaining / 60, 10)
     seconds = parseInt(timeRemaining % 60, 10);
 
-    // minutes = minutes < 10 ? "0" + minutes : minutes;
-    // seconds = seconds < 10 ? "0" + seconds : seconds;
-
     HELPERS.getMinutesCont1().textContent = parseInt(minutes / 10, 10);
     HELPERS.getMinutesCont2().textContent = parseInt(minutes % 10, 10);
     HELPERS.getSecondsCont1().textContent = parseInt(seconds / 10, 10);
     HELPERS.getSecondsCont2().textContent = parseInt(seconds % 10, 10);
 
-    HELPERS.getBreakTimerCont().textContent = parseInt(timeToBreak / 60) + ' minutes';
+    HELPERS.getBreakTimerCont().textContent = parseInt(timeToBreak / 60, 10) + ' minutes';
 
-    
     if (timeRemaining == 59) {
       HELPERS.getAudioWarning().play();
     }
@@ -459,59 +418,48 @@ function startTimer(timeRemaining, timeToBreak) {
       HELPERS.getAudioEndRound().play();
     }
 
-    
     if (timeRemaining == 0) {
       clearInterval(timerInterval); // stops timer from progressing
       updateLevel(++currentLevel);
       getLevel();
-      timeRemaining = defaultBlindsData[currentLevel].time * 60;
-      initTimer( timeRemaining );
+      timeRemaining = (parseInt(defaultBlindsData[currentLevel].time, 10) || 0) * 60;
+      initTimer(timeRemaining);
       setBreakTimer();
-      // setBreakTimer put the value in localStorage, go get it
-      timeToBreak = JSON.parse( localStorage.getItem('timeToBreak'));
+      timeToBreak = JSON.parse(localStorage.getItem('timeToBreak'));
       startTimer(timeRemaining, timeToBreak);
     } 
   }, 1000);
 }
 
 // pause timer 
-
 function pauseTimer() {
-
   isRunning = false;
   clearInterval(timerInterval);
 }
 
-// get time remaining from timer display
-
+// get time remaining from storage
 function getTimeRemaining() {
-  // timeRemaining = parseInt( HELPERS.getMinutesCont().textContent) * 60 + parseInt( HELPERS.getSecondsCont().textContent);
-  timeRemaining = localStorage.getItem('timeRemaining');
+  timeRemaining = parseInt(localStorage.getItem('timeRemaining') || '0', 10);
   return timeRemaining;
 }
 
-// get time remaining from timer display
-
+// get time to break from storage
 function getTimeToBreak() {
-  // timeRemaining = parseInt( HELPERS.getMinutesCont().textContent) * 60 + parseInt( HELPERS.getSecondsCont().textContent);
-  timeToBreak = parseInt( localStorage.getItem('timeToBreak') );
+  timeToBreak = parseInt(localStorage.getItem('timeToBreak') || '0', 10);
   return timeToBreak;
 }
 
-
-
 // build player
-
-function buildPlayerEl( pid ) {
+function buildPlayerEl(pid) {
   playerList = JSON.parse(localStorage.getItem('playerList'));
   let name;
   let player = playerList.find(player => player.pid === pid);
-  if( player ) {
+  if (player) {
     pid = player.pid;
     name = player.name;
     rebuys = player.rebuys || 0;
   } else {
-    addPlayer( pid ); // adds empty player
+    addPlayer(pid); // adds empty player
     pid = pid;
     name = "";
     rebuys = 0;
@@ -525,10 +473,9 @@ function buildPlayerEl( pid ) {
   playerEl.setAttribute('class', 'player-row');
   playerEl.setAttribute('data-player', pid );
 
-  if ( player.placed ) { 
+  if (player.placed) { 
     playerEl.setAttribute('data-placed', player.placed );
   }
-
 
   playerEl.innerHTML = 
   `<form action="">
@@ -552,24 +499,23 @@ function buildPlayerEl( pid ) {
     </div>
   </form>`;
 
-
   playerEl.querySelector('input').addEventListener('focusout', updatePlayer );
   playerEl.querySelector('input').addEventListener('keypress', function(e) {
-    if ( e.key === 'Enter' ) {
+    if (e.key === 'Enter') {
       e.preventDefault();
     }
   });
   
   playerEl.querySelector('.eliminate').addEventListener('click', eliminatePlayer);
 
-  if ( playerEl.querySelector('.rebuy-plus') ) {
+  if (playerEl.querySelector('.rebuy-plus')) {
     playerEl.querySelector('.rebuy-plus').addEventListener('click', function(e){
       e.preventDefault();
       let pid = e.target.parentElement.dataset.rebuy;
       rebuyPlayer(pid, 1, playerEl);
     });
   }
-  if ( playerEl.querySelector('.rebuy-minus') ) {
+  if (playerEl.querySelector('.rebuy-minus')) {
     playerEl.querySelector('.rebuy-minus').addEventListener('click', function(e){
       e.preventDefault();
       let pid = e.target.parentElement.dataset.rebuy;
@@ -584,70 +530,54 @@ function buildPlayerEl( pid ) {
 const activePlayersContainer = document.querySelector('#active-players');
 
 if (activePlayersContainer) {
-    activePlayersContainer.addEventListener('click', function (e) {
-        // Check if the clicked element is a delete button or its child
-        if (e.target.matches('.delete button')) {
-            e.preventDefault();
-            // Find the button and extract the associated player ID
-            const button = e.target.closest('button');
-            const pid = parseInt(button?.dataset.delete, 10);
-
-            if (pid) {
-                deleteWarning(pid);
-            }
-        }
-    });
+  activePlayersContainer.addEventListener('click', function (e) {
+    if (e.target.matches('.delete button')) {
+      e.preventDefault();
+      const button = e.target.closest('button');
+      const pid = parseInt(button?.dataset.delete, 10);
+      if (pid) deleteWarning(pid);
+    }
+  });
 }
 
 function updateAddPlayerUI() {
-  const actionRow = HELPERS.getPlayerActionRow(); // Get the action row container
-
-  // Clear the existing content of the action row
+  const actionRow = HELPERS.getPlayerActionRow();
   actionRow.innerHTML = '';
 
-  // Create the form element
   const form = document.createElement('form');
 
-  // Create the "Save" button container
   const saveDiv = document.createElement('div');
-  saveDiv.classList.add('save'); // Add the 'save' class to the container
+  saveDiv.classList.add('save');
   const saveButton = document.createElement('button');
   saveButton.textContent = 'Save';
   saveButton.setAttribute('type', 'button');
-  saveButton.classList.add('primary'); // Add the 'primary' class
+  saveButton.classList.add('primary');
   saveButton.addEventListener('click', function (e) {
       e.preventDefault();
-      savePlayer(); // Call your save function
+      savePlayer();
   });
-  saveDiv.appendChild(saveButton); // Add the button to the div
+  saveDiv.appendChild(saveButton);
 
-  // Create the "Save and Add" button container
   const saveNewDiv = document.createElement('div');
-  saveNewDiv.classList.add('save-new'); // Add the 'save-new' class to the container
+  saveNewDiv.classList.add('save-new');
   const saveAndAddButton = document.createElement('button');
   saveAndAddButton.textContent = 'Save and Add';
   saveAndAddButton.setAttribute('type', 'button');
-  saveAndAddButton.classList.add('primary'); // Add the 'primary' class
+  saveAndAddButton.classList.add('primary');
   saveAndAddButton.addEventListener('click', function (e) {
       e.preventDefault();
-      savePlayer(); // Call your save function
-      updateAddPlayerUI(); // Reset the action row for adding another player
+      savePlayer();
+      updateAddPlayerUI();
   });
-  saveNewDiv.appendChild(saveAndAddButton); // Add the button to the div
+  saveNewDiv.appendChild(saveAndAddButton);
 
-  // Append the button containers to the form
   form.appendChild(saveDiv);
   form.appendChild(saveNewDiv);
-
-  // Add the form to the action row
   actionRow.appendChild(form);
 }
 
-
-
 // checks status of rebuys when the delete player button is clicked
 function deleteWarning(pid) {
-
   playerList = JSON.parse(localStorage.getItem('playerList'));
   player = playerList.find(player => player.pid === pid);
 
@@ -657,13 +587,12 @@ function deleteWarning(pid) {
   }
 
   if (window.confirm("Are you sure you want to delete this player? This cannot be undone.")) {
-    deletePlayer( pid );
+    deletePlayer(pid);
   } else {}
 }
 
 // build player element to display in remaning/results containers
-
-function buildPlayerResultEl( pid ) {
+function buildPlayerResultEl(pid) {
   pid = parseInt(pid, 10);
   playerList = JSON.parse(localStorage.getItem('playerList'));
   let playerEl = document.createElement('div');
@@ -672,11 +601,11 @@ function buildPlayerResultEl( pid ) {
 
   let player = playerList.find(player => player.pid === pid);
 
-  if ( player.placed ) { 
+  if (player.placed) { 
     playerEl.setAttribute('data-placed', player.placed );
   }
 
-  if ( player.rebuys > 0 ) {
+  if (player.rebuys > 0) {
     rebuys = player.rebuys;
   } else {
     rebuys = "";
@@ -698,19 +627,13 @@ function buildPlayerResultEl( pid ) {
   return playerEl;
 }
 
-
-
 // create next eliminated player position
-
-if( !localStorage.getItem('nextEliminatedPosition') ) {
+if (!localStorage.getItem('nextEliminatedPosition')) {
   localStorage.setItem('nextEliminatedPosition', JSON.stringify(playerList.length));
 }
 
-
 // create prize pool
-
 let prizePool = entryCount * 10;
-
 let payouts = []; // array of payouts
 let placesPaid = 1;
 
@@ -719,22 +642,19 @@ function updatePrizePool() {
   prizePool = entryCount * 10;
 
   let payoutIndex;
-
-  if ( initialCount <= 4 ) {
+  if (initialCount <= 4) {
     payoutIndex = 0;
   } else {
     payoutIndex = initialCount - 4;
   }
 
   let numPayouts = defaultNumPayouts[payoutIndex];
-  
   payouts = []; // empty array before re-populating
 
   placesPaid = numPayouts.placesPaid;
   
   let prizeValues;
-
-  if ( numPayouts.placesPaid < 2 ) {
+  if (numPayouts.placesPaid < 2) {
     prizeValues = [1];
   } else {
     prizeValues = defaultPrizes.filter(prize => {
@@ -742,9 +662,7 @@ function updatePrizePool() {
     });
   }
 
-  
   let payoutPrecentages;
-  
   if (prizeValues[0] == 1 ) {
     payoutPrecentages = [1];
   } else {
@@ -752,47 +670,36 @@ function updatePrizePool() {
   } 
   
   let pot = prizePool;
-  
   for (let i = 0; i < payoutPrecentages.length; i++) {
     if (i < payoutPrecentages.length - 1) {
       let payout = payoutPrecentages[i];
       cashPayout = Math.round(payout * prizePool);
-      payouts.push( cashPayout );
+      payouts.push(cashPayout);
       pot = pot - cashPayout;
     } else {
-      payouts.push( pot );
+      payouts.push(pot);
     }
   }
-
   payouts = payouts.reverse();
-
   localStorage.setItem('payouts', JSON.stringify(payouts));
-
   return payouts;
 }
 
-
 // update average stack
-
-
-
 function updateAverageStack() {
-  if ( entryCount > 0 && remainingPlayerCount > 0 ) {
+  if (entryCount > 0 && remainingPlayerCount > 0) {
     averageStack = Math.round(entryCount * 10000 / remainingPlayerCount);
-  } else if ( entryCount > 0 && remainingPlayerCount == 0 ) {
+  } else if (entryCount > 0 && remainingPlayerCount == 0) {
     averageStack = entryCount * 10000;
   } else {
     averageStack = 0;
   }
-  localStorage.setItem('averageStack', JSON.stringify( averageStack ));
-
+  localStorage.setItem('averageStack', JSON.stringify(averageStack));
   HELPERS.getAveargeStackCont().textContent = '$' + averageStack.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
-
 updateAverageStack();
 
 // update player in player list
-
 function updatePlayer() {
   let pid = parseInt(this.dataset.pid, 10);
 
@@ -806,13 +713,10 @@ function updatePlayer() {
   localStorage.setItem('playerList', JSON.stringify(playerList));
 
   // add player to remainingPlayers array
-
   let remainingPlayers = JSON.parse(localStorage.getItem('remainingPlayers'));
   let playerInRemaining = remainingPlayers.find(player => player.pid === pid);
 
-  // check to see if player exists in the remainingPlayers array before adding a new entry
- 
-  if ( playerInRemaining ) {
+  if (playerInRemaining) {
     playerInRemaining.name = cleanName;
   } else {
     remainingPlayers.push(player);
@@ -824,8 +728,7 @@ function updatePlayer() {
 }
 
 // add player to player list in localStorage
-
-function addPlayer( pid ) {
+function addPlayer(pid) {
   playerList = JSON.parse(localStorage.getItem('playerList'));
   remainingList = JSON.parse(localStorage.getItem('remainingPlayers'));
   player = {
@@ -839,7 +742,7 @@ function addPlayer( pid ) {
   remainingList.push(player);
 
   playerList.forEach(player => {
-    if ( player.placed != null ) {
+    if (player.placed != null) {
       ++player.placed;
     }
   });
@@ -859,10 +762,8 @@ function addPlayer( pid ) {
   updatePlayerCountInNav();
 }
 
-function rebuyPlayer( pid, value, playerEl ) {
-
-  if ( value > 0 ) {
-    // update player's rebuy record
+function rebuyPlayer(pid, value, playerEl) {
+  if (value > 0) {
     playerList = JSON.parse(localStorage.getItem('playerList'));
     player = playerList.find(player => player.pid == pid);
     player.rebuys++;
@@ -875,7 +776,6 @@ function rebuyPlayer( pid, value, playerEl ) {
     
     entryCount++;
   } else {
-    // update player's rebuy record
     playerList = JSON.parse(localStorage.getItem('playerList'));
     player = playerList.find(player => player.pid == pid);
     player.rebuys--;
@@ -888,7 +788,6 @@ function rebuyPlayer( pid, value, playerEl ) {
 
     entryCount--;
   }
-  
 
   const rebuyButton = playerEl.querySelector('.rebuy');
   const newRebuyButton = document.createElement('div');
@@ -908,14 +807,14 @@ function rebuyPlayer( pid, value, playerEl ) {
 
   rebuyButton.replaceWith(newRebuyButton);
 
-  if ( playerEl.querySelector('.rebuy-plus') ) {
+  if (playerEl.querySelector('.rebuy-plus')) {
     playerEl.querySelector('.rebuy-plus').addEventListener('click', function(e){
       e.preventDefault();
       let pid = e.target.parentElement.dataset.rebuy;
       rebuyPlayer(pid, 1, playerEl);
     });
   }
-  if ( playerEl.querySelector('.rebuy-minus') ) {
+  if (playerEl.querySelector('.rebuy-minus')) {
     playerEl.querySelector('.rebuy-minus').addEventListener('click', function(e){
       e.preventDefault();
       let pid = e.target.parentElement.dataset.rebuy;
@@ -929,22 +828,17 @@ function rebuyPlayer( pid, value, playerEl ) {
 }
 
 // delete player 
-
 function deletePlayer(pid) {
-    
   pid = parseInt(pid, 10);
-  
   remove = HELPERS.getPlayersMenu().querySelector(`[data-player='${ pid }']`);
   remove.remove();
 
-  // remove player from playerList array
   playerList = JSON.parse(localStorage.getItem('playerList'));
-  playerList = playerList.filter( player => player.pid !== pid);
+  playerList = playerList.filter(player => player.pid !== pid);
   localStorage.setItem('playerList', JSON.stringify(playerList));
 
-  // remove player from remainingPlayers array
   remainingPlayers = JSON.parse(localStorage.getItem('remainingPlayers'));
-  remainingPlayers = remainingPlayers.filter( player => player.pid !== pid);
+  remainingPlayers = remainingPlayers.filter(player => player.pid !== pid);
   localStorage.setItem('remainingPlayers', JSON.stringify(remainingPlayers));
 
   entryCount--;
@@ -962,42 +856,32 @@ function deletePlayer(pid) {
 }
 
 // reorder placements
-
 function reorderPlacements() {
   playerList = JSON.parse(localStorage.getItem('playerList'));
-
   playerList.forEach(player => {
-    if ( !player.active ) { --player.placed; }
+    if (!player.active) { --player.placed; }
   });
-
-  localStorage.setItem('playerList', JSON.stringify( playerList ));
+  localStorage.setItem('playerList', JSON.stringify(playerList));
 }
 
-
 // eliminate player
-
 function eliminatePlayer() {
-  
   pid = this.parentElement.parentElement.dataset.player;
   pid = parseInt(pid, 10);
   
   this.parentElement.parentElement.remove();
   
   let nextEliminatedPosition = JSON.parse(localStorage.getItem('nextEliminatedPosition'));
-  
   playerList = JSON.parse(localStorage.getItem('playerList'));
 
   let eliminatedPlayer = playerList.find(player => player.pid === pid);
   
-  // Ensure eliminatedPlayer is a reference to the object in playerList
   if (eliminatedPlayer) {
     eliminatedPlayer.placed = nextEliminatedPosition;
     eliminatedPlayer.active = false;
 
-    // Save the updated playerList back to localStorage
     localStorage.setItem('playerList', JSON.stringify(playerList));
 
-    // Remove player from remainingPlayers array
     let remainingPlayers = JSON.parse(localStorage.getItem('remainingPlayers'));
     remainingPlayers = remainingPlayers.filter(player => player.pid !== eliminatedPlayer.pid);
     localStorage.setItem('remainingPlayers', JSON.stringify(remainingPlayers));
@@ -1014,17 +898,14 @@ function eliminatePlayer() {
 }
 
 // re-enroll player
-
 function reEnrollPlayer() {
   pid = parseInt(this.parentElement.dataset.player, 10);
   playerList = JSON.parse(localStorage.getItem('playerList'));
-  console.log(playerList);
   let playerToReEnroll = playerList.find(player => player.pid === pid);
-  console.log(playerToReEnroll);
   nextEliminatedPosition = JSON.parse(localStorage.getItem('nextEliminatedPosition'));
 
   playerList.forEach(player => {
-    if ( player.placed != null && player.placed < playerToReEnroll.placed ) {
+    if (player.placed != null && player.placed < playerToReEnroll.placed) {
       ++player.placed;
     }
   });
@@ -1038,7 +919,7 @@ function reEnrollPlayer() {
   localStorage.setItem('remainingPlayers', JSON.stringify(remainingPlayers));
 
   let playerEl = buildPlayerEl(pid);
-  HELPERS.getPlayerActionRow().after( playerEl );
+  HELPERS.getPlayerActionRow().after(playerEl);
 
   updatePlayerResultsLists();
 
@@ -1051,25 +932,19 @@ function reEnrollPlayer() {
 }
 
 // build blind level
-
 function buildBlindLevel() {
   // build an empty html form field for a single blind level
 }
 
 // build break level 
-
 function buildBreakLevel() {
   // build an empty html form field for a single break level
 }
 
 // build default blinds
-
-function buildDefaultBlinds() {
-
-}
+function buildDefaultBlinds() {}
 
 // global
-
 const allLinks = document.querySelectorAll('a');
 allLinks.forEach(link => {
   link.addEventListener('click', function(e){
@@ -1087,15 +962,13 @@ allButtons.forEach(button => {
 const allForms = document.querySelectorAll('form');
 allForms.forEach(form => {
   form.addEventListener('keypress', function(e){
-    if( e.key === 'Enter') {  }
+    if (e.key === 'Enter') { }
   });
 });
-
 
 function updatePlayerResultsLists() {
   HELPERS.getPayoutsCont().innerHTML = null;
   HELPERS.getPlayerResultsCont().innerHTML = null;
-  // HELPERS.getPlayersRemainingCont().innerHTML = null;
   
   updatePrizePool();
   buildPayoutResults();
@@ -1105,26 +978,21 @@ function updatePlayerResultsLists() {
   playerList = JSON.parse(localStorage.getItem('playerList'));
   playerList.sort((a, b) => a.placed - b.placed);
 
-
   playerList.forEach(player => {
-    if ( player.active === false ) {
+    if (player.active === false) {
       let playerEl = buildPlayerResultEl(player.pid);
       playerEl.querySelector('.re-enroll').addEventListener('click', reEnrollPlayer);
       resultsList.push(playerEl);
     }
   });
 
-
   resultsList.forEach(player => {
     HELPERS.getPlayerResultsCont().append(player);
   });
 
-
-  if ( playerList.length > 1 ) { addPayoutBadges(); }
+  if (playerList.length > 1) { addPayoutBadges(); }
 }
-
 updatePlayerResultsLists();
-
 
 function closeMenuPanels() {
   let panels = HELPERS.getMenuPanels();
@@ -1134,44 +1002,31 @@ function closeMenuPanels() {
 }
 
 function assignSeats() {
+  playerCount = JSON.parse(localStorage.getItem('remainingPlayerCount'));
+  tableCount = Math.ceil(playerCount / 9);
+  localStorage.setItem('tableCount', JSON.stringify(tableCount));
 
-  playerCount = JSON.parse( localStorage.getItem( 'remainingPlayerCount' ) );
-
-  tableCount = Math.ceil( playerCount / 9 );
-  localStorage.setItem( 'tableCount', JSON.stringify(tableCount) );
-
-  playerList = JSON.parse( localStorage.getItem( 'remainingPlayers' ) );
-
+  playerList = JSON.parse(localStorage.getItem('remainingPlayers'));
   shuffledList = shufflePlayers();
 
   for (let i = 0, s = 0; i < shuffledList.length; i++) {
-    shuffledList[i].table = ( i % tableCount ) + 1;
-
-    if ( i % tableCount == 0 ) { s++; }
-
+    shuffledList[i].table = (i % tableCount) + 1;
+    if (i % tableCount == 0) { s++; }
     shuffledList[i].seat = s;
-    
   }
 
-  localStorage.setItem( 'remainingPlayers', JSON.stringify( shuffledList ));
-
-  displaySeatingChart( tableCount, shuffledList );
-
+  localStorage.setItem('remainingPlayers', JSON.stringify(shuffledList));
+  displaySeatingChart(tableCount, shuffledList);
 }
 
 function shufflePlayers () {
-
   remainingPlayers = JSON.parse(localStorage.getItem('remainingPlayers'));
-
   remainingPlayers.sort(() => Math.random() - 0.5);
-
   return remainingPlayers;
-
 }
 
-function displaySeatingChart( tableCount, shuffledList ) {
-
-  if ( document.querySelector('.table-wrapper')) {
+function displaySeatingChart(tableCount, shuffledList) {
+  if (document.querySelector('.table-wrapper')) {
     document.querySelector('.table-wrapper').remove();
   }
 
@@ -1185,63 +1040,271 @@ function displaySeatingChart( tableCount, shuffledList ) {
     let tableName = document.createElement('h2');
     tableName.innerText = 'Table ' + (i + 1);
 
-    tableContainer.append( tableName );
+    tableContainer.append(tableName);
 
     let tableList = document.createElement('ol');
-
     tablePlayers = shuffledList.filter(player => player.table === (i + 1));
 
     for (let p = 0; p < tablePlayers.length; p++) {
       let player = document.createElement('li');
       player.innerText = tablePlayers[p].name;
-
       tableList.append(player);
     }
 
-    tableContainer.append( tableList );
-    tableWrapper.append( tableContainer );
-    
+    tableContainer.append(tableList);
+    tableWrapper.append(tableContainer);
   }
 
-  HELPERS.getSeatingPanel().append( tableWrapper );
-
+  HELPERS.getSeatingPanel().append(tableWrapper);
 }
 
 updatePlayerCountInNav();
 
+// ---------- Levels Editor (render + mutate + persist) ----------
 
+function persistLevels() {
+  localStorage.setItem('defaultBlinds', JSON.stringify(defaultBlindsData));
+  getDefaultBlinds();
+}
 
+function refreshTimerUI() {
+  currentLevel = Math.min(
+    JSON.parse(localStorage.getItem('currentLevel')) || 0,
+    defaultBlindsData.length - 1
+  );
+  localStorage.setItem('currentLevel', JSON.stringify(currentLevel));
+  const newTime = (parseInt(defaultBlindsData[currentLevel]?.time, 10) || 0) * 60;
+  localStorage.setItem('timeRemaining', JSON.stringify(newTime));
+  initTimer(newTime);
+  setBreakTimer();
+}
 
+function makeBlindRowEl(item, idx) {
+  const tpl = document.querySelector('#tpl-blind-row');
+  const row = tpl.content.firstElementChild.cloneNode(true);
+  row.dataset.index = idx;
 
+  // unique IDs for a11y
+  row.querySelector('.sb').id = `sb-${idx}`;
+  row.querySelector('label[for="sb-input"]').setAttribute('for', `sb-${idx}`);
 
+  row.querySelector('.bb').id = `bb-${idx}`;
+  row.querySelector('label[for="bb-input"]').setAttribute('for', `bb-${idx}`);
 
+  row.querySelector('.ante').id = `ante-${idx}`;
+  row.querySelector('label[for="ante-input"]').setAttribute('for', `ante-${idx}`);
 
+  row.querySelector('.time').id = `time-${idx}`;
+  row.querySelector('label[for="time-input"]').setAttribute('for', `time-${idx}`);
+
+  row.querySelector('.sb').value   = item.sb   ?? '';
+  row.querySelector('.bb').value   = item.bb   ?? '';
+  row.querySelector('.ante').value = (item.ante ?? '') === 0 ? '' : (item.ante ?? '');
+  row.querySelector('.time').value = (item.time ?? '') === 0 ? '' : (item.time ?? '');
+
+  wireRowHandlers(row);
+  return row;
+}
+
+function makeBreakRowEl(item, idx) {
+  const tpl = document.querySelector('#tpl-break-row');
+  const row = tpl.content.firstElementChild.cloneNode(true);
+  row.dataset.index = idx;
+
+  // unique IDs for a11y
+  row.querySelector('.label').id = `break-label-${idx}`;
+  row.querySelector('label[for="break-label-input"]').setAttribute('for', `break-label-${idx}`);
+
+  row.querySelector('.time').id = `break-time-${idx}`;
+  row.querySelector('label[for="break-time-input"]').setAttribute('for', `break-time-${idx}`);
+
+  row.querySelector('.label').value = item.label || 'Break';
+  row.querySelector('.time').value  = (item.time ?? '') === 0 ? '' : (item.time ?? '');
+
+  wireRowHandlers(row);
+  return row;
+}
+
+function wireRowHandlers(row) {
+  const idx = () => parseInt(row.dataset.index, 10);
+  const type = row.dataset.type;
+
+  row.addEventListener('input', (e) => {
+    const i = idx();
+    const item = defaultBlindsData[i];
+    if (!item) return;
+    if (type === 'blind') {
+      if (e.target.classList.contains('sb')) item.sb = e.target.value;
+      if (e.target.classList.contains('bb')) item.bb = e.target.value;
+      if (e.target.classList.contains('ante')) item.ante = e.target.value || '';
+      if (e.target.classList.contains('time')) item.time = e.target.value === '' ? '' : parseInt(e.target.value || '0', 10);
+    } else {
+      if (e.target.classList.contains('label')) item.label = e.target.value || 'Break';
+      if (e.target.classList.contains('time')) item.time = e.target.value === '' ? '' : parseInt(e.target.value || '0', 10);
+    }
+    persistLevels();
+    refreshTimerUI();
+  });
+
+  row.querySelector('.delete-row').addEventListener('click', (e) => {
+    e.preventDefault();
+    const i = idx();
+    defaultBlindsData.splice(i, 1);
+    persistLevels();
+    renderLevelsEditor();
+    refreshTimerUI();
+  });
+
+  row.querySelector('.move-up').addEventListener('click', (e) => {
+    e.preventDefault();
+    const i = idx();
+    if (i === 0) return;
+    [defaultBlindsData[i - 1], defaultBlindsData[i]] = [defaultBlindsData[i], defaultBlindsData[i - 1]];
+    persistLevels();
+    renderLevelsEditor();
+    refreshTimerUI();
+  });
+
+  row.querySelector('.move-down').addEventListener('click', (e) => {
+    e.preventDefault();
+    const i = idx();
+    if (i >= defaultBlindsData.length - 1) return;
+    [defaultBlindsData[i + 1], defaultBlindsData[i]] = [defaultBlindsData[i], defaultBlindsData[i + 1]];
+    persistLevels();
+    renderLevelsEditor();
+    refreshTimerUI();
+  });
+}
+
+function showOptionRow() {
+  HELPERS.getLevelsActionRow().classList.add('is-hidden');
+  HELPERS.getLevelsOptionRow().classList.remove('is-hidden');
+}
+
+function showActionRow() {
+  HELPERS.getLevelsOptionRow().classList.add('is-hidden');
+  HELPERS.getLevelsActionRow().classList.remove('is-hidden');
+}
+
+function focusLastRowFirstField() {
+  const content = HELPERS.getLevelsContent();
+  const lastRow = content.querySelector('.level-row:last-of-type, .break-row:last-of-type');
+  if (!lastRow) return;
+  const firstInput = lastRow.querySelector('input');
+  if (firstInput) firstInput.focus();
+}
+
+function renderLevelsEditor() {
+  const content    = HELPERS.getLevelsContent();
+  const header     = HELPERS.getLevelsHeader();
+  const optionRow  = HELPERS.getLevelsOptionRow();
+
+  // clear existing rows
+  [...content.querySelectorAll('.level-row, .break-row')].forEach(el => el.remove());
+
+  // render rows above the bottom controls
+  defaultBlindsData.forEach((item, i) => {
+    const rowEl = item.type === 'break' ? makeBreakRowEl(item, i) : makeBlindRowEl(item, i);
+    optionRow.before(rowEl);
+  });
+
+  // Add (+) -> show options
+  const addBtn = HELPERS.getLevelsAddBtn && HELPERS.getLevelsAddBtn();
+  if (addBtn) {
+    addBtn.onclick = (e) => {
+      e.preventDefault();
+      showOptionRow();
+    };
+  }
+
+  // Option: Blind
+  const optBlind = HELPERS.getOptionBlindBtn && HELPERS.getOptionBlindBtn();
+  if (optBlind) {
+    optBlind.onclick = (e) => {
+      e.preventDefault();
+      defaultBlindsData.push({
+        type: 'blind',
+        label: `Level ${defaultBlindsData.length + 1}`,
+        sb: '',
+        bb: '',
+        ante: '',
+        time: ''
+      });
+      persistLevels();
+      renderLevelsEditor();
+      refreshTimerUI();
+      showActionRow();
+      focusLastRowFirstField();
+    };
+  }
+
+  // Option: Break
+  const optBreak = HELPERS.getOptionBreakBtn && HELPERS.getOptionBreakBtn();
+  if (optBreak) {
+    optBreak.onclick = (e) => {
+      e.preventDefault();
+      defaultBlindsData.push({
+        type: 'break',
+        label: 'Break',
+        time: ''
+      });
+      persistLevels();
+      renderLevelsEditor();
+      refreshTimerUI();
+      showActionRow();
+      focusLastRowFirstField();
+    };
+  }
+
+  // Option: Cancel
+  const optCancel = HELPERS.getOptionCancelBtn && HELPERS.getOptionCancelBtn();
+  if (optCancel) {
+    optCancel.onclick = (e) => {
+      e.preventDefault();
+      showActionRow();
+    };
+  }
+
+  // Reset Levels -> restore pristine defaults
+  const resetBtn = HELPERS.getLevelsResetBtn && HELPERS.getLevelsResetBtn();
+  if (resetBtn) {
+    resetBtn.onclick = (e) => {
+      e.preventDefault();
+      const backup = JSON.parse(localStorage.getItem('defaultBlindsBackup') || '[]');
+      if (backup.length) {
+        defaultBlindsData = backup.slice();
+        persistLevels();
+        renderLevelsEditor();
+        refreshTimerUI();
+        showActionRow();
+      }
+    };
+  }
+}
+
+// expose for ui.js
+window.renderLevelsEditor = renderLevelsEditor;
+
+// --------- Cursor auto-hide ---------
 let cursorTimer;
 
 function hideCursor() {
   document.documentElement.style.setProperty("cursor", "none", "important");
   document.documentElement.classList.add("hide-cursor");
-
-  // Disable hover effects by adding a class
   document.body.classList.add("disable-hover");
 }
 
 function showCursor() {
   document.documentElement.style.setProperty("cursor", "auto", "important");
   document.documentElement.classList.remove("hide-cursor");
-
-  // Enable hover effects again
   document.body.classList.remove("disable-hover");
 }
 
 function resetCursorTimer() {
-  showCursor(); // Show cursor on movement
+  showCursor();
   clearTimeout(cursorTimer);
   cursorTimer = setTimeout(hideCursor, 5000); // 5-second delay
 }
 
-// Detect any mouse movement to reset the timer
 document.addEventListener("mousemove", resetCursorTimer);
-
-// Start the timer initially
 resetCursorTimer();

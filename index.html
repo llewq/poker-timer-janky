@@ -31,6 +31,7 @@
         </nav>
       </div>
 
+      <!-- Levels panel -->
       <div id="navLevels" class="nav-panel">
         <span class="back"><i class="fas fa-angle-left"></i>Settings</span>
         <h2>Levels</h2>
@@ -41,51 +42,63 @@
             <span>Ante</span>
             <span>Time</span>
           </div>
-          <div class="level-row">
-            <form action="">
-              <div class="mover">
-                <button><i class="fas fa-angle-up"></i></button>
-                <button><i class="fas fa-angle-down"></i></button>
-              </div>
-              <div>
-                <label for="sb-1">Small Blind</label>
-                <input type="text" id="sb-1" name="Small Blind 1" value="25">
-              </div>
-              <div>
-                <label for="bb-1">Big Blind</label>
-                <input type="text" id="bb-1" name="Big Blind 1" value="50">
-              </div>
-              <div>
-                <label for="an-1">Ante</label>
-                <input type="text" id="an-1" name="Ante 1">
-              </div>
-              <div>
-                <label for="tm-1">Time</label>
-                <input type="text" id="tm-1" name="Time 1">
-              </div>
-              <div class="delete">
-                <button><i class="fas fa-times"></i></button>
-              </div>
-            </form>
-          </div>
 
-          <div class="break-row">
-            <form action="">
-              <div class="mover">
-                <button><i class="fas fa-angle-up"></i></button>
-                <button><i class="fas fa-angle-down"></i></button>
-              </div>
-              <div>
-                <label for="br-1">Break Length</label>
-                <input type="text" id="br-1" name="Break 1" value="15 min">
-              </div>
-              <div class="delete">
-                <button><i class="fas fa-times"></i></button>
-              </div>
-            </form>
-          </div>
+          <!-- template for a BLIND row -->
+          <template id="tpl-blind-row">
+            <div class="level-row" data-type="blind">
+              <form action="">
+                <div class="mover">
+                  <button class="move-up"><i class="fas fa-angle-up"></i></button>
+                  <button class="move-down"><i class="fas fa-angle-down"></i></button>
+                </div>
+                <div class="field-sb">
+                  <label for="sb-input" class="sr-only">Small Blind</label>
+                  <input type="text" id="sb-input" class="blind-input sb" placeholder="SB">
+                </div>
+                <div class="field-bb">
+                  <label for="bb-input" class="sr-only">Big Blind</label>
+                  <input type="text" id="bb-input" class="blind-input bb" placeholder="BB">
+                </div>
+                <div class="field-ante">
+                  <label for="ante-input" class="sr-only">Ante</label>
+                  <input type="text" id="ante-input" class="blind-input ante" placeholder="ANTE">
+                </div>
+                <div class="field-time">
+                  <label for="time-input" class="sr-only">Time (min)</label>
+                  <input type="text" id="time-input" class="blind-input time" placeholder="TIME">
+                </div>
+                <div class="delete">
+                  <button class="delete-row"><i class="fas fa-times"></i></button>
+                </div>
+              </form>
+            </div>
+          </template>
 
-          <div class="option-row">
+          <!-- template for a BREAK row -->
+          <template id="tpl-break-row">
+            <div class="break-row" data-type="break">
+              <form action="">
+                <div class="mover">
+                  <button class="move-up"><i class="fas fa-angle-up"></i></button>
+                  <button class="move-down"><i class="fas fa-angle-down"></i></button>
+                </div>
+                <div class="field-label">
+                  <label for="break-label-input" class="sr-only">Break Label</label>
+                  <input type="text" id="break-label-input" class="break-input label" placeholder="Break label (optional)">
+                </div>
+                <div class="field-time">
+                  <label for="break-time-input" class="sr-only">Break Time (min)</label>
+                  <input type="text" id="break-time-input" class="break-input time" placeholder="TIME">
+                </div>
+                <div class="delete">
+                  <button class="delete-row"><i class="fas fa-times"></i></button>
+                </div>
+              </form>
+            </div>
+          </template>
+
+          <!-- CONTROLS MOVED TO BOTTOM -->
+          <div class="option-row is-hidden">
             <form action="">
               <div class="blind">
                 <button class="primary">Blind</button>
@@ -111,6 +124,7 @@
           </div>
         </div>
       </div>
+
 
       <div id="navPlayers" class="nav-panel">
         <span class="back"><i class="fas fa-angle-left"></i>Settings</span>
@@ -236,9 +250,11 @@
               <span class="seconds-2"></span>
           </div>
           <div class="controls">
-            <button class="prev"><i class=" fas fa-caret-left"></i></button>
+            <button class="skip skip-back"><img src="assets/img/back-30.svg" alt=""></button>
+            <button class="prev"><i class=" fas fa-backward-step"></i></button>
             <button class="play"><i class=" fas fa-play"></i></button>
-            <button class="next"><i class=" fas fa-caret-right"></i></button>
+            <button class="next"><i class=" fas fa-forward-step"></i></button>
+            <button class="skip skip-forward"><img src="assets/img/forward-30.svg" alt=""></button>
           </div>
       </section>
 
