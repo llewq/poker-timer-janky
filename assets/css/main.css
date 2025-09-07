@@ -43,6 +43,8 @@
   --size-large: 2rem; /* 32px */
   --size-medium: 1.5rem; /* 24px */
   --size-small: 1.25rem; /* 20px */
+  --size-smaller: 1rem;
+  --size-smallest: 0.875rem;
   --ease-in-cubic: cubic-bezier(0.32, 0, 0.67, 0) ;
 }
 
@@ -487,11 +489,6 @@ form .counter span {
 
 /* tools section */
 #tools {
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  gap: 24px;
-  padding: 0 2.25rem; /* 36px */
   font-size: 1.5rem; /* 24px */
   color: var(--color-gray-300);
   background-color: rgba(68, 68, 68, 0.9);
@@ -499,6 +496,14 @@ form .counter span {
   opacity: 0;
   cursor: pointer;
   transition: opacity ease 400ms;
+}
+#tools .inner {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 24px;
+  padding: 0 2.25rem; /* 36px */
+  height: 100%;
 }
 #tools:hover {
   opacity: 1;
@@ -719,7 +724,7 @@ form .counter span {
 }
 #timer .display .time {
   position: relative;
-  font-size: clamp(60px, 6vw, 120px);
+  font-size: clamp(30px, 6vw, 120px);
   letter-spacing: 0.05em;
   line-height: 1;
   display: flex;
@@ -799,7 +804,6 @@ form .counter span {
 /* Players Section */
 #payouts {
   padding: 2rem;
-  padding-bottom: 0;
 }
 #payouts .title {
   font-size: var(--size-large);
@@ -1029,4 +1033,168 @@ form .counter span {
 }
 .disable-hover * #tools {
   opacity: 0 !important;
+}
+
+@media screen and (max-width: 782px) {
+  html {
+    overflow: auto;
+  }
+  .wrapper {
+    height: auto;
+  }
+  #tools {
+    position: relative;
+    opacity: 1;
+    width: calc(100% + 40px);
+    height: auto;
+    background: none;
+    padding: 20px 0;
+    padding-top: 0;
+    margin: 0 -20px;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+  #tools:before, #tools:after {
+    content: "";
+    position: absolute;
+    z-index: 10;
+    width: 20px;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background: linear-gradient(to right, var(--color-gray-900), transparent);
+  }
+  #tools:after {
+    left: unset;
+    right: 0;
+    background: linear-gradient(to left, var(--color-gray-900), transparent);
+  }
+  #tools .menu-btn {
+    margin-right: unset;
+  }
+  #tools .inner {
+    display: flex;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    padding: 0 20px;
+    gap: 8px;
+  }
+  #tools .inner::-webkit-scrollbar {
+    display: none;
+  }
+  #tools .inner button {
+    white-space: nowrap;
+  }
+  main {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+  }
+  main .title {
+    font-size: var(--size-medium);
+  }
+  #menu {
+    width: 100%;
+    padding: 1rem;
+    padding-top: 4rem;
+  }
+  #menu .close-btn {
+    right: 0px;
+    top: 20px;
+  }
+  #menu input[type=text] {
+    font-size: var(--size-smaller);
+  }
+  #menu .action-row form button, #menu .option-row form button {
+    font-size: var(--size-smaller);
+  }
+  #timer {
+    grid-row: 1/span 1;
+    grid-column: 1/span 1;
+    padding: 20px;
+  }
+  #timer .display .level {
+    font-size: var(--size-medium);
+  }
+  #timer .display .time > span {
+    padding: 12px 0px;
+  }
+  #timer .display .time > span:not(.colon) {
+    width: 40px;
+  }
+  #blinds-current {
+    grid-row: 2/span 1;
+    grid-column: 1/span 1;
+    flex-direction: row;
+    justify-content: center;
+  }
+  #blinds-current > * {
+    flex: 1 1 100%;
+  }
+  #blinds-next {
+    grid-row: 3/span 1;
+    grid-column: 1/span 1;
+    gap: 1rem;
+    flex-direction: row;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  #blinds-next > * {
+    flex: 0 0 25%;
+  }
+  #blinds-next > h2 {
+    flex: 0 0 100%;
+  }
+  #blinds-prev {
+    grid-row: 4/span 1;
+    grid-column: 1/span 1;
+    gap: 1rem;
+    flex-direction: row;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  #blinds-prev > * {
+    flex: 0 0 25%;
+  }
+  #blinds-prev > h2 {
+    flex: 0 0 100%;
+  }
+  #blinds-current .blind .label,
+  #blinds-prev .blind .label,
+  #blinds-next .blind .label {
+    font-size: 12px;
+    line-height: 1.2;
+  }
+  #blinds-current .blind .value,
+  #blinds-prev .blind .value,
+  #blinds-next .blind .value {
+    font-size: 24px;
+  }
+  #info {
+    grid-row: 5/span 1;
+    grid-column: 1/span 1;
+    gap: 1rem;
+  }
+  #info .title {
+    margin-bottom: 0.5rem;
+    font-size: var(--size-medium);
+  }
+  #info p {
+    font-size: var(--size-small);
+  }
+  #payouts {
+    grid-row: 6/span 1;
+    grid-column: 1/span 1;
+  }
+  #payouts .title {
+    font-size: var(--size-medium);
+  }
+  .disable-hover * {
+    pointer-events: auto !important;
+  }
+  .disable-hover * #tools {
+    opacity: 1 !important;
+  }
 }/*# sourceMappingURL=main.css.map */

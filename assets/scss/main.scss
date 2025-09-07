@@ -53,6 +53,8 @@
   --size-large: 2rem; /* 32px */
   --size-medium: 1.5rem; /* 24px */
   --size-small: 1.25rem; /* 20px */
+  --size-smaller: 1rem;
+  --size-smallest: 0.875rem;
 
   --ease-in-cubic: cubic-bezier(0.32, 0, 0.67, 0)
 }
@@ -508,11 +510,14 @@ form .counter {
 /* tools section */
 
 #tools {
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  gap: 24px;
-  padding: 0 2.25rem; /* 36px */
+  .inner {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 24px;
+    padding: 0 2.25rem; /* 36px */
+    height: 100%;
+  }
   font-size: 1.5rem; /* 24px */
   color: var(--color-gray-300);
   background-color: rgba(#444, 0.9);
@@ -754,7 +759,7 @@ form .counter {
     .time {
       position: relative;
       // font-family: 'Noto', monospace;
-      font-size: clamp(60px, 6vw, 120px);
+      font-size: clamp(30px, 6vw, 120px);
       letter-spacing: 0.05em;
       line-height: 1;
       display: flex;
@@ -835,7 +840,6 @@ form .counter {
 
 #payouts {
   padding: 2rem;
-  padding-bottom: 0;
   .title {
     font-size: var(--size-large);
     line-height: 1;
@@ -1070,4 +1074,176 @@ form .counter {
   #tools {
     opacity: 0 !important;
   }
+}
+
+@media screen and (max-width: 782px) {
+  html {
+    overflow: auto;
+  }
+  .wrapper {
+    height: auto;
+  }
+  #tools {
+    position: relative;
+    opacity: 1;
+    width: calc(100% + 40px);
+    height: auto;
+    background: none;
+    padding: 20px 0;
+    padding-top: 0;
+    margin: 0 -20px;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    &:before,
+    &:after {
+      content: '';
+      position: absolute;
+      z-index: 10;
+      width: 20px;
+      height: 100%;
+      top: 0;
+      left: 0;
+      background: linear-gradient(to right, var(--color-gray-900), transparent);
+    }
+    &:after {
+      left: unset;
+      right: 0;
+      background: linear-gradient(to left, var(--color-gray-900), transparent);
+    }
+    .menu-btn {
+      margin-right: unset;
+    }
+    .inner {
+      display: flex;
+      overflow-x: scroll;
+      overflow-y: hidden;
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+      padding: 0 20px;
+      // snap
+      // scroll-snap-type: x mandatory;   /* axis + strictness */
+      // scroll-padding-inline: 20px;
+      &::-webkit-scrollbar {
+        display: none;
+      }
+      gap: 8px;
+      button {
+        white-space: nowrap;
+        // scroll-snap-align: start;
+        // scroll-snap-stop: normal;
+      }
+    }
+  }
+  main {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    .title {
+      font-size: var(--size-medium);
+    }
+  }
+  #menu {
+    width: 100%;
+    padding: 1rem;
+    padding-top: 4rem;
+    .close-btn {
+      right: 0px;
+      top: 20px;
+    }
+    input[type="text"] {
+      font-size: var(--size-smaller);
+    }
+    .action-row form button, .option-row form button {
+      font-size: var(--size-smaller);
+    }
+  }
+  #timer {
+    grid-row: 1 / span 1;
+    grid-column: 1 / span 1;
+    padding: 20px;
+    .display .level {
+      font-size: var(--size-medium);
+    }
+    .display .time > span {
+      padding: 12px 0px;
+      &:not(.colon) {
+        width: 40px;
+      }
+    }
+  }
+  #blinds-current {
+    grid-row: 2 / span 1;
+    grid-column: 1 / span 1;
+    flex-direction: row;
+    justify-content: center;
+    > * {
+      flex: 1 1 100%;
+    }
+  }
+  #blinds-next {
+    grid-row: 3 / span 1;
+    grid-column: 1 / span 1;
+    gap: 1rem;
+    flex-direction: row;
+    justify-content: center;
+    flex-wrap: wrap;
+    > * {
+      flex: 0 0 25%;
+    }
+    > h2 {
+      flex: 0 0 100%;
+    }
+  }
+  #blinds-prev {
+    grid-row: 4 / span 1;
+    grid-column: 1 / span 1;
+    gap: 1rem;
+    flex-direction: row;
+    justify-content: center;
+    flex-wrap: wrap;
+    > * {
+      flex: 0 0 25%;
+    }
+    > h2 {
+      flex: 0 0 100%;
+    }
+  }
+  #blinds-current,
+  #blinds-prev,
+  #blinds-next {
+    .blind {
+      .label {
+        font-size: 12px;
+        line-height: 1.2;
+      }
+      .value {
+        font-size: 24px;
+      }
+    }
+  }
+  #info {
+    grid-row: 5 / span 1;
+    grid-column: 1 / span 1;
+    gap: 1rem;
+    .title {
+      margin-bottom: 0.5rem;
+      font-size: var(--size-medium);
+    }
+    p {
+      font-size: var(--size-small);
+    }
+  }
+  #payouts {
+    grid-row: 6 / span 1;
+    grid-column: 1 / span 1;
+    .title {
+      font-size: var(--size-medium);
+    }
+  }
+  .disable-hover * {
+  pointer-events: auto !important;
+  #tools {
+    opacity: 1 !important;
+  }
+}
 }

@@ -1,5 +1,7 @@
 # Poker Timer - the janky version
 
+Version 0.4.1 - Responsive layout for mobile
+
 Version 0.4.0 - Overhauled Add Player UI
 
 Version 0.3.6 - Added Levels functionality. Added 30s skip buttons.
