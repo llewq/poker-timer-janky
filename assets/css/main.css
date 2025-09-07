@@ -660,14 +660,25 @@ form .counter span {
   height: 38px;
   font-size: 1.75rem;
   cursor: pointer;
+  transition: all ease 300ms;
+}
+#timer .controls button:hover {
+  color: var(--color-primary);
 }
 #timer .controls button.play {
   color: var(--color-black);
   background-color: var(--color-gray-300);
   font-size: 1.5rem;
 }
+#timer .controls button.play:hover {
+  color: var(--color-black);
+  background-color: var(--color-primary);
+}
 #timer .controls button.skip {
   border: none;
+}
+#timer .controls button.skip:hover svg path {
+  fill: var(--color-primary);
 }
 #timer .controls button:nth-of-type(3) {
   width: 50px;

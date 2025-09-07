@@ -695,13 +695,24 @@ form .counter {
     height: 38px;
     font-size: 1.75rem;
     cursor: pointer;
+    transition: all ease 300ms;
+    &:hover {
+      color: var(--color-primary);
+    }
     &.play {
       color: var(--color-black);
       background-color: var(--color-gray-300);
       font-size: 1.5rem;
+      &:hover {
+        color: var(--color-black);
+        background-color: var(--color-primary);
+      }
     }
     &.skip {
       border: none;
+      &:hover svg path {
+        fill: var(--color-primary)
+      }
     }
   }
   button:nth-of-type(3) {
