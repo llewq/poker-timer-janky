@@ -513,9 +513,6 @@ function buildPlayerEl(pid) {
     <div class="delete">
       <button data-delete="${ pid }" class="tooltip"><i class="fa-solid fa-trash"></i></button>
     </div>
-    <div class="counter">
-      <span></span>
-    </div>
     <div>
       <label for="player-${ pid }"></label>
       <input type="text" id="player-${ pid }" data-pid="${ pid }" name="" value="${ name }">
