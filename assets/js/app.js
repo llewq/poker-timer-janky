@@ -411,12 +411,30 @@ function startTimer(timeRemaining, timeToBreak) {
     HELPERS.getBreakTimerCont().textContent = parseInt(timeToBreak / 60, 10) + ' minutes';
 
     if (timeRemaining == 59) {
-      HELPERS.getAudioWarning().play();
+      // HELPERS.getAudioWarning().play();
+      playWarningSound();
     }
     
     if (timeRemaining == 3) {
-      HELPERS.getAudioEndRound().play();
+      // HELPERS.getAudioEndRound().play();
+      playEndOfLevelSound();
     }
+
+    // === Minimal audio helpers that respect settings ===
+    (function(){
+    const cache = {};
+    function getAudio(src){ return cache[src] || (cache[src] = new Audio(src)); }
+    function play(src){ const a = getAudio(src); a.volume = AppSettings.get('audio.volume') ?? 1; try{ a.currentTime = 0; a.play(); }catch(e){} }
+
+
+    // If you already have play* functions, either replace their body with these checks
+    // or call these from there.
+    window.playEndOfLevelSound = function(){ if (AppSettings.get('audio.endOfLevel')) play('assets/audio/timer-buzzer.mp3'); };
+    window.playWarningSound = function(){ if (AppSettings.get('audio.warning')) play('assets/audio/warning.mp3'); };
+
+
+
+    })();
 
     if (timeRemaining == 0) {
       clearInterval(timerInterval); // stops timer from progressing

@@ -194,6 +194,29 @@ input[type="text"] {
   }
 }
 
+#navAudio {
+  h2 {
+    margin-bottom: 24px;
+  }
+  .settings__row {
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: var(--size-medium);
+  }
+  button {
+    border: none;
+    background: none;
+    font-size: var(--size-medium);
+    color: var(--color-gray-300);
+    
+  }
+  button[aria-pressed="true"] {
+      color: var(--color-primary);
+    }
+}
+
 label {
   position: absolute;
   width: 0;

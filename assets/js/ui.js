@@ -1,3 +1,59 @@
+// === Audio settings (tiny helper, persisted) ===
+(function(){
+const KEY = 'pt.settings.v1';
+const defaults = { audio: { endOfLevel: true, warning: true, volume: 1 } };
+
+
+function load(){
+  try { return Object.assign({}, defaults, JSON.parse(localStorage.getItem(KEY)||'{}')); }
+  catch { return JSON.parse(JSON.stringify(defaults)); }
+}
+
+function save(state){ localStorage.setItem(KEY, JSON.stringify(state)); }
+
+function deepGet(obj, path){ return path.split('.').reduce((o,k)=> (o && k in o)? o[k] : undefined, obj); }
+
+function deepSet(obj, path, val){ const ks=path.split('.'); let cur=obj; for(let i=0;i<ks.length-1;i++){ cur[ks[i]] = cur[ks[i]] || {}; cur = cur[ks[i]]; } cur[ks.at(-1)] = val; }
+
+
+const state = load();
+window.AppSettings = {
+  state,
+  get: (p)=> deepGet(state, p),
+  set: (p,v)=>{ deepSet(state, p, v); save(state); document.dispatchEvent(new CustomEvent('settings:changed', { detail: { path:p, val:v } })); }
+};
+})();
+
+
+// === Wire up the #navAudio toggles ===
+(function(){
+  function renderBtn(btn){
+    const on = !!AppSettings.get(btn.dataset.toggle);
+    btn.setAttribute('aria-pressed', String(on));
+    const i = btn.querySelector('i');
+    if (i){ 
+      i.classList.toggle('fa-toggle-on', on); i.classList.toggle('fa-toggle-off', !on); 
+    }
+  }
+  function renderPanel(){ 
+    document.querySelectorAll('#navAudio .settings-toggle[data-toggle]').forEach(renderBtn); 
+  }
+  function onClick(e){
+    const btn = e.currentTarget; const path = btn.dataset.toggle; const next = !AppSettings.get(path);
+    AppSettings.set(path, next); renderBtn(btn);
+    if (next) document.dispatchEvent(new CustomEvent('audio:preview', { detail: { path } }));
+  }
+  document.addEventListener('DOMContentLoaded', ()=>{
+    renderPanel();
+    document.querySelectorAll('#navAudio .settings-toggle[data-toggle]').forEach(btn=>{
+      if(!btn.hasAttribute('role')) btn.setAttribute('role','switch');
+      btn.addEventListener('click', onClick);
+      btn.addEventListener('keydown', (ev)=>{ if(ev.key==='Enter' || ev.key===' '){ ev.preventDefault(); btn.click(); }});
+    });
+  });
+  document.addEventListener('settings:changed', (e)=>{ if((e.detail.path||'').startsWith('audio.')) renderPanel(); });
+})();
+
 // user actions
 
 HELPERS.getPlayBtn().addEventListener('click', function(){

@@ -16,7 +16,7 @@
   </div>
   <div class="wrapper">
 
-    <section id="menu" class="">
+    <section id="menu" class="active">
 
       <div class="nav-container">
         <span class="close-btn">
@@ -159,6 +159,42 @@
       <div id="navAudio" class="nav-panel">
         <span class="back"><i class="fas fa-angle-left"></i>Settings</span>
         <h2>Audio Alerts</h2>
+        <div class="settings-list">
+          <div class="settings__row" data-setting-row>
+            <div class="settings__left">
+              <div class="settings__label">End of Level</div>
+            </div>
+            <div class="settings__right">
+              <button
+              type="button"
+              class="settings-toggle"
+              data-toggle="audio.endOfLevel"
+              aria-label="Toggle End of Level alert"
+              aria-pressed="false"
+              role="switch"
+              >
+              <i class="fa-solid fa-toggle-off" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+          <div class="settings__row" data-setting-row>
+            <div class="settings__left">
+              <div class="settings__label">1 Minute Warning</div>
+            </div>
+            <div class="settings__right">
+              <button
+              type="button"
+              class="settings-toggle"
+              data-toggle="audio.warning"
+              aria-label="Toggle End of Level warning"
+              aria-pressed="false"
+              role="switch"
+              >
+              <i class="fa-solid fa-toggle-off" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
     </section>
