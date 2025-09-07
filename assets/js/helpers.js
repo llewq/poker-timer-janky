@@ -347,3 +347,18 @@ HELPERS.getSkipBackBtn = function () {
 HELPERS.getSkipForwardBtn = function () {
   return HELPERS.getTimerPanel().querySelector('.skip-forward');
 }
+HELPERS.getPlayersListCont = function() {
+  return HELPERS.getPlayersMenu().querySelector('#players-list');
+};
+
+HELPERS.getPlayersListCont = function () {
+  // Create it on first use if it doesn’t exist
+  const content = HELPERS.getPlayersMenu().querySelector('#active-players .content');
+  let list = content.querySelector('#players-list');
+  if (!list) {
+    list = document.createElement('div');
+    list.id = 'players-list';
+    content.insertBefore(list, HELPERS.getPlayerActionRow());
+  }
+  return list;
+};

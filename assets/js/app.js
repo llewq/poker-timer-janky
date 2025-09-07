@@ -61,6 +61,12 @@ function getPlayerList() {
 }
 getPlayerList();
 
+/** Centralized placer: always append into #players-list (above action row) */
+function placePlayerRow(el) {
+  const list = HELPERS.getPlayersListCont();
+  list.append(el);
+}
+
 // create entry count - does not change as players are elimintated
 let entryCount = 0;
 let initialCount = 0;
@@ -108,8 +114,8 @@ function buildPlayerListUI() {
   playerList = JSON.parse(localStorage.getItem('playerList'));
   playerList.forEach(player => {
     if (player.active) {
-      player = buildPlayerEl(player.pid);
-      HELPERS.getPlayerActionRow().after(player);
+      const row = buildPlayerEl(player.pid);
+      placePlayerRow(row);
     }
   });
 }
@@ -117,13 +123,26 @@ buildPlayerListUI();
 
 // renumbers the players in the player management panel
 function updatePlayerCountInNav() {
-  playerCount = JSON.parse(localStorage.getItem('initialCount'));
-  counter = HELPERS.getPlayersMenu().querySelector('.player-count');
-  counter.innerText = playerCount;
-  
-  remainingCount = JSON.parse(localStorage.getItem('remainingPlayerCount'));
-  counterRemaining = HELPERS.getPlayersMenu().querySelector('.remaining-count');
-  counterRemaining.innerText = remainingCount;
+  const playerCount = parseInt(JSON.parse(localStorage.getItem('initialCount')), 10);
+  const remainingCount = parseInt(JSON.parse(localStorage.getItem('remainingPlayerCount')), 10);
+
+  // Players menu (optional — may not exist depending on layout/state)
+  const menu = HELPERS.getPlayersMenu();
+  if (menu) {
+    const counter = menu.querySelector('.player-count');
+    const counterRemaining = menu.querySelector('.remaining-count');
+    if (counter) counter.innerText = playerCount;
+    if (counterRemaining) counterRemaining.innerText = remainingCount;
+  }
+
+  // Info panel (always present in main UI)
+  const initialEl = HELPERS.getInitialCountCont();      // #player-count-initial
+  const remainingEl = HELPERS.getRemainingCountCont();  // #player-count-remaining
+  if (initialEl) initialEl.textContent = playerCount;
+  if (remainingEl) remainingEl.textContent = remainingCount;
+
+  localStorage.setItem('initialCount', JSON.stringify(playerCount));
+  localStorage.setItem('remainingPlayerCount', JSON.stringify(remainingCount));
 }
 
 // build payout results
@@ -210,7 +229,7 @@ function generateHTML(tournamentResults, payouts) {
     <tbody>`;
 
   for (let i = 0; i < tournamentResults.length; i++) {
-    const name = tournamentResults[i]?.name || "";
+    const name   = tournamentResults[i]?.name   || "";
     const placed = tournamentResults[i]?.placed || "";
     const rebuys = tournamentResults[i]?.rebuys || "";
     const payout = payouts[i] ? `$${payouts[i]}` : "-";
@@ -231,6 +250,7 @@ function generateHTML(tournamentResults, payouts) {
 
   return htmlContent;
 }
+
 
 // export tournament results (playerList)
 function exportCSV() {
@@ -268,8 +288,8 @@ function initTimer(timeRemaining) {
   setTimer(timeRemaining);
 
   HELPERS.getSmallBlindCont().textContent = defaultBlindsData[currentLevel].sb ? defaultBlindsData[currentLevel].sb : '-';
-  HELPERS.getBigBlindCont().textContent = defaultBlindsData[currentLevel].bb ? defaultBlindsData[currentLevel].bb : '-';
-  HELPERS.getAnteCont().textContent      = defaultBlindsData[currentLevel].ante ? defaultBlindsData[currentLevel].ante : '-';
+  HELPERS.getBigBlindCont().textContent   = defaultBlindsData[currentLevel].bb ? defaultBlindsData[currentLevel].bb : '-';
+  HELPERS.getAnteCont().textContent       = defaultBlindsData[currentLevel].ante ? defaultBlindsData[currentLevel].ante : '-';
 
   if (currentLevel < (defaultBlindsData.length - 1)) {
     HELPERS.getNextSmallBlindCont().textContent = defaultBlindsData[currentLevel + 1].sb ? defaultBlindsData[currentLevel + 1].sb : '-';
@@ -341,7 +361,6 @@ function adjustTimerSeconds(deltaSeconds) {
   } else {
     ttb = 0;
   }
-
 
   localStorage.setItem('timeRemaining', tr);
   localStorage.setItem('timeToBreak',  ttb);
@@ -422,18 +441,12 @@ function startTimer(timeRemaining, timeToBreak) {
 
     // === Minimal audio helpers that respect settings ===
     (function(){
-    const cache = {};
-    function getAudio(src){ return cache[src] || (cache[src] = new Audio(src)); }
-    function play(src){ const a = getAudio(src); a.volume = AppSettings.get('audio.volume') ?? 1; try{ a.currentTime = 0; a.play(); }catch(e){} }
+      const cache = {};
+      function getAudio(src){ return cache[src] || (cache[src] = new Audio(src)); }
+      function play(src){ const a = getAudio(src); a.volume = AppSettings.get('audio.volume') ?? 1; try{ a.currentTime = 0; a.play(); }catch(e){} }
 
-
-    // If you already have play* functions, either replace their body with these checks
-    // or call these from there.
-    window.playEndOfLevelSound = function(){ if (AppSettings.get('audio.endOfLevel')) play('assets/audio/timer-buzzer.mp3'); };
-    window.playWarningSound = function(){ if (AppSettings.get('audio.warning')) play('assets/audio/warning.mp3'); };
-
-
-
+      window.playEndOfLevelSound = function(){ if (AppSettings.get('audio.endOfLevel')) play('assets/audio/timer-buzzer.mp3'); };
+      window.playWarningSound    = function(){ if (AppSettings.get('audio.warning'))    play('assets/audio/warning.mp3'); };
     })();
 
     if (timeRemaining == 0) {
@@ -937,7 +950,7 @@ function reEnrollPlayer() {
   localStorage.setItem('remainingPlayers', JSON.stringify(remainingPlayers));
 
   let playerEl = buildPlayerEl(pid);
-  HELPERS.getPlayerActionRow().after(playerEl);
+  placePlayerRow(playerEl);
 
   updatePlayerResultsLists();
 
@@ -1326,3 +1339,149 @@ function resetCursorTimer() {
 
 document.addEventListener("mousemove", resetCursorTimer);
 resetCursorTimer();
+
+/* ===== Pending Add Flow (Add Player UX) ===== */
+
+function renderAddActions() {
+  const actionRow = HELPERS.getPlayerActionRow();
+  actionRow.dataset.state = 'multi';
+  actionRow.innerHTML = '';
+  const form = document.createElement('form');
+
+  const makeBtn = (cls, label, onClick) => {
+    const wrap = document.createElement('div');
+    const btn = document.createElement('button');
+    btn.classList.add(cls);
+    btn.textContent = label;
+    btn.addEventListener('click', function(e){ e.preventDefault(); onClick(); });
+    wrap.appendChild(btn);
+    return wrap;
+  };
+
+  form.appendChild(makeBtn('primary', 'Save', () => savePendingPlayer(false)));
+  form.appendChild(makeBtn('primary', 'Save and Add New', () => savePendingPlayer(true)));
+
+  const cancelWrap = document.createElement('div');
+  const cancelBtn = document.createElement('button');
+  cancelBtn.classList.add('ghost');
+  cancelBtn.textContent = 'Cancel';
+  cancelBtn.addEventListener('click', function(e){ e.preventDefault(); cancelPendingPlayer(); });
+  cancelWrap.appendChild(cancelBtn);
+
+  form.appendChild(cancelWrap);
+  actionRow.appendChild(form);
+}
+
+function renderAddButton() {
+  const actionRow = HELPERS.getPlayerActionRow();
+  actionRow.dataset.state = 'single';
+  actionRow.innerHTML = '';
+  const form = document.createElement('form');
+  form.setAttribute('onsubmit', 'return false');
+  const addDiv = document.createElement('div');
+  const btn = document.createElement('button');
+  btn.classList.add('primary');
+  btn.textContent = 'Add Player';
+  btn.addEventListener('click', function(e){ e.preventDefault(); startAddPlayerFlow(); });
+  addDiv.appendChild(btn);
+  form.appendChild(addDiv);
+  actionRow.appendChild(form);
+}
+
+function hasPendingRow() {
+  // Only true if a real, editable pending row exists (with an input)
+  return !!HELPERS.getPlayersListCont().querySelector('.player-row.pending input');
+}
+
+function startAddPlayerFlow() {
+  if (hasPendingRow()) {
+    const input = HELPERS.getPlayersListCont().querySelector('.player-row.pending input');
+    input?.focus();
+    return;
+  }
+  // pending row (name only)
+  const row = document.createElement('div');
+  row.className = 'player-row pending';
+  row.innerHTML = `
+    <form action="">
+      <div style="flex:1 1 auto;">
+        <label for="new-player"></label>
+        <input type="text" id="new-player" placeholder="Player Name">
+      </div>
+    </form>`;
+  HELPERS.getPlayersListCont().appendChild(row);
+  renderAddActions();
+  row.querySelector('input').focus();
+}
+
+function cancelPendingPlayer() {
+  const pending = HELPERS.getPlayersListCont().querySelector('.player-row.pending');
+  pending?.remove();
+  renderAddButton();
+}
+
+// Programmatic name setter (mirrors updatePlayer logic but without relying on input 'this')
+function setPlayerName(pid, rawValue) {
+  const cleanName = DOMPurify.sanitize(rawValue);
+  let playerList = JSON.parse(localStorage.getItem('playerList'));
+  let player = playerList.find(p => p.pid === pid);
+  if (!player) return;
+  player.name = cleanName;
+  localStorage.setItem('playerList', JSON.stringify(playerList));
+
+  // keep remainingPlayers in sync (same as updatePlayer does)
+  let remainingPlayers = JSON.parse(localStorage.getItem('remainingPlayers'));
+  let playerInRemaining = remainingPlayers.find(p => p.pid === pid);
+  if (playerInRemaining) {
+    playerInRemaining.name = cleanName;
+  } else {
+    remainingPlayers.push(player);
+  }
+  localStorage.setItem('remainingPlayers', JSON.stringify(remainingPlayers));
+
+  updatePlayerCountInNav();
+  updatePlayerResultsLists();
+}
+
+function savePendingPlayer(addAnother) {
+  const list = HELPERS.getPlayersListCont();
+  const pending = list?.querySelector('.player-row.pending');
+  if (!pending) return;
+
+  const nameInput = pending.querySelector('input');
+  const nameVal = (nameInput?.value || '').trim();
+
+  // Create the player now
+  const pid = Date.now();
+  addPlayer(pid);
+  setPlayerName(pid, nameVal);
+
+  // Pre-build final row
+  const standardRow = buildPlayerEl(pid);
+
+  // If we're adding another, mark this row as "saving" so the guard doesn't block us
+  if (addAnother) {
+    pending.classList.remove('pending');
+    pending.classList.add('saving'); // purely a marker; style if you want
+    startAddPlayerFlow();            // <-- new empty field appears immediately
+  } else {
+    renderAddButton();               // revert action row right away
+  }
+
+  // Show success flash in the current row
+  pending.innerHTML = `
+    <div class="save-confirm">
+      <i class="fa-regular fa-circle-check"></i>
+    </div>
+  `;
+  const flash = pending.querySelector('.save-confirm');
+  requestAnimationFrame(() => flash.classList.add('show'));
+
+  // After flash, swap to the standard row
+  setTimeout(() => {
+    flash.classList.remove('show');
+    setTimeout(() => {
+      pending.replaceWith(standardRow);
+    }, 250);
+  }, 1000);
+}

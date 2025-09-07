@@ -16,7 +16,7 @@
   </div>
   <div class="wrapper">
 
-    <section id="menu" class="active">
+    <section id="menu" class="">
 
       <div class="nav-container">
         <span class="close-btn">
@@ -128,27 +128,35 @@
 
       <div id="navPlayers" class="nav-panel">
         <span class="back"><i class="fas fa-angle-left"></i>Settings</span>
+
         <div id="active-players">
           <h2>Players</h2>
-          <p>
-            <span>Players registered: <span class="player-count">0</span></span>
-            <span>Players remaining: <span class="remaining-count">0</span></span>
-          </p>
+
+          <!-- NEW: list container where rows render -->
           <div class="content">
-            <div class="action-row">
+            <div id="players-list"></div> <!-- NEW -->
+            <div class="action-row" data-state="single">
               <form action="" onsubmit="return false">
                 <div class="add">
                   <button class="primary">Add Player</button>
                 </div>
               </form>
             </div>
+            <p>
+              <span>Players registered: <span class="player-count">0</span></span>
+              <span>Players remaining: <span class="remaining-count">0</span></span>
+            </p>
+
           </div>
+
         </div>
+
         <div id="inactive-players">
           <h2 class="title">Busted</h2>
           <div class="content"></div>
         </div>
       </div>
+
 
       <div id="navCash" class="nav-panel">
         <span class="back"><i class="fas fa-angle-left"></i>Settings</span>
