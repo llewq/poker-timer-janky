@@ -4,6 +4,11 @@
 }
 
 @font-face {
+  font-family: 'Kanit Light';
+  src: url('../fonts/Kanit/Kanit-Light.ttf');
+}
+
+@font-face {
   font-family: 'Kanit Bold';
   src: url('../fonts/Kanit/Kanit-Bold.ttf');
 }
@@ -15,6 +20,7 @@
 
 :root {
   --font-kanit: 'Kanit', sans-serif;
+  --font-kanit-light: 'Kanit Light', sans-serif;
   --font-kanit-bold: 'Kanit Bold', sans-serif;
   --font-fas: 'Font Awesome 6' !important;
 
@@ -256,6 +262,11 @@ label {
   .player-row.pending input[type=text] {
     background-color: var(--color-white);
     color: var(--color-gray-900);
+    &::placeholder {
+      font-size: var(--size-small);
+      font-family: var(--font-kanit-light);
+      color: var(--color-gray-300);
+    }
   }
   .action-row[data-state="multi"] form > div {
     flex: 0 0 20%;
