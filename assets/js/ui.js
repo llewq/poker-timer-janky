@@ -192,3 +192,22 @@ if (HELPERS.getSkipBackBtn) {
     if (typeof adjustTimerSeconds === 'function') adjustTimerSeconds(30);
   });
 }
+
+
+// Hotkeys for seating panel
+document.addEventListener('keydown', function(e) {
+  // Ignore key presses if user is typing in an input or textarea
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+    return;
+  }
+
+  if (e.key === 's' || e.key === 'S') {
+    // Open seating chart
+    HELPERS.getSeatingPanel().classList.add('active');
+  }
+
+  if (e.key === 'Escape') {
+    // Close seating chart
+    HELPERS.getSeatingPanel().classList.remove('active');
+  }
+});
