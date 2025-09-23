@@ -145,6 +145,18 @@ function updatePlayerCountInNav() {
   localStorage.setItem('remainingPlayerCount', JSON.stringify(remainingCount));
 }
 
+// Restore seating chart markup on page load (data is already in localStorage)
+window.addEventListener('load', () => {
+  const tc = parseInt(localStorage.getItem('tableCount') || '0', 10);
+  const seated = JSON.parse(localStorage.getItem('remainingPlayers') || '[]');
+
+  // Only rebuild if at least one player has a seat assigned
+  if (tc && seated.some(p => p.table && p.seat)) {
+    displaySeatingChart(tc, seated);
+  }
+});
+
+
 // build payout results
 function buildPayoutResults() {
   let i = 0;
@@ -1045,6 +1057,8 @@ function assignSeats() {
 
   localStorage.setItem('remainingPlayers', JSON.stringify(shuffledList));
   displaySeatingChart(tableCount, shuffledList);
+
+  localStorage.setItem('seatingAssigned', 'true');
 }
 
 function shufflePlayers () {
@@ -1453,6 +1467,10 @@ function savePendingPlayer(addAnother) {
   addPlayer(pid);
   setPlayerName(pid, nameVal);
 
+  if (localStorage.getItem('seatingAssigned') === 'true') {
+    seatLatePlayer(pid);
+  }
+
   // Pre-build final row
   const standardRow = buildPlayerEl(pid);
 
@@ -1481,4 +1499,77 @@ function savePendingPlayer(addAnother) {
       pending.replaceWith(standardRow);
     }, 250);
   }, 1000);
+}
+
+/**
+ * 
+ * Seating Helpers
+ * 
+ * 
+ */
+
+function getTableCount() {
+  let tc = parseInt(localStorage.getItem('tableCount'), 10);
+  if (!tc || Number.isNaN(tc)) {
+    const playerCount = parseInt(localStorage.getItem('remainingPlayerCount') || '0', 10);
+    tc = Math.max(1, Math.ceil(playerCount / 9)); // 9 seats per table
+    localStorage.setItem('tableCount', JSON.stringify(tc));
+  }
+  return tc;
+}
+
+function getTableOccupancies() {
+  const tc = getTableCount();
+  const remaining = JSON.parse(localStorage.getItem('remainingPlayers')) || [];
+  const counts = Array(tc + 1).fill(0); // 1-index tables
+  remaining.forEach(p => {
+    if (p.table) counts[p.table]++;
+  });
+  return counts;
+}
+
+function ensureCapacity() {
+  // If every table is full (>= 9), add a new table
+  const counts = getTableOccupancies();
+  const tc = getTableCount();
+  const allFull = counts.slice(1).every(c => c >= 9);
+  if (allFull) {
+    const newTc = tc + 1;
+    localStorage.setItem('tableCount', JSON.stringify(newTc));
+    return newTc;
+  }
+  return tc;
+}
+
+function findNextAvailableSeat() {
+  const tc = ensureCapacity();
+  const counts = getTableOccupancies();
+  // Find minimum occupancy across tables 1..tc
+  let min = Infinity;
+  let candidates = [];
+  for (let t = 1; t <= tc; t++) {
+    if (counts[t] < min) { min = counts[t]; candidates = [t]; }
+    else if (counts[t] === min) { candidates.push(t); }
+  }
+  const table = Math.min(...candidates);  // tie -> lowest table number
+  const seat = counts[table] + 1;
+  return { table, seat };
+}
+
+function seatLatePlayer(pid) {
+  const remaining = JSON.parse(localStorage.getItem('remainingPlayers')) || [];
+  const player = remaining.find(p => p.pid === pid);
+  if (!player) return;
+
+  // already seated? bail out
+  if (player.table && player.seat) return;
+
+  const { table, seat } = findNextAvailableSeat();
+  player.table = table;
+  player.seat = seat;
+  localStorage.setItem('remainingPlayers', JSON.stringify(remaining));
+
+  // keep chart in sync
+  const tc = getTableCount();
+  displaySeatingChart(tc, remaining);
 }
