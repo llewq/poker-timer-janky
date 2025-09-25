@@ -288,9 +288,12 @@ function getLevel() {
 }
 getLevel();
 
+updateLateRegByLevel(currentLevel);
+
 // update level data
 function updateLevel() {
   localStorage.setItem('currentLevel', JSON.stringify(currentLevel));
+  updateLateRegByLevel(currentLevel);
 }
 
 // initialize timer - runs when app is loaded and at start of new round
@@ -462,7 +465,7 @@ function startTimer(timeRemaining, timeToBreak) {
     })();
 
     if (timeRemaining == 0) {
-      clearInterval(timerInterval); // stops timer from progressing
+      clearInterval(timerInterval);
       updateLevel(++currentLevel);
       getLevel();
       timeRemaining = (parseInt(defaultBlindsData[currentLevel].time, 10) || 0) * 60;
@@ -470,7 +473,7 @@ function startTimer(timeRemaining, timeToBreak) {
       setBreakTimer();
       timeToBreak = JSON.parse(localStorage.getItem('timeToBreak'));
       startTimer(timeRemaining, timeToBreak);
-    } 
+    }
   }, 1000);
 }
 
@@ -492,80 +495,88 @@ function getTimeToBreak() {
   return timeToBreak;
 }
 
+// === Late registration state derived from levels array ===
+
+// Count the number of BLIND rounds completed/active up to `idx` (1-based ordinal)
+function getBlindOrdinalAtIndex(idx) {
+  const levels = JSON.parse(localStorage.getItem('defaultBlinds')) || [];
+  let count = 0;
+  for (let i = 0; i <= idx && i < levels.length; i++) {
+    if (levels[i]?.type === 'blind') count++;
+  }
+  return count; // e.g., on Level 6 blind this will be 6; on the break after Level 5, this is 5
+}
+
+// Toggle lateRegClosed from the current index+type
+function updateLateRegByLevel(idx) {
+  const levels = JSON.parse(localStorage.getItem('defaultBlinds')) || [];
+  if (!levels.length || idx < 0 || idx >= levels.length) return;
+
+  const ordinal = getBlindOrdinalAtIndex(idx);
+  const shouldClose = ordinal >= 6;
+
+  const prev = JSON.parse(localStorage.getItem('lateRegClosed') || 'false');
+  if (prev !== shouldClose) {
+    localStorage.setItem('lateRegClosed', JSON.stringify(shouldClose));
+    if (shouldClose && typeof cancelPendingPlayer === 'function') {
+      cancelPendingPlayer(); // removes pending row + renders notice
+    }
+  }
+  if (typeof renderAddButton === 'function') renderAddButton();
+}
+
+
+
 // build player
 function buildPlayerEl(pid) {
   playerList = JSON.parse(localStorage.getItem('playerList'));
-  let name;
-  let player = playerList.find(player => player.pid === pid);
+  let name = "";
+  let player = playerList.find(p => p.pid === pid);
+
   if (player) {
     pid = player.pid;
-    name = player.name;
-    rebuys = player.rebuys || 0;
+    name = player.name || "";
   } else {
-    addPlayer(pid); // adds empty player
-    pid = pid;
-    name = "";
-    rebuys = 0;
-
-    // refreshes playerList if a new player was added
+    // create the player record then refresh references
+    addPlayer(pid);
     playerList = JSON.parse(localStorage.getItem('playerList'));
-    player = playerList.find(player => player.pid === pid);
+    player = playerList.find(p => p.pid === pid);
+    name = player?.name || "";
   }
 
-  let playerEl = document.createElement('div');
+  const playerEl = document.createElement('div');
   playerEl.setAttribute('class', 'player-row');
-  playerEl.setAttribute('data-player', pid );
-
-  if (player.placed) { 
-    playerEl.setAttribute('data-placed', player.placed );
+  playerEl.setAttribute('data-player', pid);
+  if (player?.placed) {
+    playerEl.setAttribute('data-placed', player.placed);
   }
 
-  playerEl.innerHTML = 
-  `<form action="">
-    <div class="delete">
-      <button data-delete="${ pid }" class="tooltip"><i class="fa-solid fa-trash"></i></button>
-    </div>
-    <div>
-      <label for="player-${ pid }"></label>
-      <input type="text" id="player-${ pid }" data-pid="${ pid }" name="" value="${ name }">
-    </div>
-    <div data-rebuy="${ pid }" class="rebuy tooltip">
-      <button class="rebuy-minus ${rebuys > 0 ? '' : 'disabled'}">-</button>
-      <span class="rebuy-count">${rebuys}</span>
-      <button class="rebuy-plus">+</button>
-    </div>
-    <div class="eliminate">
-      <button data-eliminate="${ pid }" class="tooltip"><i class="fa-solid fa-user-slash"></i></button>
-    </div>
-  </form>`;
+  playerEl.innerHTML = `
+    <form action="">
+      <div class="name">
+        <label for="player-${pid}"></label>
+        <input type="text" id="player-${pid}" data-pid="${pid}" value="${name}" placeholder="Player Name">
+      </div>
+      <div class="delete">
+        <button data-delete="${pid}" class="tooltip" title="Delete player">
+          <i class="fa-solid fa-trash"></i>
+        </button>
+      </div>
+    </form>
+  `;
 
-  playerEl.querySelector('input').addEventListener('focusout', updatePlayer );
-  playerEl.querySelector('input').addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-    }
+  // Save name on blur; block Enter from submitting the form
+  const input = playerEl.querySelector('input');
+  input.addEventListener('focusout', updatePlayer);
+  input.addEventListener('keypress', function (e) {
+    if (e.key === 'Enter') e.preventDefault();
   });
-  
-  playerEl.querySelector('.eliminate').addEventListener('click', eliminatePlayer);
 
-  if (playerEl.querySelector('.rebuy-plus')) {
-    playerEl.querySelector('.rebuy-plus').addEventListener('click', function(e){
-      e.preventDefault();
-      let pid = e.target.parentElement.dataset.rebuy;
-      rebuyPlayer(pid, 1, playerEl);
-    });
-  }
-  if (playerEl.querySelector('.rebuy-minus')) {
-    playerEl.querySelector('.rebuy-minus').addEventListener('click', function(e){
-      e.preventDefault();
-      let pid = e.target.parentElement.dataset.rebuy;
-      rebuyPlayer(pid, -1, playerEl);
-    });
-  }
-  
+  // No rebuy/eliminate wiring here (moved to Seating in Phase B)
   updatePlayerCountInNav();
   return playerEl;
 }
+
 
 const activePlayersContainer = document.querySelector('#active-players');
 
@@ -769,6 +780,7 @@ function updatePlayer() {
 
 // add player to player list in localStorage
 function addPlayer(pid) {
+  if (registrationIsClosed()) return;
   playerList = JSON.parse(localStorage.getItem('playerList'));
   remainingList = JSON.parse(localStorage.getItem('remainingPlayers'));
   player = {
@@ -1390,14 +1402,24 @@ function renderAddButton() {
   const form = document.createElement('form');
   form.setAttribute('onsubmit', 'return false');
   const addDiv = document.createElement('div');
-  const btn = document.createElement('button');
-  btn.classList.add('primary');
-  btn.textContent = 'Add Player';
-  btn.addEventListener('click', function(e){ e.preventDefault(); startAddPlayerFlow(); });
-  addDiv.appendChild(btn);
+
+  if (registrationIsClosed()) {
+    const p = document.createElement('p');
+    p.className = 'notice';
+    p.textContent = 'Registration is closed.';
+    addDiv.appendChild(p);
+  } else {
+    const btn = document.createElement('button');
+    btn.classList.add('primary');
+    btn.textContent = 'Add Player';
+    btn.addEventListener('click', function(e){ e.preventDefault(); startAddPlayerFlow(); });
+    addDiv.appendChild(btn);
+  }
+
   form.appendChild(addDiv);
   actionRow.appendChild(form);
 }
+
 
 function hasPendingRow() {
   // Only true if a real, editable pending row exists (with an input)
@@ -1405,6 +1427,8 @@ function hasPendingRow() {
 }
 
 function startAddPlayerFlow() {
+  if (registrationIsClosed()) { renderAddButton(); return; }
+
   if (hasPendingRow()) {
     const input = HELPERS.getPlayersListCont().querySelector('.player-row.pending input');
     input?.focus();
@@ -1431,6 +1455,14 @@ function cancelPendingPlayer() {
   renderAddButton();
 }
 
+// ---- Late Registration helpers (Phase A, non-invasive) ----
+function registrationIsClosed() {
+  return JSON.parse(localStorage.getItem('lateRegClosed') || 'false');
+}
+
+
+
+
 // Programmatic name setter (mirrors updatePlayer logic but without relying on input 'this')
 function setPlayerName(pid, rawValue) {
   const cleanName = DOMPurify.sanitize(rawValue);
@@ -1455,6 +1487,12 @@ function setPlayerName(pid, rawValue) {
 }
 
 function savePendingPlayer(addAnother) {
+  if (registrationIsClosed()) {
+    window.alert('Registration is closed. Player not added.');
+    cancelPendingPlayer();
+    return;
+  }
+
   const list = HELPERS.getPlayersListCont();
   const pending = list?.querySelector('.player-row.pending');
   if (!pending) return;

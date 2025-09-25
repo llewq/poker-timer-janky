@@ -161,9 +161,9 @@ HELPERS.getAccordionBtns().forEach(button => {
   });
 });
 
-HELPERS.getAddPlayerBtn().addEventListener('click', function () {
-  startAddPlayerFlow();
-});
+// HELPERS.getAddPlayerBtn().addEventListener('click', function () {
+//   startAddPlayerFlow();
+// });
 
 
 
