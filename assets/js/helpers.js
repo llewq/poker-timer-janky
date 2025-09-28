@@ -283,9 +283,9 @@ HELPERS.getPlayersRemainingCont = function() {
   return HELPERS.getPlayersMenu().querySelector('#active-players');
 }
 
-HELPERS.getPlayerResultsCont = function() {
-  return HELPERS.getPlayersMenu().querySelector('#inactive-players .content');
-}
+// HELPERS.getPlayerResultsCont = function() {
+//   return HELPERS.getPlayersMenu().querySelector('#inactive-players .content');
+// }
 
 HELPERS.getPayoutsCont = function() {
   return HELPERS.getPayoutsPanel().querySelector('#results .content');

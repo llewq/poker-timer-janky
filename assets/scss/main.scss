@@ -536,8 +536,8 @@ form .counter {
 
 
 #tools,
-#seating {
-  button {
+#seating .buttons {
+   button {
     display: flex;
     gap: 10px;
     padding: 10px 20px;
@@ -563,25 +563,26 @@ form .counter {
   align-items: center;
   justify-content: center;
   gap: 2rem;
-  padding: 5rem;
+  padding: 5rem 3rem;
   padding-bottom: 8rem;
   background-color: rgba(#444, 0.9);
   backdrop-filter: blur(5px);
   .table-wrapper {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, 19%);
     justify-content: center;
     align-items: stretch;
-    gap: 2rem;
+    gap: 1.25%;
     width: 100%;
   }
   .table {
     flex: 1 1 15%;
     display: inline-block;
-    min-width: 30ch;
-    max-width: 20vw;
+    // min-width: 30ch;
+    // max-width: 20vw;
     vertical-align: top;
-    background-color: var(--color-gray-900);
-    padding: 2rem;
+    background-color: var(--color-black);
+    padding: 1.5rem;
     border-radius: 1rem;
     &:nth-child(1) {
       border-top: solid 8px #359BE1;
@@ -599,10 +600,25 @@ form .counter {
       border-top: solid 8px #FFC933;
       border-bottom: solid 8px #FFC933;
     }
+    &.busted-wrapper {
+      border-top: solid 8px #5C5C5C;
+      border-bottom: solid 8px #5C5C5C;
+    }
+    .idx,
+    .name {
+      background-color: var(--color-gray-900);
+      border-radius: 4px;
+    }
+    .idx {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75em;
+    }
   }
   h2 {
     font-size: 2.5rem;
-    margin-bottom: 2rem;
+    margin-bottom: 0;
   }
   li {
     list-style-position: inside;
@@ -619,6 +635,139 @@ form .counter {
     justify-content: center;
     gap: 1rem;
   }
+  .idx {
+    flex: 0 0 32px;
+    display: flex;
+    justify-content: center;
+  }
+  .seats,
+  .busted-list {
+    padding-top: 2rem;
+    overflow-x: hidden;
+  }
+  .seat {
+    display: flex;
+    gap: 4px;
+    justify-content: flex-start;
+    min-height: 48px;
+    cursor: pointer;
+    .slot
+    .tile,
+    .name,
+    .s-rebuy {
+      position: relative;
+      flex: 1 1 100%;
+      display: flex;
+      align-self: stretch;
+      max-width: 100%;
+    }
+    .slot {
+      width: 100%;
+      max-width: calc(100% - 36px);
+    }
+    .tile,
+    .hover-controls {
+      gap: 4px;
+    }
+    .name {
+      display: inline-block;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+      box-sizing: border-box;
+      padding: 0 0.5rem;
+      cursor: grab;
+    }
+    .hover-controls {
+      flex: 0 0 0px;
+      min-width: 0px;
+      display: flex;
+      min-width: 0px;
+      transition: all ease 200ms 0ms;
+      transform-origin: right;
+      .s-rebuy {
+        background-color: var(--color-gray-900);
+        border-radius: 4px;
+      }
+      button {
+        flex: 0 0 32px;
+        border: none;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        background-color: var(--color-gray-900);
+        color: var(--color-gray-300);
+        cursor: pointer;
+        transition: all ease 400ms;
+      }
+      .s-count {
+        flex: 0 0 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75em;
+      }
+    }
+    &:hover {
+      .hover-controls {
+        flex: 0 0 128px;
+        transition: all ease 200ms 750ms;
+        button:hover {
+          color: var(--color-black);
+          background-color: var(--color-primary);
+        }
+      }
+    }
+  }
+  .slot.empty {
+    border-radius: 4px;
+    border: 2px dashed var(--color-gray-500);
+  }
+  .busted-wrapper {
+    &.col-2 { grid-column: span 2; }
+    &.col-3 { grid-column: span 3; }
+    &.col-4 { grid-column: span 4; }
+    &.col-5 { grid-column: span 5; }
+  }
+  .busted-list {
+    column-width: 24ch;
+    column-gap: 2rem;
+    list-style-position: outside;
+    li { break-inside: avoid; }
+    li:nth-child(9),
+    li:nth-child(18),
+    li:nth-child(27),
+    li:nth-child(36) { 
+      break-after: column;
+      -webkit-column-break-after: column;
+    }
+
+  }
+
+}
+
+/* ===== Seats: highlight valid drop targets ===== */
+.seat:not(.occupied).drop-ok .slot {
+  border: 2px dashed var(--color-gray-100) !important;
+  background: rgba(255,255,255,0.10);
+  transition: all ease 200ms;
+}
+
+
+/* Single indicator line inside the busted list */
+.busted-list {
+  position: relative;
+  --drop-offset: -2px;   /* visual nudge: move line up a hair */
+  --xpad: 0px;           /* set to match your list's horizontal padding if any */
+}
+.busted-list .drop-line {
+  position: absolute;
+  left: var(--xpad);
+  right: var(--xpad);
+  height: 0;
+  border-top: 2px dashed var(--color-gray-100);
+  transform: translateY(var(--drop-offset));  /* 👈 small visual shift */
+  pointer-events: none;
 }
 
 
@@ -1032,7 +1181,7 @@ form .counter {
   transform: translate(-50%, -100%) rotate(45deg);
   top: 4px;
   left: 50%;
-  background-color: white;
+  background-color: var(--color-gray-100);
   pointer-events: none;
 }
 
@@ -1049,7 +1198,8 @@ form .counter {
   content: "Re-enroll";
 }
 
-.eliminate .tooltip:before {
+.eliminate .tooltip:before,
+.s-elim.tooltip:before {
   content: "Eliminate";
 }
 
@@ -1057,8 +1207,15 @@ form .counter {
   content: "Delete";
 }
 
-.rebuy.tooltip:before {
+.rebuy.tooltip:before,
+.s-rebuy.tooltip:before {
   content: "Re-buy";
+}
+
+.s-elim.tooltip:before {
+  left: unset;
+  right: 0;
+  transform: translate(0, -100%);
 }
 
 
@@ -1247,3 +1404,4 @@ form .counter {
   }
 }
 }
+

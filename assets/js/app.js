@@ -879,6 +879,33 @@ function rebuyPlayer(pid, value, playerEl) {
   updateAverageStack();
 }
 
+function rebuyByPid(pid, delta) {
+  pid = parseInt(pid, 10);
+  const playerList = JSON.parse(localStorage.getItem('playerList')) || [];
+  const remaining  = JSON.parse(localStorage.getItem('remainingPlayers')) || [];
+  const p1 = playerList.find(p => p.pid === pid);
+  const p2 = remaining.find(p => p.pid === pid);
+  if (!p1 || !p2) return;
+
+  const current = p1.rebuys || 0;
+  const next    = Math.max(0, current + delta);
+  const diff    = next - current;
+
+  // persist player rebuys
+  p1.rebuys = next; p2.rebuys = next;
+  localStorage.setItem('playerList', JSON.stringify(playerList));
+  localStorage.setItem('remainingPlayers', JSON.stringify(remaining));
+
+  // ✅ update the GLOBAL entryCount (not just localStorage)
+  entryCount = (parseInt(entryCount, 10) || 0) + diff;
+  updateEntryCount();              // writes the new global value to localStorage
+
+  // recompute payouts/results/avg stack (prize pool = entryCount * 10)
+  updatePlayerResultsLists();
+  updateAverageStack();
+}
+
+
 // delete player 
 function deletePlayer(pid) {
   pid = parseInt(pid, 10);
@@ -949,6 +976,37 @@ function eliminatePlayer() {
   }
 }
 
+function eliminateByPid(pid) {
+  pid = parseInt(pid, 10);
+  const playerList = JSON.parse(localStorage.getItem('playerList')) || [];
+  const player = playerList.find(p => p.pid === pid);
+  if (!player) return;
+
+  let nextEliminatedPosition =
+    parseInt(localStorage.getItem('nextEliminatedPosition') || String(playerList.length), 10);
+
+  player.active = false;
+  player.placed = nextEliminatedPosition;
+  localStorage.setItem('playerList', JSON.stringify(playerList));
+
+  let remaining = JSON.parse(localStorage.getItem('remainingPlayers')) || [];
+  remaining = remaining.filter(p => p.pid !== pid);
+  localStorage.setItem('remainingPlayers', JSON.stringify(remaining));
+
+  nextEliminatedPosition--;
+  localStorage.setItem('nextEliminatedPosition', JSON.stringify(nextEliminatedPosition));
+
+  remainingPlayerCount--;
+  updateRemainingCount();
+  updateAverageStack();
+  updatePlayerResultsLists();
+  updatePlayerCountInNav();
+
+  if (HELPERS.getSeatingPanel().classList.contains('active')) {
+    renderBustedColumn();
+  }
+}
+
 // re-enroll player
 function reEnrollPlayer() {
   pid = parseInt(this.parentElement.dataset.player, 10);
@@ -981,7 +1039,65 @@ function reEnrollPlayer() {
   updateRemainingCount();
   updateAverageStack();
   updatePlayerCountInNav();
+
+  if (HELPERS.getSeatingPanel().classList.contains('active')) {
+    renderBustedColumn();
+  }
 }
+
+// Re-enroll by pid (used by Seating panel busted list)
+function reEnrollByPid(pid) {
+  pid = parseInt(pid, 10);
+
+  // Find player
+  let playerList = JSON.parse(localStorage.getItem('playerList')) || [];
+  let playerToReEnroll = playerList.find(p => p.pid === pid);
+  if (!playerToReEnroll) return;
+
+  // Pull and bump "next eliminated" marker
+  let nextEliminatedPosition = parseInt(
+    localStorage.getItem('nextEliminatedPosition') || String(playerList.length),
+    10
+  );
+
+  // Shift placements up for anyone busted before this player
+  playerList.forEach(p => {
+    if (p.placed != null && p.placed < playerToReEnroll.placed) {
+      p.placed++;
+    }
+  });
+
+  // Reactivate the player
+  playerToReEnroll.active = true;
+  playerToReEnroll.placed = null;
+  localStorage.setItem('playerList', JSON.stringify(playerList));
+
+  // Put back into remainingPlayers (avoid dupes)
+  let remainingPlayers = JSON.parse(localStorage.getItem('remainingPlayers')) || [];
+  if (!remainingPlayers.find(p => p.pid === pid)) {
+    remainingPlayers.push(playerToReEnroll);
+  }
+  localStorage.setItem('remainingPlayers', JSON.stringify(remainingPlayers));
+
+  // Rebuild their row in the Players panel
+  const row = buildPlayerEl(pid);
+  placePlayerRow(row);
+
+  // Update counts + averages
+  remainingPlayerCount++;
+  nextEliminatedPosition++;
+  localStorage.setItem('nextEliminatedPosition', JSON.stringify(nextEliminatedPosition));
+  updateRemainingCount();
+  updateAverageStack();
+  updatePlayerCountInNav();
+  updatePlayerResultsLists();
+
+  // If seats already assigned, seat the player and refresh chart
+  if (localStorage.getItem('seatingAssigned') === 'true') {
+    seatLatePlayer(pid);
+  }
+}
+
 
 // build blind level
 function buildBlindLevel() {
@@ -1019,31 +1135,31 @@ allForms.forEach(form => {
 });
 
 function updatePlayerResultsLists() {
-  HELPERS.getPayoutsCont().innerHTML = null;
-  HELPERS.getPlayerResultsCont().innerHTML = null;
-  
+  // Clear payouts UI
+  const payoutsCont = HELPERS.getPayoutsCont && HELPERS.getPayoutsCont();
+  if (payoutsCont) payoutsCont.innerHTML = '';
+
+  // Legacy "Busted" (removed from UI) — guard and clear if still present
+  const legacyBusted = HELPERS.getPlayerResultsCont && HELPERS.getPlayerResultsCont();
+  if (legacyBusted) legacyBusted.innerHTML = '';
+
+  // Recompute prize pool & rebuild payouts list
   updatePrizePool();
   buildPayoutResults();
-  
-  let resultsList = [];
 
-  playerList = JSON.parse(localStorage.getItem('playerList'));
-  playerList.sort((a, b) => a.placed - b.placed);
+  // New location: render/update the Busted column inside the Seating panel
+  // (no-op until at least one player is eliminated)
+  if (typeof renderBustedColumn === 'function') {
+    renderBustedColumn();
+  }
 
-  playerList.forEach(player => {
-    if (player.active === false) {
-      let playerEl = buildPlayerResultEl(player.pid);
-      playerEl.querySelector('.re-enroll').addEventListener('click', reEnrollPlayer);
-      resultsList.push(playerEl);
-    }
-  });
-
-  resultsList.forEach(player => {
-    HELPERS.getPlayerResultsCont().append(player);
-  });
-
-  if (playerList.length > 1) { addPayoutBadges(); }
+  // Add payout badges when we have more than one player
+  const list = JSON.parse(localStorage.getItem('playerList')) || [];
+  if (list.length > 1) {
+    addPayoutBadges();
+  }
 }
+
 updatePlayerResultsLists();
 
 function closeMenuPanels() {
@@ -1054,24 +1170,26 @@ function closeMenuPanels() {
 }
 
 function assignSeats() {
-  playerCount = JSON.parse(localStorage.getItem('remainingPlayerCount'));
-  tableCount = Math.ceil(playerCount / 9);
+  const playerCount = parseInt(localStorage.getItem('remainingPlayerCount') || '0', 10);
+  const tableCount  = Math.max(1, Math.ceil(playerCount / 9));
   localStorage.setItem('tableCount', JSON.stringify(tableCount));
 
-  playerList = JSON.parse(localStorage.getItem('remainingPlayers'));
-  shuffledList = shufflePlayers();
+  const shuffledList = shufflePlayers(); // uses remainingPlayers, shuffles in-place
+  const seatsPerTable = Array(tableCount).fill(0); // 1..9 counters
 
-  for (let i = 0, s = 0; i < shuffledList.length; i++) {
-    shuffledList[i].table = (i % tableCount) + 1;
-    if (i % tableCount == 0) { s++; }
-    shuffledList[i].seat = s;
+  for (let i = 0; i < shuffledList.length; i++) {
+    const table = (i % tableCount) + 1;
+    seatsPerTable[table - 1] = (seatsPerTable[table - 1] || 0) + 1;
+    const seat = seatsPerTable[table - 1]; // 1..9
+    shuffledList[i].table = table;
+    shuffledList[i].seat = seat;
   }
 
   localStorage.setItem('remainingPlayers', JSON.stringify(shuffledList));
   displaySeatingChart(tableCount, shuffledList);
-
   localStorage.setItem('seatingAssigned', 'true');
 }
+
 
 function shufflePlayers () {
   remainingPlayers = JSON.parse(localStorage.getItem('remainingPlayers'));
@@ -1079,38 +1197,261 @@ function shufflePlayers () {
   return remainingPlayers;
 }
 
-function displaySeatingChart(tableCount, shuffledList) {
-  if (document.querySelector('.table-wrapper')) {
-    document.querySelector('.table-wrapper').remove();
-  }
+function displaySeatingChart(tableCount, seatedList) {
+  const prev = document.querySelector('.table-wrapper');
+  if (prev) prev.remove();
 
-  let tableWrapper = document.createElement('div');
+  const tableWrapper = document.createElement('div');
   tableWrapper.classList.add('table-wrapper');
 
-  for (let i = 0; i < tableCount; i++) {
-    let tableContainer = document.createElement('div');
-    tableContainer.classList.add('table');
+  const remaining = Array.isArray(seatedList)
+    ? seatedList
+    : (JSON.parse(localStorage.getItem('remainingPlayers')) || []);
 
-    let tableName = document.createElement('h2');
-    tableName.innerText = 'Table ' + (i + 1);
+  for (let t = 1; t <= tableCount; t++) {
+    const table = document.createElement('div');
+    table.classList.add('table');
 
-    tableContainer.append(tableName);
+    const h2 = document.createElement('h2');
+    h2.textContent = 'Table ' + t;
+    table.append(h2);
 
-    let tableList = document.createElement('ol');
-    tablePlayers = shuffledList.filter(player => player.table === (i + 1));
+    const grid = document.createElement('ol');           // fixed 9 seats
+    grid.classList.add('seats');
 
-    for (let p = 0; p < tablePlayers.length; p++) {
-      let player = document.createElement('li');
-      player.innerText = tablePlayers[p].name;
-      tableList.append(player);
+    for (let s = 1; s <= 9; s++) {
+      const li = document.createElement('li');
+      li.className = 'seat';
+      li.dataset.table = t;
+      li.dataset.seat  = s;
+
+      // seat index always visible
+      const idx = document.createElement('span');
+      idx.className = 'idx';
+      idx.textContent = s;
+      li.append(idx);
+
+      // slot area (either player tile or empty)
+      const slot = document.createElement('div');
+      slot.className = 'slot';
+
+      const player = remaining.find(p => p.table === t && p.seat === s);
+      if (player) {
+        li.classList.add('occupied');
+        slot.innerHTML = `
+          <div class="tile" data-pid="${player.pid}" draggable="true">
+            <span class="name" aria-label="${player.name}">${player.name}</span>
+            <div class="hover-controls">
+              <div class="s-rebuy tooltip" role="group" aria-label="Rebuy controls">
+                <button class="s-minus" aria-label="Decrease rebuys">
+                  <i class="fa-solid fa-minus"></i>
+                </button>
+                <span class="s-count">${player.rebuys || 0}</span>
+                <button class="s-plus"  aria-label="Increase rebuys">
+                  <i class="fa-solid fa-plus"></i>
+                </button>
+              </div>
+              <button class="s-elim tooltip"  aria-label="Eliminate player">
+                <i class="fa-solid fa-user-slash"></i>
+              </button>
+            </div>
+          </div>
+        `;
+      } else {
+        // empty seat: show nothing in the slot (no text)
+        slot.classList.add('empty');
+      }
+
+      li.append(slot);
+      grid.append(li);
     }
 
-    tableContainer.append(tableList);
-    tableWrapper.append(tableContainer);
+    table.append(grid);
+    tableWrapper.append(table);
   }
 
   HELPERS.getSeatingPanel().append(tableWrapper);
+
+  renderBustedColumn();
 }
+
+// How many columns should Busted use?
+function bustedColClass(count) {
+  if (count >= 19) return 'col-3';   // 19+ -> 3 columns
+  if (count >= 10) return 'col-2';   // 10–18 -> 2 columns
+  return 'col-1';                    // 1–9 -> 1 column
+}
+
+function getEliminatedPlayersSorted() {
+  const list = JSON.parse(localStorage.getItem('playerList')) || [];
+  return list
+    .filter(p => p.active === false && typeof p.placed === 'number')
+    .sort((a, b) => a.placed - b.placed);
+}
+
+function renderBustedColumn() {
+  const seating = HELPERS.getSeatingPanel && HELPERS.getSeatingPanel();
+  if (!seating) return;
+
+  // Remove any prior Busted column
+  const prev = seating.querySelector('.busted-wrapper');
+  if (prev) prev.remove();
+
+  // Build only if at least one player is eliminated
+  const eliminated = getEliminatedPlayersSorted();
+  if (!eliminated.length) return;
+
+  // Ensure a wrapper exists to append into
+  let wrapper = seating.querySelector('.table-wrapper');
+  if (!wrapper) {
+    wrapper = document.createElement('div');
+    wrapper.className = 'table-wrapper';
+    seating.appendChild(wrapper);
+  }
+
+  // Create the Busted column with the dynamic col-* class
+  const cols = bustedColClass(eliminated.length);
+  const col  = document.createElement('div');
+  col.className = `busted-wrapper table ${cols}`;
+  col.setAttribute('data-cols', cols.replace('col-', '')); // optional hook
+
+  const h2 = document.createElement('h2');
+  h2.textContent = 'Busted';
+  col.appendChild(h2);
+
+  const list = document.createElement('ol');
+  list.className = 'busted-list';
+
+  eliminated.forEach(p => {
+    const li = document.createElement('li');
+    li.className = 'seat busted';
+    li.dataset.pid = p.pid;
+    li.dataset.placed = p.placed;
+
+    const idx = document.createElement('span');
+    idx.className = 'idx';
+    idx.textContent = p.placed;
+
+    const slot = document.createElement('div');
+    slot.className = 'slot';
+    slot.innerHTML = `
+      <div class="tile" data-pid="${p.pid}" draggable="true">
+        <span class="name" aria-label="${p.name}">${p.name}</span>
+      </div>
+    `;
+
+
+
+    li.appendChild(idx);
+    li.appendChild(slot);
+    list.appendChild(li);
+  });
+
+  col.appendChild(list);
+  wrapper.appendChild(col);
+}
+
+// Re-enroll by pid (optionally skip auto-seat)
+function reEnrollByPid(pid, { autoSeat = true } = {}) {
+  pid = parseInt(pid, 10);
+
+  let playerList = JSON.parse(localStorage.getItem('playerList')) || [];
+  let playerToReEnroll = playerList.find(p => p.pid === pid);
+  if (!playerToReEnroll) return;
+
+  let nextEliminatedPosition = parseInt(
+    localStorage.getItem('nextEliminatedPosition') || String(playerList.length),
+    10
+  );
+
+  // Shift placements upward for players eliminated before this one
+  playerList.forEach(p => {
+    if (p.placed != null && p.placed < playerToReEnroll.placed) {
+      p.placed++;
+    }
+  });
+
+  playerToReEnroll.active = true;
+  playerToReEnroll.placed = null;
+  localStorage.setItem('playerList', JSON.stringify(playerList));
+
+  let remainingPlayers = JSON.parse(localStorage.getItem('remainingPlayers')) || [];
+  if (!remainingPlayers.find(p => p.pid === pid)) remainingPlayers.push(playerToReEnroll);
+  localStorage.setItem('remainingPlayers', JSON.stringify(remainingPlayers));
+
+  remainingPlayerCount++;
+  nextEliminatedPosition++;
+  localStorage.setItem('nextEliminatedPosition', JSON.stringify(nextEliminatedPosition));
+  updateRemainingCount();
+  updateAverageStack();
+  updatePlayerCountInNav();
+  updatePlayerResultsLists();
+
+  if (autoSeat && localStorage.getItem('seatingAssigned') === 'true') {
+    seatLatePlayer(pid); // legacy "next available" seat
+  }
+}
+
+// Seat player into a specific (table, seat)
+function seatPlayerAt(pid, table, seat) {
+  pid = parseInt(pid, 10);
+  table = parseInt(table, 10);
+  seat  = parseInt(seat, 10);
+
+  const remaining = JSON.parse(localStorage.getItem('remainingPlayers')) || [];
+  let p = remaining.find(x => x.pid === pid);
+  if (!p) {
+    const all = JSON.parse(localStorage.getItem('playerList')) || [];
+    p = all.find(x => x.pid === pid);
+    if (!p) return;
+    remaining.push(p);
+  }
+  p.table = table;
+  p.seat  = seat;
+  localStorage.setItem('remainingPlayers', JSON.stringify(remaining));
+}
+
+// Move seated player to a new empty seat
+function moveSeat(pid, table, seat) {
+  pid = parseInt(pid, 10);
+  table = parseInt(table, 10);
+  seat  = parseInt(seat, 10);
+
+  const remaining = JSON.parse(localStorage.getItem('remainingPlayers')) || [];
+  const p = remaining.find(x => x.pid === pid);
+  if (!p) return;
+  p.table = table;
+  p.seat  = seat;
+  localStorage.setItem('remainingPlayers', JSON.stringify(remaining));
+}
+
+function getEliminatedRange() {
+  const initial = parseInt(localStorage.getItem('initialCount') || '0', 10);
+  const nextPos = parseInt(localStorage.getItem('nextEliminatedPosition') || '0', 10);
+  const k = initial - nextPos;          // eliminated count
+  const minPlace = nextPos + 1;         // first eliminated place number
+  return { k, minPlace };
+}
+
+function applyBustedOrder(pidOrder) {
+  const players = JSON.parse(localStorage.getItem('playerList')) || [];
+  const { minPlace } = getEliminatedRange();
+  pidOrder.forEach((pid, i) => {
+    const p = players.find(x => x.pid === pid);
+    if (!p) return;
+    p.active = false;
+    p.placed = minPlace + i;
+  });
+  localStorage.setItem('playerList', JSON.stringify(players));
+  updatePlayerResultsLists();
+
+  // redraw seating panel (keeps Busted column in sync too)
+  const tc     = parseInt(localStorage.getItem('tableCount') || '0', 10);
+  const seated = JSON.parse(localStorage.getItem('remainingPlayers') || '[]');
+  if (tc) displaySeatingChart(tc, seated);
+}
+
+
 
 updatePlayerCountInNav();
 
