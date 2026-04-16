@@ -226,7 +226,31 @@ function getCurrentDateFormatted() {
 
 // converts data to html (for download)
 function generateHTML(tournamentResults, payouts) {
-  tournamentResults = tournamentResults.sort((a, b) => a.placed - b.placed);
+  const bulletEntries = JSON.parse(localStorage.getItem('bulletEntries') || '[]');
+
+  // One entry per player result (all players, including still-active)
+  // _sortKey drives ordering; place is assigned sequentially after sorting.
+  const entries = tournamentResults.map(p => ({
+    _sortKey: p.placed ?? Infinity,
+    name: p.name || "",
+    rebuys: p.rebuys || "-",
+    payout: p.placed && payouts[p.placed - 1] ? `$${payouts[p.placed - 1]}` : "-"
+  }));
+
+  // One entry per bullet — sort after real players using their fractional placedAt
+  bulletEntries.forEach(b => {
+    entries.push({
+      _sortKey: b.placedAt,
+      name: `${b.name} (Bullet ${b.bulletNumber})`,
+      rebuys: "-",
+      payout: "-"
+    });
+  });
+
+  entries.sort((a, b) => a._sortKey - b._sortKey);
+
+  // Assign sequential place numbers to every row
+  entries.forEach((e, i) => { e.place = i + 1; });
 
   let htmlContent = `<figure class="wp-block-table is-style-stripes">
   <table>
@@ -240,18 +264,13 @@ function generateHTML(tournamentResults, payouts) {
     </thead>
     <tbody>`;
 
-  for (let i = 0; i < tournamentResults.length; i++) {
-    const name   = tournamentResults[i]?.name   || "";
-    const placed = tournamentResults[i]?.placed || "";
-    const rebuys = tournamentResults[i]?.rebuys || "";
-    const payout = payouts[i] ? `$${payouts[i]}` : "-";
-
+  for (const entry of entries) {
     htmlContent += `
     <tr>
-        <td class="has-text-align-center" data-align="center">${placed}</td>
-        <td class="has-text-align-center" data-align="center">${name}</td>
-        <td class="has-text-align-center" data-align="center">${rebuys}</td>
-        <td class="has-text-align-center" data-align="center">${payout}</td>
+        <td class="has-text-align-center" data-align="center">${entry.place}</td>
+        <td class="has-text-align-center" data-align="center">${entry.name}</td>
+        <td class="has-text-align-center" data-align="center">${entry.rebuys}</td>
+        <td class="has-text-align-center" data-align="center">${entry.payout}</td>
     </tr>`;
   }
 
@@ -667,6 +686,19 @@ function buildPlayerResultEl(pid) {
   return playerEl;
 }
 
+// build a locked display-only row for a bullet entry in the Busted section
+function buildBulletEntryEl(entry) {
+  const el = document.createElement('div');
+  el.classList.add('player', 'bullet-entry');
+  el.setAttribute('data-bullet-pid', entry.pid);
+  el.setAttribute('data-placed', entry.placedAt);
+  el.innerHTML =
+    `<span class="field">
+      <span class="name">${DOMPurify.sanitize(entry.name)} (Bullet ${entry.bulletNumber})</span>
+    </span>`;
+  return el;
+}
+
 // create next eliminated player position
 if (!localStorage.getItem('nextEliminatedPosition')) {
   localStorage.setItem('nextEliminatedPosition', JSON.stringify(playerList.length));
@@ -803,7 +835,29 @@ function addPlayer(pid) {
 }
 
 function rebuyPlayer(pid, value, playerEl) {
+  const pidInt = parseInt(pid, 10);
+
   if (value > 0) {
+    // --- create bullet entry ---
+    const bulletEntries = JSON.parse(localStorage.getItem('bulletEntries') || '[]');
+    let nextElimPos = JSON.parse(localStorage.getItem('nextEliminatedPosition'));
+
+    playerList = JSON.parse(localStorage.getItem('playerList'));
+    const playerData = playerList.find(p => p.pid == pid);
+    const bulletNumber = bulletEntries.filter(e => e.pid === pidInt).length + 1;
+
+    // Use NEP + 0.5 so bullet entries float between real bust positions
+    // without consuming integer slots — real player placed values stay intact.
+    bulletEntries.push({
+      pid: pidInt,
+      name: playerData ? playerData.name : '',
+      bulletNumber: bulletNumber,
+      placedAt: nextElimPos + 0.5
+    });
+    localStorage.setItem('bulletEntries', JSON.stringify(bulletEntries));
+    // NEP is NOT decremented — only real busts consume integer positions.
+    // --- end bullet entry ---
+
     playerList = JSON.parse(localStorage.getItem('playerList'));
     player = playerList.find(player => player.pid == pid);
     player.rebuys++;
@@ -813,11 +867,27 @@ function rebuyPlayer(pid, value, playerEl) {
     player = remainingPlayers.find(player => player.pid == pid);
     player.rebuys++;
     localStorage.setItem('remainingPlayers', JSON.stringify(remainingPlayers));
-    
+
     entryCount++;
   } else {
     playerList = JSON.parse(localStorage.getItem('playerList'));
     player = playerList.find(player => player.pid == pid);
+
+    if (player.rebuys <= 0) return;
+
+    // --- remove most recent bullet entry ---
+    const bulletEntries = JSON.parse(localStorage.getItem('bulletEntries') || '[]');
+    let lastBulletIdx = -1;
+    for (let i = bulletEntries.length - 1; i >= 0; i--) {
+      if (bulletEntries[i].pid === pidInt) { lastBulletIdx = i; break; }
+    }
+    if (lastBulletIdx !== -1) {
+      bulletEntries.splice(lastBulletIdx, 1);
+      localStorage.setItem('bulletEntries', JSON.stringify(bulletEntries));
+      // NEP is NOT restored — it was never decremented when the bullet was created.
+    }
+    // --- end bullet entry removal ---
+
     player.rebuys--;
     localStorage.setItem('playerList', JSON.stringify(playerList));
 
@@ -1009,25 +1079,41 @@ allForms.forEach(form => {
 function updatePlayerResultsLists() {
   HELPERS.getPayoutsCont().innerHTML = null;
   HELPERS.getPlayerResultsCont().innerHTML = null;
-  
+
   updatePrizePool();
   buildPayoutResults();
-  
+
   let resultsList = [];
 
   playerList = JSON.parse(localStorage.getItem('playerList'));
-  playerList.sort((a, b) => a.placed - b.placed);
+  const bulletEntries = JSON.parse(localStorage.getItem('bulletEntries') || '[]');
 
-  playerList.forEach(player => {
-    if (player.active === false) {
-      let playerEl = buildPlayerResultEl(player.pid);
+  // Inactive players sorted ascending by placed (lowest = most recent bust, shown first)
+  const inactivePlayers = playerList
+    .filter(p => p.active === false)
+    .sort((a, b) => a.placed - b.placed);
+
+  // Bullet entries sorted ascending by placedAt (same ordering logic)
+  const sortedBullets = [...bulletEntries].sort((a, b) => a.placedAt - b.placedAt);
+
+  // Merge the two lists by position value (ascending)
+  let pi = 0, bi = 0;
+  while (pi < inactivePlayers.length || bi < sortedBullets.length) {
+    const p = inactivePlayers[pi];
+    const b = sortedBullets[bi];
+    if (p && (!b || p.placed <= b.placedAt)) {
+      const playerEl = buildPlayerResultEl(p.pid);
       playerEl.querySelector('.re-enroll').addEventListener('click', reEnrollPlayer);
       resultsList.push(playerEl);
+      pi++;
+    } else {
+      resultsList.push(buildBulletEntryEl(b));
+      bi++;
     }
-  });
+  }
 
-  resultsList.forEach(player => {
-    HELPERS.getPlayerResultsCont().append(player);
+  resultsList.forEach(el => {
+    HELPERS.getPlayerResultsCont().append(el);
   });
 
   if (playerList.length > 1) { addPayoutBadges(); }
