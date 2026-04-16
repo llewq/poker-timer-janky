@@ -258,8 +258,8 @@ function generateHTML(tournamentResults, payouts) {
       <tr>
         <th class="has-text-align-center" data-align="center">Place</th>
         <th class="has-text-align-center" data-align="center">Player</th>
-        <th class="has-text-align-center" data-align="center">Rebuys</th>
-        <th class="has-text-align-center" data-align="center">Winnings</th>
+        <th class="has-text-align-center" data-align="center" style="text-align: center;">Rebuys</th>
+        <th class="has-text-align-center" data-align="center" style="text-align: center;">Winnings</th>
       </tr>
     </thead>
     <tbody>`;
@@ -269,8 +269,8 @@ function generateHTML(tournamentResults, payouts) {
     <tr>
         <td class="has-text-align-center" data-align="center">${entry.place}</td>
         <td class="has-text-align-center" data-align="center">${entry.name}</td>
-        <td class="has-text-align-center" data-align="center">${entry.rebuys}</td>
-        <td class="has-text-align-center" data-align="center">${entry.payout}</td>
+        <td class="has-text-align-center" data-align="center" style="text-align: center;">${entry.rebuys}</td>
+        <td class="has-text-align-center" data-align="center" style="text-align: center;">${entry.payout}</td>
     </tr>`;
   }
 
