@@ -852,7 +852,8 @@ function rebuyPlayer(pid, value, playerEl) {
       pid: pidInt,
       name: playerData ? playerData.name : '',
       bulletNumber: bulletNumber,
-      placedAt: nextElimPos + 0.5
+      placedAt: nextElimPos + 0.5,
+      createdAt: Date.now()
     });
     localStorage.setItem('bulletEntries', JSON.stringify(bulletEntries));
     // NEP is NOT decremented — only real busts consume integer positions.
@@ -989,6 +990,7 @@ function eliminatePlayer() {
   if (eliminatedPlayer) {
     eliminatedPlayer.placed = nextEliminatedPosition;
     eliminatedPlayer.active = false;
+    eliminatedPlayer.bustTime = Date.now();
 
     localStorage.setItem('playerList', JSON.stringify(playerList));
 
@@ -1019,7 +1021,15 @@ function reEnrollPlayer() {
       ++player.placed;
     }
   });
-  
+
+  const bulletEntries = JSON.parse(localStorage.getItem('bulletEntries') || '[]');
+  bulletEntries.forEach(bullet => {
+    if (bullet.placedAt < playerToReEnroll.placed) {
+      ++bullet.placedAt;
+    }
+  });
+  localStorage.setItem('bulletEntries', JSON.stringify(bulletEntries));
+
   playerToReEnroll.active = true;
   playerToReEnroll.placed = null;
   localStorage.setItem('playerList', JSON.stringify(playerList));
@@ -1088,20 +1098,20 @@ function updatePlayerResultsLists() {
   playerList = JSON.parse(localStorage.getItem('playerList'));
   const bulletEntries = JSON.parse(localStorage.getItem('bulletEntries') || '[]');
 
-  // Inactive players sorted ascending by placed (lowest = most recent bust, shown first)
+  // Sort by bust time descending so most recently eliminated appears first (top of list)
   const inactivePlayers = playerList
     .filter(p => p.active === false)
-    .sort((a, b) => a.placed - b.placed);
+    .sort((a, b) => (b.bustTime ?? 0) - (a.bustTime ?? 0) || a.placed - b.placed);
 
-  // Bullet entries sorted ascending by placedAt (same ordering logic)
-  const sortedBullets = [...bulletEntries].sort((a, b) => a.placedAt - b.placedAt);
+  // Sort bullets by creation time descending (most recently created rebuy at top)
+  const sortedBullets = [...bulletEntries].sort((a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0) || a.placedAt - b.placedAt);
 
-  // Merge the two lists by position value (ascending)
+  // Merge: whichever event happened more recently goes first
   let pi = 0, bi = 0;
   while (pi < inactivePlayers.length || bi < sortedBullets.length) {
     const p = inactivePlayers[pi];
     const b = sortedBullets[bi];
-    if (p && (!b || p.placed <= b.placedAt)) {
+    if (p && (!b || (p.bustTime ?? 0) >= (b.createdAt ?? 0))) {
       const playerEl = buildPlayerResultEl(p.pid);
       playerEl.querySelector('.re-enroll').addEventListener('click', reEnrollPlayer);
       resultsList.push(playerEl);
