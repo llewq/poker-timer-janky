@@ -544,46 +544,21 @@ form .counter span {
   display: flex;
 }
 #seating .table-wrapper {
-  display: flex;
-  justify-content: center;
-  align-items: stretch;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
   gap: 2rem;
   width: 100%;
+  place-content: center;
+  justify-items: center;
 }
-#seating .table {
-  flex: 1 1 15%;
-  display: inline-block;
-  min-width: 30ch;
-  max-width: 20vw;
-  vertical-align: top;
-  background-color: var(--color-gray-900);
-  padding: 2rem;
-  border-radius: 1rem;
+#seating .table-tile {
+  width: 100%;
+  max-width: 720px;
 }
-#seating .table:nth-child(1) {
-  border-top: solid 8px #359BE1;
-  border-bottom: solid 8px #359BE1;
-}
-#seating .table:nth-child(2) {
-  border-top: solid 8px #F10437;
-  border-bottom: solid 8px #F10437;
-}
-#seating .table:nth-child(3) {
-  border-top: solid 8px #92B71A;
-  border-bottom: solid 8px #92B71A;
-}
-#seating .table:nth-child(4) {
-  border-top: solid 8px #FFC933;
-  border-bottom: solid 8px #FFC933;
-}
-#seating h2 {
-  font-size: 2.5rem;
-  margin-bottom: 2rem;
-}
-#seating li {
-  list-style-position: inside;
-  margin-bottom: 1rem;
-  font-size: 2rem;
+#seating .table-tile svg {
+  width: 100%;
+  height: auto;
+  display: block;
 }
 #seating .buttons {
   position: absolute;

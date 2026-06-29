@@ -1,5 +1,7 @@
 let averageStack;
 
+const tableSvgTemplate = new DOMParser().parseFromString(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 773 342"><defs><style>.cls-1{fill:#363636}.cls-2{fill:#087861}.cls-4,.cls-5,.cls-6,.cls-7{fill:#fff}.cls-5,.cls-6{font-family:Kanit-Regular,Kanit}.cls-5,.cls-7{font-size:36px}.cls-6{font-size:21px}.cls-7{font-family:Kanit-SemiBold,Kanit;font-weight:600}</style></defs><g id="table"><path id="table-path" class="cls-2" d="M558,178c0,47.496-38.504,86-86,86h-172c-47.496,0-86-38.504-86-86s38.504-86,86-86h172c47.496,0,86,38.504,86,86Z"/><text id="table-label" x="386" y="189.22" text-anchor="middle">Table 1</text></g><g id="player-0"><path class="cls-1" d="M483.9,288.4h-81.014c0-8.284-6.716-15-15-15s-15,6.716-15,15h-80.986c-2.209,0-4,1.791-4,4v46c0,2.209,1.791,4,4,4h192c2.209,0,4-1.791,4-4v-46c0-2.209-1.791-4-4-4Z"/><text id="player-label-0" class="cls-5" x="387.9" y="327.764" text-anchor="middle">Player</text><text class="cls-6" transform="translate(384.537 294.4)"><tspan x="0" y="0">1</tspan></text><path id="button-0" class="button cls-4" d="M388.9,235.4h0c5.247,0,9.5,4.253,9.5,9.5h0c0,5.247-4.253,9.5-9.5,9.5h0c-5.247,0-9.5-4.253-9.5-9.5h0c0-5.247,4.253-9.5,9.5-9.5Z"/></g><g id="player-1"><path class="cls-1" d="M261.466,267h-81.014c0-8.284-6.716-15-15-15s-15,6.716-15,15h-80.986c-2.209,0-4,1.791-4,4v46c0,2.209,1.791,4,4,4h192c2.209,0,4-1.791,4-4v-46c0-2.209-1.791-4-4-4Z"/><text id="player-label-1" class="cls-5" x="165.466" y="306.364" text-anchor="middle">Player</text><text class="cls-6" transform="translate(160.108 273)"><tspan x="0" y="0">2</tspan></text><path id="button-1" class="button cls-4" d="M294.5,232h0c5.247,0,9.5,4.253,9.5,9.5h0c0,5.247-4.253,9.5-9.5,9.5h0c-5.247,0-9.5-4.253-9.5-9.5h0c0-5.247,4.253-9.5,9.5-9.5Z"/></g><g id="player-2"><path class="cls-1" d="M195.986,192h-81.014c0-8.284-6.716-15-15-15s-15,6.716-15,15H3.986c-2.209,0-4,1.791-4,4v46c0,2.209,1.791,4,4,4h192c2.209,0,4-1.791,4-4v-46c0-2.209-1.791-4-4-4Z"/><text id="player-label-2" class="cls-5" x="99.986" y="231.364" text-anchor="middle">Player</text><text class="cls-6" transform="translate(94.523 198)"><tspan x="0" y="0">3</tspan></text><path id="button-2" class="button cls-4" d="M237.5,194h0c5.247,0,9.5,4.253,9.5,9.5h0c0,5.247-4.253,9.5-9.5,9.5h0c-5.247,0-9.5-4.253-9.5-9.5h0c0-5.247,4.253-9.5,9.5-9.5Z"/></g><g id="player-3"><path class="cls-1" d="M196,112h-81.014c0-8.284-6.716-15-15-15s-15,6.716-15,15H4c-2.209,0-4,1.791-4,4v46c0,2.209,1.791,4,4,4h192c2.209,0,4-1.791,4-4v-46c0-2.209-1.791-4-4-4Z"/><text id="player-label-3" class="cls-5" x="100" y="151.364" text-anchor="middle">Player</text><text class="cls-6" transform="translate(94.285 118)"><tspan x="0" y="0">4</tspan></text><path id="button-3" class="button cls-4" d="M237.5,143h1c5.247,0,9.5,4.253,9.5,9.5h0c0,5.247-4.253,9.5-9.5,9.5h-1c-5.247,0-9.5-4.253-9.5-9.5h0c0-5.247,4.253-9.5,9.5-9.5Z"/></g><g id="player-4"><path class="cls-1" d="M261.986,35h-81.014c0-8.284-6.716-15-15-15s-15,6.716-15,15h-80.986c-2.209,0-4,1.791-4,4v46c0,2.209,1.791,4,4,4h192c2.209,0,4-1.791,4-4v-46c0-2.209-1.791-4-4-4Z"/><text id="player-label-4" class="cls-5" x="165.986" y="74.364" text-anchor="middle">Player</text><text class="cls-6" transform="translate(160.565 41)"><tspan x="0" y="0">5</tspan></text><path id="button-4" class="button cls-4" d="M294.5,103h0c5.247,0,9.5,4.253,9.5,9.5h0c0,5.247-4.253,9.5-9.5,9.5h0c-5.247,0-9.5-4.253-9.5-9.5h0c0-5.247,4.253-9.5,9.5-9.5Z"/></g><g id="player-5"><path class="cls-1" d="M482.048,15h-81.014c0-8.284-6.716-15-15-15s-15,6.716-15,15h-80.986c-2.209,0-4,1.791-4,4v46c0,2.209,1.791,4,4,4h192c2.209,0,4-1.791,4-4V19c0-2.209-1.791-4-4-4Z"/><text id="player-label-5" class="cls-5" x="386.048" y="54.364" text-anchor="middle">Player</text><text class="cls-6" transform="translate(380.018 21)"><tspan x="0" y="0">6</tspan></text><path id="button-5" class="button cls-4" d="M387.5,103h0c5.247,0,9.5,4.253,9.5,9.5h0c0,5.247-4.253,9.5-9.5,9.5h0c-5.247,0-9.5-4.253-9.5-9.5h0c0-5.247,4.253-9.5,9.5-9.5Z"/></g><g id="player-6"><path class="cls-1" d="M700.74,34.316h-81.014c0-8.284-6.716-15-15-15s-15,6.716-15,15h-80.986c-2.209,0-4,1.791-4,4v46c0,2.209,1.791,4,4,4h192c2.209,0,4-1.791,4-4v-46c0-2.209-1.791-4-4-4Z"/><text id="player-label-6" class="cls-5" x="604.74" y="73.68" text-anchor="middle">Player</text><text class="cls-6" transform="translate(599.497 40.316)"><tspan x="0" y="0">7</tspan></text><path id="button-6" class="button cls-4" d="M480,103h0c5.523,0,10,4.477,10,10h0c0,5.523-4.477,10-10,10h0c-5.523,0-10-4.477-10-10h0c0-5.523,4.477-10,10-10Z"/></g><g id="player-7"><path class="cls-1" d="M769.002,112h-81.014c0-8.284-6.716-15-15-15s-15,6.716-15,15h-80.986c-2.209,0-4,1.791-4,4v46c0,2.209,1.791,4,4,4h192c2.209,0,4-1.791,4-4v-46c0-2.209-1.791-4-4-4Z"/><text id="player-label-7" class="cls-5" x="673.002" y="151.364" text-anchor="middle">Player</text><text class="cls-6" transform="translate(666.794 118)"><tspan x="0" y="0">8</tspan></text><path id="button-7" class="button cls-4" d="M533.5,143h1c5.247,0,9.5,4.253,9.5,9.5h0c0,5.247-4.253,9.5-9.5,9.5h-1c-5.247,0-9.5-4.253-9.5-9.5h0c0-5.247,4.253-9.5,9.5-9.5Z"/></g><g id="player-8"><path class="cls-1" d="M769.002,192.316h-81.014c0-8.284-6.716-15-15-15s-15,6.716-15,15h-80.986c-2.209,0-4,1.791-4,4v46c0,2.209,1.791,4,4,4h192c2.209,0,4-1.791,4-4v-46c0-2.209-1.791-4-4-4Z"/><text id="player-label-8" class="cls-5" x="673.002" y="231.68" text-anchor="middle">Player</text><text class="cls-6" transform="translate(666.972 198.316)"><tspan x="0" y="0">9</tspan></text><path id="button-8" class="button cls-4" d="M534.5,194h0c5.247,0,9.5,4.253,9.5,9.5h0c0,5.247-4.253,9.5-9.5,9.5h0c-5.247,0-9.5-4.253-9.5-9.5h0c0-5.247,4.253-9.5,9.5-9.5Z"/></g><g id="player-9"><path class="cls-1" d="M700.726,267h-81.014c0-8.284-6.716-15-15-15s-15,6.716-15,15h-80.986c-2.209,0-4,1.791-4,4v46c0,2.209,1.791,4,4,4h192c2.209,0,4-1.791,4-4v-46c0-2.209-1.791-4-4-4Z"/><text class="cls-6" transform="translate(594.528 273)"><tspan x="0" y="0">10</tspan></text><text id="player-label-9" class="cls-5" x="604.726" y="306.364" text-anchor="middle">Player</text><path id="button-9" class="button cls-4" d="M479.5,232h1c5.247,0,9.5,4.253,9.5,9.5h0c0,5.247-4.253,9.5-9.5,9.5h-1c-5.247,0-9.5-4.253-9.5-9.5h0c0-5.247,4.253-9.5,9.5-9.5Z"/></g></svg>`, 'image/svg+xml').documentElement;
+
 /**
  * Adds default player list to local storage, if no local storage exists
  */
@@ -1146,7 +1148,7 @@ function closeMenuPanels() {
 
 function assignSeats() {
   playerCount = JSON.parse(localStorage.getItem('remainingPlayerCount'));
-  tableCount = Math.ceil(playerCount / 9);
+  tableCount = Math.ceil(playerCount / 10);
   localStorage.setItem('tableCount', JSON.stringify(tableCount));
 
   playerList = JSON.parse(localStorage.getItem('remainingPlayers'));
@@ -1175,29 +1177,76 @@ function displaySeatingChart(tableCount, shuffledList) {
     document.querySelector('.table-wrapper').remove();
   }
 
-  let tableWrapper = document.createElement('div');
+  const TABLE_COLORS = ['#359BE1', '#F10437', '#FFC933', '#92B71A'];
+  const ns = 'http://www.w3.org/2000/svg';
+
+  function truncateName(name) {
+    return name.length > 10 ? name.slice(0, 9) + '…' : name;
+  }
+
+  const tableWrapper = document.createElement('div');
   tableWrapper.classList.add('table-wrapper');
 
   for (let i = 0; i < tableCount; i++) {
-    let tableContainer = document.createElement('div');
-    tableContainer.classList.add('table');
+    const tableNum = i + 1;
+    const color = TABLE_COLORS[i % 4];
+    const clone = tableSvgTemplate.cloneNode(true);
 
-    let tableName = document.createElement('h2');
-    tableName.innerText = 'Table ' + (i + 1);
-
-    tableContainer.append(tableName);
-
-    let tableList = document.createElement('ol');
-    tablePlayers = shuffledList.filter(player => player.table === (i + 1));
-
-    for (let p = 0; p < tablePlayers.length; p++) {
-      let player = document.createElement('li');
-      player.innerText = tablePlayers[p].name;
-      tableList.append(player);
+    // Query elements before rewriting IDs
+    const tableGroup = clone.querySelector('#table');
+    const tableLabel = clone.querySelector('#table-label');
+    const playerGroups = [];
+    const playerLabels = [];
+    for (let k = 0; k < 10; k++) {
+      playerGroups[k] = clone.querySelector('#player-' + k);
+      playerLabels[k] = clone.querySelector('#player-label-' + k);
     }
 
-    tableContainer.append(tableList);
-    tableWrapper.append(tableContainer);
+    // Rewrite all IDs to be unique per table instance
+    clone.querySelectorAll('[id]').forEach(el => {
+      el.id = el.id + '-t' + tableNum;
+    });
+
+    // Set table label
+    tableLabel.textContent = 'Table ' + tableNum;
+    tableLabel.setAttribute('fill', '#fff');
+    tableLabel.setAttribute('font-family', 'Kanit');
+    tableLabel.setAttribute('font-weight', 'normal');
+    tableLabel.setAttribute('font-size', '36');
+    tableLabel.setAttribute('y', '182');
+    tableLabel.setAttribute('dominant-baseline', 'central');
+
+    // Inject colored badge rect behind the label
+    const rect = document.createElementNS(ns, 'rect');
+    rect.setAttribute('x', '296');
+    rect.setAttribute('y', '155');
+    rect.setAttribute('width', '180');
+    rect.setAttribute('height', '54');
+    rect.setAttribute('rx', '8');
+    rect.setAttribute('ry', '8');
+    rect.setAttribute('fill', color);
+    tableGroup.insertBefore(rect, tableLabel);
+
+    // Build a seat-number → player map for this table
+    const seatMap = {};
+    shuffledList.filter(p => p.table === tableNum).forEach(p => {
+      seatMap[p.seat] = p;
+    });
+
+    // Populate names and hide empty seats
+    for (let k = 0; k < 10; k++) {
+      const seatNum = k + 1;
+      if (seatMap[seatNum]) {
+        playerLabels[k].textContent = truncateName(seatMap[seatNum].name);
+      } else {
+        playerGroups[k].style.display = 'none';
+      }
+    }
+
+    const tile = document.createElement('div');
+    tile.classList.add('table-tile');
+    tile.appendChild(clone);
+    tableWrapper.appendChild(tile);
   }
 
   HELPERS.getSeatingPanel().append(tableWrapper);
@@ -1615,7 +1664,7 @@ function getTableCount() {
   let tc = parseInt(localStorage.getItem('tableCount'), 10);
   if (!tc || Number.isNaN(tc)) {
     const playerCount = parseInt(localStorage.getItem('remainingPlayerCount') || '0', 10);
-    tc = Math.max(1, Math.ceil(playerCount / 9)); // 9 seats per table
+    tc = Math.max(1, Math.ceil(playerCount / 10)); // 10 seats per table
     localStorage.setItem('tableCount', JSON.stringify(tc));
   }
   return tc;
@@ -1632,10 +1681,10 @@ function getTableOccupancies() {
 }
 
 function ensureCapacity() {
-  // If every table is full (>= 9), add a new table
+  // If every table is full (>= 10), add a new table
   const counts = getTableOccupancies();
   const tc = getTableCount();
-  const allFull = counts.slice(1).every(c => c >= 9);
+  const allFull = counts.slice(1).every(c => c >= 10);
   if (allFull) {
     const newTc = tc + 1;
     localStorage.setItem('tableCount', JSON.stringify(newTc));
