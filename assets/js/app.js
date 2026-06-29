@@ -241,13 +241,20 @@ function generateHTML(tournamentResults, payouts) {
   bulletEntries.forEach(b => {
     entries.push({
       _sortKey: b.placedAt,
+      _createdAt: b.createdAt ?? 0,
       name: `${b.name} (Bullet ${b.bulletNumber})`,
       rebuys: "-",
       payout: "-"
     });
   });
 
-  entries.sort((a, b) => a._sortKey - b._sortKey);
+  // Primary: ascending placedAt (lower = better placement).
+  // Tiebreak: descending createdAt — a more recently created bullet was eliminated
+  // later in the tournament and therefore holds a better position.
+  entries.sort((a, b) => {
+    if (a._sortKey !== b._sortKey) return a._sortKey - b._sortKey;
+    return (b._createdAt ?? 0) - (a._createdAt ?? 0);
+  });
 
   // Assign sequential place numbers to every row
   entries.forEach((e, i) => { e.place = i + 1; });
