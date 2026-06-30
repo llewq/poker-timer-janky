@@ -1161,8 +1161,15 @@ function assignSeats() {
   }
 
   localStorage.setItem('remainingPlayers', JSON.stringify(shuffledList));
-  displaySeatingChart(tableCount, shuffledList);
 
+  const tableDealers = {};
+  for (let t = 1; t <= tableCount; t++) {
+    const dealer = shuffledList.find(p => p.table === t && p.seat === 1);
+    if (dealer) tableDealers[t] = dealer.pid;
+  }
+  localStorage.setItem('tableDealers', JSON.stringify(tableDealers));
+
+  displaySeatingChart(tableCount, shuffledList);
   localStorage.setItem('seatingAssigned', 'true');
 }
 
@@ -1197,9 +1204,11 @@ function displaySeatingChart(tableCount, shuffledList) {
     const tableLabel = clone.querySelector('#table-label');
     const playerGroups = [];
     const playerLabels = [];
+    const playerButtons = [];
     for (let k = 0; k < 10; k++) {
       playerGroups[k] = clone.querySelector('#player-' + k);
       playerLabels[k] = clone.querySelector('#player-label-' + k);
+      playerButtons[k] = clone.querySelector('#button-' + k);
     }
 
     // Rewrite all IDs to be unique per table instance
@@ -1216,16 +1225,26 @@ function displaySeatingChart(tableCount, shuffledList) {
     tableLabel.setAttribute('y', '182');
     tableLabel.setAttribute('dominant-baseline', 'central');
 
-    // Inject colored badge rect behind the label
-    const rect = document.createElementNS(ns, 'rect');
-    rect.setAttribute('x', '296');
-    rect.setAttribute('y', '155');
-    rect.setAttribute('width', '180');
-    rect.setAttribute('height', '54');
-    rect.setAttribute('rx', '8');
-    rect.setAttribute('ry', '8');
-    rect.setAttribute('fill', color);
-    tableGroup.insertBefore(rect, tableLabel);
+    // Inject badge: colored outer rect (creates top/bottom border), black inner rect
+    const borderRect = document.createElementNS(ns, 'rect');
+    borderRect.setAttribute('x', '296');
+    borderRect.setAttribute('y', '155');
+    borderRect.setAttribute('width', '180');
+    borderRect.setAttribute('height', '54');
+    borderRect.setAttribute('rx', '8');
+    borderRect.setAttribute('ry', '8');
+    borderRect.setAttribute('fill', color);
+    tableGroup.insertBefore(borderRect, tableLabel);
+
+    const bgRect = document.createElementNS(ns, 'rect');
+    bgRect.setAttribute('x', '296');
+    bgRect.setAttribute('y', '159');
+    bgRect.setAttribute('width', '180');
+    bgRect.setAttribute('height', '46');
+    bgRect.setAttribute('rx', '6');
+    bgRect.setAttribute('ry', '6');
+    bgRect.setAttribute('fill', '#000');
+    tableGroup.insertBefore(bgRect, tableLabel);
 
     // Build a seat-number → player map for this table
     const seatMap = {};
@@ -1233,14 +1252,45 @@ function displaySeatingChart(tableCount, shuffledList) {
       seatMap[p.seat] = p;
     });
 
-    // Populate names and hide empty seats
+    // Populate names, hide empty seats, and attach rotation click handlers
     for (let k = 0; k < 10; k++) {
       const seatNum = k + 1;
       if (seatMap[seatNum]) {
         playerLabels[k].textContent = truncateName(seatMap[seatNum].name);
+        if (seatNum !== 1) {
+          const tooltip = document.createElementNS(ns, 'title');
+          tooltip.textContent = 'Click to assign dealer';
+          playerGroups[k].insertBefore(tooltip, playerGroups[k].firstChild);
+          playerGroups[k].style.cursor = 'pointer';
+          playerGroups[k].addEventListener('click', (function(seat, tNum) {
+            return function() {
+              const remaining = JSON.parse(localStorage.getItem('remainingPlayers'));
+              const N = remaining.filter(p => p.table === tNum).length;
+              remaining.forEach(p => {
+                if (p.table !== tNum) return;
+                p.seat = ((p.seat - seat + N) % N) + 1;
+              });
+              localStorage.setItem('remainingPlayers', JSON.stringify(remaining));
+              displaySeatingChart(parseInt(localStorage.getItem('tableCount'), 10), remaining);
+            };
+          })(seatNum, tableNum));
+        }
       } else {
         playerGroups[k].style.display = 'none';
       }
+    }
+
+    // Hide all button dots, then show only the dealer's
+    const tableDealers = JSON.parse(localStorage.getItem('tableDealers') || '{}');
+    const dealerPid = tableDealers[tableNum];
+    for (let k = 0; k < 10; k++) {
+      if (playerButtons[k]) playerButtons[k].style.display = 'none';
+    }
+    const dealerPlayer = dealerPid != null
+      ? shuffledList.find(p => p.pid === dealerPid && p.table === tableNum)
+      : null;
+    if (dealerPlayer && playerButtons[dealerPlayer.seat - 1]) {
+      playerButtons[dealerPlayer.seat - 1].style.display = '';
     }
 
     const tile = document.createElement('div');

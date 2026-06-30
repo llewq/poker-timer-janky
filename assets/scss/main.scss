@@ -569,8 +569,9 @@ form .counter {
   backdrop-filter: blur(5px);
   .table-wrapper {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
-    gap: 2rem;
+    grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
+    gap: 3rem;
+    row-gap: 4rem;
     width: 100%;
     place-content: center;
     justify-items: center;
